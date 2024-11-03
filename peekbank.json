@@ -5,7 +5,7 @@ layout: null
 {
   "host":"34.210.173.143",
   "current":"2022.1",
-  "supported": ["2022.1","2021.1", "peekbank_dev","workshop_2024_dev"],
+  "supported": ["2022.1","2021.1", "peekbank_dev","workshop_2024_dev","grant_2024_dev"],
   "historical":[],
   "user": "reader",
   "password": "gazeofraccoons"
