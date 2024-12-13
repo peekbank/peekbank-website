@@ -12,16 +12,16 @@ The Peekbank data framework consists of three components (see Figure on right):
 2. populating a relational database
 3. providing an interface to the database 
 
-The code used to process raw datasets is hosted in <a target="_blank" href="https://github.com/langcog/peekbank-data-import" style="color:#3399f3"><code>peekbank-data-import</code></a> and processed data files are hosted on the public <a target="_blank" href="https://osf.io/pr6wu/" style="color:#3399f3">Peekbank OSF repository</a>.
+The code used to process raw datasets is hosted in <a target="_blank" href="https://github.com/peekbank/peekbank-data-import" style="color:#3399f3"><code>peekbank-data-import</code></a> and processed data files are hosted on the public <a target="_blank" href="https://osf.io/pr6wu/" style="color:#3399f3">Peekbank OSF repository</a>.
 
-The <a target="_blank" href="https://github.com/langcog/peekds" style="color:#3399f3"><code>peekds</code></a> library helps researchers convert and validate existing datasets to use the relational format of the database.
+The <a target="_blank" href="https://github.com/peekbank/peekds" style="color:#3399f3"><code>peekds</code></a> library helps researchers convert and validate existing datasets to use the relational format of the database.
 
-The <a target="_blank" href="https://github.com/langcog/peekbank" style="color:#3399f3"><code>peekbank</code></a> module (Python) creates a database with the relational schema and populates it with the standardized datasets produced by peekds. 
+The <a target="_blank" href="https://github.com/peekbank/peekbank" style="color:#3399f3"><code>peekbank</code></a> module (Python) creates a database with the relational schema and populates it with the standardized datasets produced by peekds. 
 The database is implemented in MySQL, an industry standard relational database, which may be accessed by a variety of programming languages over the internet. 
 
-The <a target="_blank" href="https://langcog.github.io/peekbankr/index.html" style="color:#3399f3"><code>peekbankr</code></a> library (R) provides an application programming interface, or API, that offers high-level abstractions for accessing data in Peekbank.
+The <a target="_blank" href="https://peekbank.github.io/peekbankr/index.html" style="color:#3399f3"><code>peekbankr</code></a> library (R) provides an application programming interface, or API, that offers high-level abstractions for accessing data in Peekbank.
 
-The <a target="_blank" href="https://github.com/langcog/peekbank-shiny" style="color:#3399f3"><code>peekbank-shiny</code></a> app provides a tool for interactively visualizing the data.
+The <a target="_blank" href="https://github.com/peekbank/peekbank-shiny" style="color:#3399f3"><code>peekbank-shiny</code></a> app provides a tool for interactively visualizing the data.
 
 </div>
 
@@ -64,12 +64,12 @@ https://docs.google.com/spreadsheets/d/e/2PACX-1vR4AiOkIzIMbb2C9ksCpu6aWqYaIEiA7
 The Peekbank project consists of the following repositories and tools.
 
 - Peekbank OSF repository, containing raw and standardized datasets: <a target="_blank" href="https://osf.io/pr6wu/" style="color:#3399f3">https://osf.io/pr6wu/</a>
-- <code>peekbank-data-import</code>, Peekbank data import scripts: <a target="_blank" href="https://github.com/langcog/peekbank-data-import" style="color:#3399f3">https://github.com/langcog/peekbank-data-import</a>
-- <code>peekds</code>, Peekbank data standard and data import functions: <a target="_blank" href="https://github.com/langcog/peekds" style="color:#3399f3">https://github.com/langcog/peekds</a>
-- <code>peekbankr</code>, R package for accessing the database: <a target="_blank" href="https://github.com/langcog/peekbankr" style="color:#3399f3">https://github.com/langcog/peekbankr</a>
-- <code>peekbank</code>, Peekbank database management: <a target="_blank" href="https://github.com/langcog/peekbank" style="color:#3399f3">https://github.com/langcog/peekbank</a>
-- <code>peekbank-shiny</code>, interactive data visualizations using Shiny: <a target="_blank" href="https://github.com/langcog/peekbank-shiny" style="color:#3399f3">https://github.com/langcog/peekbank-shiny</a>
-- <code>peekbank-website</code>, code for website frontend: <a target="_blank" href="https://github.com/langcog/peekbank-website" style="color:#3399f3">https://github.com/langcog/peekbank-website</a>
+- <code>peekbank-data-import</code>, Peekbank data import scripts: <a target="_blank" href="https://github.com/peekbank/peekbank-data-import" style="color:#3399f3">https://github.com/peekbank/peekbank-data-import</a>
+- <code>peekds</code>, Peekbank data standard and data import functions: <a target="_blank" href="https://github.com/peekbank/peekds" style="color:#3399f3">https://github.com/peekbank/peekds</a>
+- <code>peekbankr</code>, R package for accessing the database: <a target="_blank" href="https://github.com/peekbank/peekbankr" style="color:#3399f3">https://github.com/peekbank/peekbankr</a>
+- <code>peekbank</code>, Peekbank database management: <a target="_blank" href="https://github.com/peekbank/peekbank" style="color:#3399f3">https://github.com/peekbank/peekbank</a>
+- <code>peekbank-shiny</code>, interactive data visualizations using Shiny: <a target="_blank" href="https://github.com/peekbank/peekbank-shiny" style="color:#3399f3">https://github.com/peekbank/peekbank-shiny</a>
+- <code>peekbank-website</code>, code for website frontend: <a target="_blank" href="https://github.com/peekbank/peekbank-website" style="color:#3399f3">https://github.com/peekbank/peekbank-website</a>
 
 Peekbank is open source and under active development. If you run encounter a problem, please file an issue in the GitHub Issues page of the appropriate repository.
 
