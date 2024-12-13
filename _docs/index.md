@@ -8,7 +8,7 @@ redirect_from: /docs/index.html
 ## Getting Data
 
 If you're ready to download some data and play with it on your own, check out the [data access tutorial]({{ "/docs/data-access" | prepend: site.baseurl }})
-to learn about the [peekbankr R package](https://github.com/langcog/peekbankr).
+to learn about the [peekbankr R package](https://github.com/peekbank/peekbankr).
 
 ## Sharing Data
 
