@@ -10,7 +10,6 @@ import react from "@astrojs/react";
 export default defineConfig({
   // Set your production site and base for GitHub Pages project site
   site: "https://peekbank.github.io",
-  base: "/peekbank-docs/",
   vite: {
     plugins: [tailwindcss()],
   },
@@ -25,8 +24,8 @@ export default defineConfig({
       plugins: [
         starlightThemeNova({
           nav: [
-            { label: "Docs", href: "/start/gettingstarted" },
-            { label: "Shiny", href: "/shiny" },
+            { label: "Docs", href: "start/gettingstarted" },
+            { label: "Shiny", href: "shiny" },
           ],
         }),
       ],

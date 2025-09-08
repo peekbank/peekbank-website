@@ -31,7 +31,11 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build
+        env:
+          ASTRO_BASE: /peekbank-docs/
+        run: |
+          echo "Using base=$ASTRO_BASE"
+          npx astro build --base "$ASTRO_BASE"
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
