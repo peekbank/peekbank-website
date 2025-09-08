@@ -24,8 +24,8 @@ export default defineConfig({
       plugins: [
         starlightThemeNova({
           nav: [
-            { label: "Docs", href: "start/gettingstarted" },
-            { label: "Shiny", href: "shiny" },
+            { label: "Docs", href: "/start/gettingstarted" },
+            { label: "Shiny", href: "/shiny" },
           ],
         }),
       ],
