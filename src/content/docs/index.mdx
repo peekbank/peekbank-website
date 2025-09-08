@@ -1,0 +1,79 @@
+---
+title: "Peekbank"
+description: Get started building your docs site with Starlight.
+template: splash
+head:
+  - tag: style
+    content: |
+      .content-panel:first-of-type{
+        display: none !important;
+      }
+      .content-panel{
+        border: none !important;
+      }
+---
+
+import RotatingGallery from "../../components/gallery.jsx";
+import Stats from "../../components/stats.astro";
+import peekbankVis from "../../assets/peekbank_item_vis.png";
+
+<div class="flex flex-col items-center text-center max-w-4xl mx-auto sm:px-2 md:px-8 grid-pattern">
+
+{" "}
+
+<RotatingGallery client:load />
+<h2 class="font-librebask leading-normal text-2xl md:text-3xl lg:text-4xl mt-8 sm:mt-16 mb-8 font-black text-gray-900 dark:text-white">
+  Peekbank is an open database of infant <wbr />looking-while-listening data
+</h2>
+
+{" "}
+
+<div class="flex gap-6 mb-16 flex-wrap justify-center">
+  <a
+    href="/start/gettingstarted"
+    class="font-librebask no-underline bg-black text-white font-medium px-8 py-4 rounded-2xl transition-all hover:scale-105 flex items-center gap-2"
+  >
+    Get Started <span>→</span>
+  </a>
+  <a
+    href="/shiny"
+    class="hidden sm:block no-underline bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-8 py-4 rounded-2xl transition-all hover:scale-105 flex items-center gap-2"
+  >
+    Shiny Visualization <span>↗</span>
+  </a>
+</div>
+<img
+  src={peekbankVis.src}
+  alt="Feature showcase"
+  class="w-full max-w-2xl border-3 sm:border-4 border-black rounded-lg p-4 mb-20"
+/>
+
+{/* <Stats /> */}
+
+{" "}
+
+  <div class="max-w-2xl flex-col items-start">
+    <div class="transform text-start">
+      <h1 class="font-librebask">What is peekbank?</h1>
+      <div class="sm:text-lg"> {/* applying directly to p clashes with starlight's theming*/}
+      <p>
+        The Peekbank project is an open database storing
+        eye-tracking data on children's word recognition in a uniform, tabular format. The project brings together data shared by different research groups, spanning <strong>39</strong> datasets with a total of <strong>3537</strong> children tested.
+        
+        If you want to browse existing data while plannign a study or want to contrast the data you collected to preexisting experiments on a low level, check out the documentation! We also have pointers if you are interested in contributing your data to peekbank to make infant research more open 🦝
+      </p>
+      </div>
+
+      <div class="flex gap-6 mt-10 flex-wrap justify-start">
+        <a
+          href="/start/gettingstarted"
+          class="font-librebask no-underline bg-black text-white font-medium px-6 py-3 rounded-2xl transition-all hover:scale-105 flex items-center gap-2"
+        >
+          Get Started <span>→</span>
+        </a>
+      
+      </div>
+    </div>
+  </div>
+
+</div>

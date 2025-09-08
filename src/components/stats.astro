@@ -1,0 +1,24 @@
+---
+const stats = [
+  { id: 1, name: "Datasets", value: "39" },
+  { id: 2, name: "Children", value: "3537" },
+  { id: 3, name: "Trials", value: "125430" },
+];
+---
+
+<div class="bg-white py-24 sm:py-32">
+  <div class="mx-auto max-w-7xl px-6 lg:px-8">
+    <div class="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-3">
+      {
+        stats.map((stat) => (
+          <div class="mx-auto flex max-w-xs flex-col gap-y-2 mt-0">
+            <div class="text-3xl  font-semibold tracking-tight text-gray-900 sm:text-5xl">
+              {stat.value}
+            </div>
+            <div class="text-base/7 text-gray-600">{stat.name}</div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</div>
