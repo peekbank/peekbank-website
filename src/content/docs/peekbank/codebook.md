@@ -3,9 +3,8 @@ title: Codebook
 description: A guide in my new Starlight docs site.
 ---
 
-Guides lead a user through a specific task they want to accomplish, often with a sequence of steps.
-Writing a good guide requires thinking about what your users are trying to do.
+The codebook for individual columns in Peekbank data columns can be found in the table below (<a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vR4AiOkIzIMbb2C9ksCpu6aWqYaIEiA72voek4y_05y9eY9J6XS5tLhnHZ5xnDk9LxKihicd0gN9BZY/pubhtml" target="_blank">link</a>):
 
-## Further reading
 
-- Read [about how-to guides](https://diataxis.fr/how-to-guides/) in the Diátaxis framework
+<iframe src="
+https://docs.google.com/spreadsheets/d/e/2PACX-1vR4AiOkIzIMbb2C9ksCpu6aWqYaIEiA72voek4y_05y9eY9J6XS5tLhnHZ5xnDk9LxKihicd0gN9BZY/pubhtml?widget=false&amp;headers=false&chrome=false" style="height: 600px; width: 100%; border: none; position:relative"></iframe> 

@@ -62,3 +62,6 @@ All commands are run from the root of the project, from a terminal:
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
 | `npm run astro -- --help` | Get help using the Astro CLI                     |
 
+### Random Notes/Oddities
+
+* The nova starlight theme likes to apply top marginsof 1 rem to a various of elements. If you have a row of elements and they are misalinged, be sure to explicity set a (top) margin via tailwind to override this.

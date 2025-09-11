@@ -6,11 +6,9 @@ import starlightThemeNova from "starlight-theme-nova";
 
 import react from "@astrojs/react";
 
-// https://astro.build/config
 const base = process.env.ASTRO_BASE || "/";
 
 export default defineConfig({
-  // Set your production site and base for GitHub Pages project site
   site: "https://peekbank.github.io",
   base,
   vite: {
@@ -47,7 +45,9 @@ export default defineConfig({
           label: "Start Here",
           items: [
             { label: "Getting Started", slug: "start/gettingstarted" },
-            { label: "Data Access", slug: "start/dataaccess" },
+            { label: "Data Access - PeekbankR", slug: "start/dataaccess" },
+            { label: "Data Access - SQL", slug: "start/dataaccesssql" },
+            { label: "Important Links", slug: "start/importantlinks" },
           ],
         },
         {
@@ -56,7 +56,7 @@ export default defineConfig({
             { label: "Framework", slug: "peekbank/framework" },
             { label: "Data Schema", slug: "peekbank/dataschema" },
             { label: "Codebook", slug: "peekbank/codebook" },
-            { label: "Main Repos", slug: "peekbank/mainrepos" },
+            { label: "Releases", slug: "peekbank/releases" },
           ],
         },
         {

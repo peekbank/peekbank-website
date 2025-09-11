@@ -1,0 +1,21 @@
+---
+title: Peekbanz Visualization
+description: .
+template: splash
+head:
+  - tag: style
+    content: |
+      .content-panel:first-of-type{
+        display: none !important;
+      }
+      .content-panel{
+        border: none !important;
+        padding: 0;
+      }
+      .sl-container{
+        max-width: 100%;
+      }
+---
+<div class="w-full">
+    <iframe src="https://peekbank-connect.com/viz" style="position: absolute; height: 100%; width: 100%; border: none"></iframe>
+</div>

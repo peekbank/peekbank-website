@@ -1,6 +1,6 @@
 ---
 title: "Peekbank"
-description: Get started building your docs site with Starlight.
+description: Peekbank is an open database of infant looking-while-listening data
 template: splash
 head:
   - tag: style
@@ -15,6 +15,7 @@ head:
 
 import RotatingGallery from "../../components/gallery.jsx";
 import Stats from "../../components/stats.astro";
+import { Image } from "astro:assets";
 import peekbankVis from "../../assets/peekbank_item_vis.png";
 
 <div class="flex flex-col items-center text-center max-w-4xl mx-auto sm:px-2 md:px-8 grid-pattern">
@@ -42,8 +43,10 @@ import peekbankVis from "../../assets/peekbank_item_vis.png";
     Shiny Visualization <span>↗</span>
   </a>
 </div>
-<img
-  src={peekbankVis.src}
+<Image
+  src={peekbankVis}
+  width={3000}
+  height={1800}
   alt="Feature showcase"
   class="w-full max-w-2xl border-3 sm:border-4 border-black rounded-lg p-4 mb-20"
 />

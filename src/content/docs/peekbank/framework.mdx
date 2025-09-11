@@ -1,0 +1,36 @@
+---
+title: Framework
+description: A guide in my new Starlight docs site.
+---
+
+import { Image } from 'astro:assets';
+import flowchartImage from "/src/assets/legacy/peekbankflowchartv6.png";
+
+<div class="flex flex-col xl:flex-row gap-8 md:gap-8 items-center lg:items-start">
+  <div class="flex-1">
+    The Peekbank data framework consists of three components (see Figure on right):
+
+    1. processing raw experimental datasets
+    2. populating a relational database
+    3. providing an interface to the database
+
+    The code used to process raw datasets is hosted in <a target="_blank" class="no-underline" href="https://github.com/peekbank/peekbank-data-import" style="color:#3399f3"><code>peekbank-data-import</code></a> and processed data files are hosted on the public <a target="_blank" href="https://osf.io/pr6wu/" style="color:#3399f3">Peekbank OSF repository</a>.
+
+    The <a target="_blank" class="no-underline" href="https://github.com/peekbank/peekbank" style="color:#3399f3"><code>peekbank</code></a> module (Python) creates a database with the relational schema and populates it with the standardized datasets produced by peekds.
+    The database is implemented in MySQL, an industry standard relational database, which may be accessed by a variety of programming languages over the internet.
+
+    The <a target="_blank" class="no-underline" href="https://peekbank.github.io/peekbankr/index.html" style="color:#3399f3"><code>peekbankr</code></a> library (R) provides an application programming interface, or API, that offers high-level abstractions for accessing data in Peekbank and helps researchers convert and validate existing datasets to use the relational format of the database.
+
+    The <a target="_blank" class="no-underline" href="https://github.com/peekbank/peekbank-shiny" style="color:#3399f3"><code>peekbank-shiny</code></a> app provides a tool for interactively visualizing the data.
+
+  </div>
+  <div class="flex-shrink-0 mx-auto md:mx-0">
+    <Image 
+      src={flowchartImage} 
+      width={720}
+      height={960}
+      alt="Peekbank data framework flowchart"
+      class="max-w-[360px] h-auto"
+    />
+  </div>
+</div>

@@ -1,0 +1,108 @@
+---
+title: Releases
+description: .
+---
+
+We release new versions of the Peekbank database as new data becomes available. To ensure reproducibility, we maintain database versions associated with each publication by the Peekbank team. Visualizations and the `peekbankr` package will always use the most recent database version by default. The R API `peekbankr` can be directed to use any recent database version by using the `db_version` parameter.
+
+<div class="my-8">
+  <div class="max-w-4xl mx-auto">
+    <div class="space-y-6">
+     
+      <div class="flex flex-col sm:flex-row gap-4 items-center">
+        <div class="flex-shrink-0">
+          <h4 class="text-blue-500 text-xl font-semibold">
+            <a name="2022.1"></a>
+            2022.1
+          </h4>
+        </div>
+        <div class="flex-1 mt-0">
+          <p class="text-gray-700">
+            Peekbank version for reproducing Zettersten et al. (2023), 
+            <em>Behavior Research Methods</em>, 
+            <a 
+              href="https://doi.org/10.3758/s13428-022-01906-4" 
+              target="_blank"
+              class="text-blue-600 hover:text-blue-800 underline"
+            > https://doi.org/10.3758/s13428-022-01906-4</a>.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-4 items-center">
+        <div class="flex-shrink-0">
+          <h4 class="text-blue-500 text-xl font-semibold">
+            <a name="2021.1"></a>
+            2021.1
+          </h4>
+        </div>
+        <div class="flex-1 mt-0">
+          <p class="text-gray-700">
+            <strong>Initial release</strong>. Peekbank version for reproducing Zettersten et al. (2021),
+            <em>CogSci</em>,
+            <a
+              href="https://psyarxiv.com/ep693"
+              target="_blank"
+              class="text-blue-600 hover:text-blue-800 underline"
+            >https://psyarxiv.com/ep693</a>.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+## Using Peekbank Locally
+
+For intensive use cases, e.g. repeatedly transferring more than 5 GB of data, users may wish to download one or more yearly releases of the database for installation on a local MySQL server (either on their own machine or a machine on their local network). The release databases can be downloaded using the `mysqldump` command:
+
+<div class="my-6 p-4 bg-gray-100 rounded-lg overflow-x-auto">
+  <code class="text-sm font-mono">
+    mysqldump -h $HOST_FROM_JSON -u $USER_FROM_JSON -p$PASSWORD_FROM_JSON
+    --databases $DATABASES | mysql -u $LOCAL_USER -p$LOCAL_PASSWORD
+  </code>
+</div>
+
+The first part of this command (`mysqldump`) outputs the content of the database as a text stream of SQL statements. The second part reads it into end-user's local MySQL server. We leave it as an exercise to the reader to replace the variables above (such as `$HOSTNAME`) with the correct values from the JSON file that is used by the R package to coordinate and authorize MySQL access, [peekbank.json](https://peekbank.stanford.edu/peekbank.json). The correspondence between variables is as follows:
+
+<div class="my-8 flex justify-center">
+  <div class="max-w-2xl w-full">
+    <div class="overflow-hidden rounded-lg border border-gray-200">
+      <div class="divide-y divide-gray-200">
+        <div class="grid grid-cols-2 gap-4 p-3 bg-gray-50 font-semibold">
+          <div>Variable</div>
+          <div>JSON Field</div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 p-3 mt-0">
+          <div class="font-mono text-sm">$HOST_FROM_JSON</div>
+          <div class="mt-0">"host" field in JSON</div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 p-3 bg-gray-50 mt-0">
+          <div class="font-mono text-sm">$USER_FROM_JSON</div>
+          <div class="mt-0">"user" field in JSON</div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 p-3 mt-0">
+          <div class="font-mono text-sm">$PASSWORD_FROM_JSON</div>
+          <div class="mt-0">"password" in JSON</div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 p-3 bg-gray-50 mt-0">
+          <div class="font-mono text-sm">$DATABASES</div>
+          <div class="mt-0">{(2021.1, "peekbank_dev")}</div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 p-3 mt-0">
+          <div class="font-mono text-sm">$LOCAL_USER</div>
+          <div class="mt-0">
+            Local MySQL user (possibly <em>root</em>)
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 p-3 bg-gray-50 mt-0">
+          <div class="font-mono text-sm">$LOCAL_PASSWORD</div>
+          <div class="mt-0">Local MySQL password for user</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+Once you have a local MySQL installation, refer to the documentation for `peekbankr` regarding how to use a local database server. For most use cases, using the API with the default remote server (hosted on Amazon EC2) should be sufficient.

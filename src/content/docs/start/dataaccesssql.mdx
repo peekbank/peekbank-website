@@ -1,0 +1,36 @@
+---
+title: Data Access - SQL
+description: A guide on how to acces peekbank data using peekbankr.
+---
+
+import { CodeTabItem, CodeTabs } from "starlight-theme-nova/components";
+
+If you want to pull the data into your existing workflows, you can connect to our online database directly. Use the following credentials to do so:
+
+- **Hostname**: `34.210.173.143`
+- **Port**: `3306`
+- **Adapter**: MariaDB
+- **Database**: `2025.1` (or any [supported release](../../peekbank/releases) like `2022.1`, `2021.1`)
+- **Username**: `reader`
+- **Password**: `gazeofraccoons`
+
+You can then access the DB in your programming language of choice:
+
+<CodeTabs>
+  <CodeTabItem
+    label="Python"
+    lang="python"
+    code={`import pymysql\n\nconn = pymysql.connect(\n    host='34.210.173.143',\n    port=3306,\n    database='2025.1',\n    user='reader',\n    password='gazeofraccoons'\n)\n\ncursor = conn.cursor()\ncursor.execute("SELECT dataset_name, shortcite FROM datasets LIMIT 5")\nresults = cursor.fetchall()\nconn.close()\n`}
+  />
+  <CodeTabItem
+    label="R DBI"
+    lang="r"
+    code={`library(DBI)\nlibrary(RMariaDB)\n\ncon <- dbConnect(\n  MariaDB(),\n  host = "34.210.173.143",\n  port = 3306,\n  dbname = "2025.1",\n  username = "reader",\n  password = "gazeofraccoons"\n)\n\ndatasets <- dbGetQuery(con, "\n  SELECT dataset_name, shortcite, COUNT(DISTINCT subject_id) as n_subjects\n  FROM datasets d\n  JOIN administrations a ON d.dataset_id = a.dataset_id\n  GROUP BY d.dataset_id, dataset_name, shortcite\n")\n\nhead(datasets)\ndbDisconnect(con)`}
+  />
+
+    <CodeTabItem label="JavaScript/Deno" lang="ts" code={`import { Client } from "https://deno.land/x/mysql/mod.ts";\n\nconst client = await new Client().connect({\n  hostname: "34.210.173.143",\n  port: 3306,\n  username: "reader",\n  password: "gazeofraccoons",\n  db: "2025.1",\n});\n\nconst datasets = await client.execute(\n  "SELECT dataset_name, shortcite FROM datasets LIMIT 5"\n);\nconsole.log(datasets.rows);\nawait client.close();`} />
+
+</CodeTabs>
+
+
+Refer to the [Data Schema](../../peekbank/dataschema/) to learn more about the shape of the data.

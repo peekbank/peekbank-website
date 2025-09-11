@@ -1,0 +1,67 @@
+---
+import { Image } from "astro:assets";
+
+export interface TeamMember {
+  name: string;
+  image: string;
+  alt: string;
+  link?: string;
+}
+
+interface Props {
+  members: TeamMember[];
+}
+
+const { members } = Astro.props;
+
+const images = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/people/*.{jpeg,jpg,png,gif}"
+);
+---
+
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 clear-both">
+  {
+    members.map(async (member) => {
+      const imagePath = `/src/assets/people/${member.image}`;
+      let imageModule;
+
+      if (images[imagePath]) {
+        imageModule = await images[imagePath]();
+      }
+
+      const cardContent = (
+        <>
+          {imageModule && (
+            <Image
+              src={imageModule.default}
+              alt={member.alt}
+              class="w-full h-auto aspect-square object-cover"
+            />
+          )}
+          <div class="p-4 text-center text-sm h-16 mt-0 flex items-center justify-center">
+            {member.name}
+          </div>
+        </>
+      );
+
+      return (
+        <div class="group mt-0">
+          <div class="border-1 rounded-md border-gray-400 hover:border-gray-600 hover:scale-105 transition-all duration-200 ease-out mt-0 cursor-pointer overflow-hidden">
+            {member.link ? (
+              <a
+                href={member.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="block no-underline"
+              >
+                {cardContent}
+              </a>
+            ) : (
+              <div class="block">{cardContent}</div>
+            )}
+          </div>
+        </div>
+      );
+    })
+  }
+</div>
