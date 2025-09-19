@@ -75,60 +75,65 @@ const RaccoonEyes = () => {
       rightHighlight.setAttribute("d", rightPath);
     }
 
-    function updateEyePosition(eye, pupil, highlight, mouseX, mouseY) {
+    function updateBothEyes(mouseX, mouseY) {
       const svgRect = svg.getBoundingClientRect();
 
       // Mouse coordinates to SVG coordinate system
       const svgX = ((mouseX - svgRect.left) / svgRect.width) * SVG_VIEWPORT_DIM;
       const svgY = ((mouseY - svgRect.top) / svgRect.height) * SVG_VIEWPORT_DIM;
 
-      const deltaX = svgX - eye.cx;
-      const deltaY = svgY - eye.cy;
+      // Calculate center point between the eyes
+      const centerX = (leftEye.cx + rightEye.cx) / 2;
+      const centerY = (leftEye.cy + rightEye.cy) / 2;
 
-      const scale = Math.min(
-        1,
-        eye.maxDistance / Math.sqrt(deltaX * deltaX + deltaY * deltaY) // vector length
-      );
-      const newX = eye.cx + deltaX * scale;
-      const newY = eye.cy + deltaY * scale;
-      pupil.setAttribute("cx", newX);
-      pupil.setAttribute("cy", newY);
+      // Calculate shared direction vector from center point to mouse
+      const deltaX = svgX - centerX;
+      const deltaY = svgY - centerY;
+      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 
-      // Update highlight position (offset slightly from pupil)
-      const highlightOffset = 2;
-      const highlightX = newX - highlightOffset;
-      const highlightY = newY - highlightOffset;
+      // Normalize the direction vector
+      let directionX = 0;
+      let directionY = 0;
 
-      // Update highlight path
-      const newPath = `M${highlightX + 4.347},${
-        highlightY - 2.174
-      }c0,2.754-2.526,2.174-2.174,2.174c-1.2,0-2.173-0.974-2.173-2.174c0-1.2,0.973-2.174,2.173-2.174C${
-        highlightX + 3.374
-      },${highlightY - 4.347},${highlightX + 4.347},${highlightY - 3.374},${
-        highlightX + 4.347
-      },${highlightY - 2.174}z`;
-      highlight.setAttribute("d", newPath);
+      if (distance > 0) {
+        directionX = deltaX / distance;
+        directionY = deltaY / distance;
+      }
+
+      // Apply the same direction to both eyes
+      [
+        { eye: leftEye, pupil: leftPupil, highlight: leftHighlight },
+        { eye: rightEye, pupil: rightPupil, highlight: rightHighlight }
+      ].forEach(({ eye, pupil, highlight }) => {
+        // Apply direction with eye-specific max distance
+        const targetX = eye.cx + directionX * eye.maxDistance;
+        const targetY = eye.cy + directionY * eye.maxDistance;
+
+        pupil.setAttribute("cx", targetX);
+        pupil.setAttribute("cy", targetY);
+
+        // Update highlight position
+        const highlightOffset = 2;
+        const highlightX = targetX - highlightOffset;
+        const highlightY = targetY - highlightOffset;
+
+        const newPath = `M${highlightX + 4.347},${
+          highlightY - 2.174
+        }c0,2.754-2.526,2.174-2.174,2.174c-1.2,0-2.173-0.974-2.173-2.174c0-1.2,0.973-2.174,2.173-2.174C${
+          highlightX + 3.374
+        },${highlightY - 4.347},${highlightX + 4.347},${highlightY - 3.374},${
+          highlightX + 4.347
+        },${highlightY - 2.174}z`;
+        highlight.setAttribute("d", newPath);
+      });
     }
 
     function handleMouseMove(event) {
       if (isSmallScreen) {
         return; // Don't track mouse on small screens
       }
-      
-      updateEyePosition(
-        leftEye,
-        leftPupil,
-        leftHighlight,
-        event.clientX,
-        event.clientY
-      );
-      updateEyePosition(
-        rightEye,
-        rightPupil,
-        rightHighlight,
-        event.clientX,
-        event.clientY
-      );
+
+      updateBothEyes(event.clientX, event.clientY);
     }
 
     if (isSmallScreen) {
