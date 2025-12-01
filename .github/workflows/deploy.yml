@@ -32,7 +32,7 @@ jobs:
 
       - name: Build
         env:
-          ASTRO_BASE: /peekbank-docs/
+          ASTRO_BASE: /peekbank-website/
         run: |
           echo "Using base=$ASTRO_BASE"
           npx astro build --base "$ASTRO_BASE"
