@@ -1,0 +1,8 @@
+{
+  "host":"34.210.173.143",
+  "current":"2022.1",
+  "supported": ["2022.1","2021.1", "peekbank_dev","workshop_2024_dev","grant_2024_dev","2025.1","2025.2"],
+  "historical":[],
+  "user": "reader",
+  "password": "gazeofraccoons"
+}
