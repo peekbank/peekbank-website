@@ -1,0 +1,65 @@
+---
+// Mounts one Quarto-built explorer flat in the page (no iframe).
+// Fragments are produced by scripts/build-viz.mjs from the viz/ submodule.
+import "../styles/viz-embed.css";
+
+interface Props {
+  slug: string;
+}
+const { slug } = Astro.props;
+
+const fragments = import.meta.glob("./viz/*.fragment.html", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+});
+const fragment = fragments[`./viz/${slug}.fragment.html`];
+if (!fragment) {
+  throw new Error(
+    `No viz fragment for "${slug}" — run: node scripts/build-viz.mjs`
+  );
+}
+
+const base = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : import.meta.env.BASE_URL + "/";
+const vizBase = `${base}viz/`;
+---
+
+<link rel="stylesheet" href={`${vizBase}quarto-ojs.css`} />
+
+{/* explorers read this before fetching data; must be set before the runtime */}
+<script is:inline define:vars={{ vizBase }}>
+  window.PEEKBANK_DATA_BASE = `${vizBase}slices/`;
+</script>
+
+<Fragment set:html={fragment} />
+
+<script is:inline type="module" src={`${vizBase}quarto-ojs-runtime.js`}></script>
+<script is:inline type="module">
+  // same bootstrap Quarto emits on its own pages; paths are only used for
+  // FileAttachment/import resolution, which the explorers don't use
+  window._ojs.paths.runtimeToDoc = "../..";
+  window._ojs.paths.runtimeToRoot = "../..";
+  window._ojs.paths.docToRoot = "";
+  window._ojs.selfContained = false;
+  window._ojs.runtime.interpretFromScriptTags();
+
+  // minimal replacement for bootstrap's Tab plugin (Quarto tabsets use
+  // data-bs-toggle markup)
+  document.addEventListener("click", (ev) => {
+    const tab = ev.target.closest('.pb-viz [data-bs-toggle="tab"]');
+    if (!tab) return;
+    ev.preventDefault();
+    const tabset = tab.closest(".panel-tabset");
+    for (const t of tabset.querySelectorAll('[data-bs-toggle="tab"]')) {
+      t.classList.toggle("active", t === tab);
+      t.setAttribute("aria-selected", t === tab ? "true" : "false");
+    }
+    const target = tabset.querySelector(tab.dataset.bsTarget);
+    for (const pane of tabset.querySelectorAll(".tab-pane")) {
+      pane.classList.toggle("active", pane === target);
+      pane.classList.toggle("show", pane === target);
+    }
+  });
+</script>

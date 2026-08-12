@@ -6,14 +6,15 @@ head:
     content: |
       .content-panel:first-of-type{ display: none !important; }
       .content-panel{ border: none !important; padding: 0; }
-      .sl-container{ max-width: 100%; }
-      .pb-switcher { display: flex; gap: 0.4rem; flex-wrap: wrap; padding: 0.5rem 1rem; border-bottom: 1px solid #e5e7eb; }
+      .sl-container{ max-width: 100%; margin: 0; }
+      .sl-markdown-content { margin-top: 0 !important; }
+      .pb-switcher { display: flex; gap: 0.4rem; flex-wrap: wrap; padding: 0.5rem 1.5rem; border-bottom: 1px solid #e5e7eb; }
       .pb-switch { background: #eef2f6; border-radius: 10px; padding: 0.15rem 0.7rem; font-size: 0.85rem; text-decoration: none; color: #1f2937; }
       .pb-switch:hover { background: #dbeafe; }
-      .pb-frame-wrap { position: absolute; inset: 6.5rem 0 0 0; }
 ---
 
+import VizExplorer from "../../../components/VizExplorer.astro";
+
 <div class="pb-switcher"><a href="../accuracy/" class="pb-switch">Accuracy</a> <a href="../rt/" class="pb-switch">Reaction Time</a> <a href="../longitudinal/" class="pb-switch">Longitudinal</a> <a href="../cdi/" class="pb-switch">CDI</a> <a href="../items/" class="pb-switch">Items</a> <a href="../reliability/" class="pb-switch">Reliability</a></div>
-<div class="pb-frame-wrap">
-    <iframe src="https://peekbank.github.io/peekbank-datapage/rt.html" style="height: 100%; width: 100%; border: none" title="Reaction Time Explorer"></iframe>
-</div>
+
+<VizExplorer slug="rt" />
