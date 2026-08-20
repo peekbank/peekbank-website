@@ -19,3 +19,9 @@ pnpm-debug.log*
 
 # macOS-specific files
 .DS_Store
+
+# Generated viz artifacts, same paths in dev and in CI/build
+viz_src/_site/
+viz_src/slices/
+src/components/viz_autogen/
+public/viz/

@@ -26,7 +26,7 @@ export default defineConfig({
         starlightThemeNova({
           nav: [
             { label: "Docs", href: `${base}start/gettingstarted` },
-            { label: "Shiny", href: `${base}shiny` },
+            { label: "Analyses", href: `${base}analyses/accuracy` },
           ],
         }),
       ],

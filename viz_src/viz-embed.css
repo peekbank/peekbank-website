@@ -1,0 +1,161 @@
+/* The styling contract for the explorer markup, scoped under .pb-viz.
+   Ported from the datapage theme, plus minimal stand-ins for the bootstrap
+   classes Quarto's markup uses (tabs, buttons, .hidden). the Astro site
+   deliberately does not load bootstrap, which would fight Starlight.
+   */
+
+.pb-viz {
+  padding: 1rem 1.5rem 2.5rem 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #374151;
+}
+
+.pb-viz .hidden { display: none !important; }
+/* Quarto injects a copy button per code block; the explorers render no code
+   (echo: false), and without bootstrap these show up as small grey nubs. */
+.pb-viz .code-copy-button { display: none; }
+
+/* --- sidebar + single-viewport analysis layout --- */
+.pb-viz .viz-layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+@media (max-width: 991px) {
+  .pb-viz .viz-layout { grid-template-columns: 1fr; }
+}
+
+.pb-viz .viz-sidebar {
+  position: sticky;
+  top: var(--sl-nav-height, 4.5rem); /* below the Starlight header */
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.85rem;
+}
+.pb-viz .viz-sidebar form,
+.pb-viz .viz-sidebar select { max-width: 100%; width: 100%; }
+.pb-viz .viz-sidebar label { font-weight: 600; }
+.pb-viz .viz-sidebar form > div,
+.pb-viz .viz-sidebar form {
+  flex-direction: column;
+  align-items: stretch;
+}
+/* toggle rows: keep label and checkbox on one line */
+.pb-viz .viz-sidebar form:has(input[type="checkbox"]) {
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+.pb-viz .viz-sidebar form:has(input[type="checkbox"]) label { margin-bottom: 0; }
+.pb-viz .viz-sidebar form:has(input[type="checkbox"]) div { flex: 0 0 auto; }
+
+.pb-viz .pb-controls {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 1rem;
+}
+
+/* --- loading spinner (removed by the OJS module once cells run) --- */
+.pb-viz .pb-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: #6b7280;
+  padding: 2.5rem 0;
+}
+.pb-viz .pb-spinner .ring {
+  width: 22px;
+  height: 22px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #374151;
+  border-radius: 50%;
+  animation: pb-spin 0.9s linear infinite;
+}
+@keyframes pb-spin { to { transform: rotate(360deg); } }
+
+/* --- tabsets (Quarto markup, bootstrap Tab classes) --- */
+.pb-viz .panel-tabset ul.nav-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+  list-style: none;
+  margin: 0 0 1rem 0;
+  padding: 0;
+  border-bottom: 1px solid #d1d5db;
+}
+.pb-viz .nav-tabs .nav-link {
+  display: block;
+  padding: 0.45rem 0.95rem;
+  color: #4b5563;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+}
+.pb-viz .nav-tabs .nav-link:hover { background: #f3f4f6; }
+.pb-viz .nav-tabs .nav-link.active {
+  color: #111827;
+  font-weight: 600;
+  background: #fff;
+  border-color: #d1d5db;
+  margin-bottom: -1px;
+}
+.pb-viz .tab-content > .tab-pane { display: none; }
+.pb-viz .tab-content > .tab-pane.active { display: block; }
+
+/* --- buttons (CSV download links use bootstrap btn classes) --- */
+.pb-viz .btn {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.85rem;
+  border: 1px solid #6b7280;
+  border-radius: 6px;
+  color: #1f2937;
+  background: #fff;
+  text-decoration: none;
+  cursor: pointer;
+}
+.pb-viz .btn:hover { background: #f3f4f6; }
+
+/* modifiers on the CSV download links. $primary is #1f2937 in the datapage
+   theme (theme.scss), not bootstrap's blue. */
+.pb-viz .btn-sm {
+  padding: 0.2rem 0.6rem;
+  font-size: 0.8rem;
+}
+.pb-viz .btn-outline-primary {
+  color: #1f2937;
+  border-color: #1f2937;
+}
+.pb-viz .btn-outline-primary:hover {
+  background: #1f2937;
+  color: #fff;
+}
+
+/* --- tables (Data tabs) --- */
+.pb-viz table {
+  display: table;
+  width: 100%;
+  font-size: 0.85rem;
+  border-collapse: collapse;
+}
+.pb-viz .pb-plain-table th,
+.pb-viz .pb-plain-table td {
+  padding: 0.3rem 0.6rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+.pb-viz .pb-plain-table th { text-align: left; color: #374151; }
+
+/* keep Starlight's generous markdown margins out of dense viz markup */
+.pb-viz p { margin: 0.5rem 0; }
+.pb-viz h1, .pb-viz h2, .pb-viz h3 { color: #111827; }
