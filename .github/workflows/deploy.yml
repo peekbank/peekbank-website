@@ -19,10 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm
@@ -34,6 +34,10 @@ jobs:
       # while releases run to v10.
       - name: Set up uv
         uses: astral-sh/setup-uv@v10.0.1
+        with:
+          # our Python deps are declared in PEP 723 headers rather than a
+          # lockfile, so the scripts are what should invalidate uv's cache
+          cache-dependency-glob: scripts/*.py
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
@@ -64,7 +68,7 @@ jobs:
           npx astro build --base "$ASTRO_BASE"
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./dist
 
@@ -78,7 +82,7 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
       - name: Verify the deployed explorers have data
         run: |
