@@ -4,6 +4,8 @@ project:
   type: website
   render:
     - "*.qmd"
+  resources:
+    - "slices/**"
 
 format:
   html:

@@ -64,6 +64,22 @@ for (const { slug } of explorers) {
   fs.writeFileSync(path.join(fragments, `${slug}.fragment.html`), out);
 }
 
+// The slices live in viz_src/slices after pulling so Quarto can serve a 
+// standalone `quarto preview` in development. For Quarto to acces them, 
+// we need to move a copy of the data to the public folder
+const slices = path.join(src, "slices");
+if (!fs.existsSync(slices)) {
+  console.warn("no viz_src/slices; run: npm run viz:pull (needs a Redivis token)");
+} else {
+  const readJson = (f) => JSON.parse(fs.readFileSync(f, "utf8"));
+  const pinned = readJson(path.join(src, "release.json")).release;
+  const pulled = readJson(path.join(slices, "manifest.json")).version;
+  if (pulled !== pinned) throw new Error(`slices are release ${pulled}, release.json pins ${pinned} — run: npm run viz:pull`);
+  const dest = path.join(publicViz, "slices");
+  fs.rmSync(dest, { recursive: true, force: true });
+  fs.cpSync(slices, dest, { recursive: true });
+}
+
 for (const f of ["quarto-ojs-runtime.js", "quarto-ojs.css"]) {
   fs.cpSync(path.join(site, "site_libs", "quarto-ojs", f), path.join(publicViz, f));
 }

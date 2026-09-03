@@ -26,6 +26,62 @@ npm run dev
 
 which makes the site accessible at `localhost:4321`.
 
+### The interactive analyses
+
+The explorers under `/analyses` are authored in Quarto (`viz_src/`) and built
+into the site, so working on these requires a bit of extra setup.
+These steps aren't needed if you are editing other pages.
+
+#### Prerequisites
+
+You need the following things for local dev:
+
+* [uv](https://docs.astral.sh/uv/) installed on your machine.
+
+* [Quarto](https://quarto.org/docs/get-started/) installed on your machine
+
+* **A Redivis token, for the data.** Copy `.env.template` to `.env.local` and
+add your own read-only Redivis token:
+
+    ```
+    REDIVIS_API_TOKEN=your-token-here
+    ```
+
+#### Creating the visualisations
+
+Fetch the data slices from Redivis using:
+
+```
+npm run viz:pull
+```
+
+
+Afterwards (or whenever you make changes to the visualisation code), rerender and ingest the Quarto output via
+
+```
+npm run build:viz
+```
+
+If you are working on the Quarto viz code, you can preview directly by running
+
+```
+quarto preview
+```
+
+in the `viz_src` directory.
+
+#### Where the data ends up
+
+Both the slice data and the Quarto output are gitignored and are to be recreated on a dev machine.
+To enable both Quarto preview and Astro consuming the data during runtime via the exported Quarto fragments, the data ends up in multiple places
+on dev machines, as illustrated below:
+
+```
+Redivis ──viz:pull──> viz_src/slices ──quarto render──> viz_src/_site/slices
+                            └────────build:viz────────> public/viz/slices ──> dist/
+```
+
+
 ### Project Structure
 
 This project is built with [Astro](https://docs.astro.build/en/getting-started/), [Starlight](https://starlight.astro.build/), the [Starlight Nova Theme](https://starlight-theme-nova.pages.dev/), [Tailwind](https://tailwindcss.com/docs/styling-with-utility-classes), and [React](https://react.dev/)

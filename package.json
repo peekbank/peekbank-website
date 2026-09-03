@@ -8,7 +8,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "build:viz": "node scripts/build-viz.mjs"
+    "build:viz": "node scripts/build-viz.mjs",
+    "viz:pull": "uv run scripts/build_slices.py && uv run scripts/build_word_categories.py"
   },
   "dependencies": {
     "@astrojs/react": "^4.3.0",
