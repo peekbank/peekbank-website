@@ -1,0 +1,25 @@
+# Quarto project for the explorers only. The site consumes the rendered output
+# via scripts/build-viz.mjs; `quarto preview` to check while authoring
+project:
+  type: website
+  render:
+    - "*.qmd"
+
+format:
+  html:
+    # cosmo is bootstrap; the two scss layers carry the datapage's variables
+    # ($primary: #1f2937). The compiled result is scoped under .pb-viz by the build script
+    theme: [cosmo, theme/theme-datapage.scss, theme/theme.scss]
+    mainfont: "ui-sans-serif, system-ui, -apple-system, Helvetica, Arial, sans-serif"
+    fontsize: 15px
+    code-copy: false
+    grid:
+      sidebar-width: 0px
+      body-width: 1200px
+      margin-width: 0px
+
+execute:
+  echo: false
+  message: false
+  warning: false
+  error: false
