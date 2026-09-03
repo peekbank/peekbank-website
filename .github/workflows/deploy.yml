@@ -30,6 +30,30 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: 1.10.18
+
+      - name: Restore data slices
+        id: slices
+        uses: actions/cache@v6
+        with:
+          path: viz_src/slices
+          key: slices-${{ hashFiles('viz_src/release.json') }}
+
+      - name: Pull data slices
+        if: steps.slices.outputs.cache-hit != 'true'
+        env:
+          REDIVIS_API_TOKEN: ${{ secrets.REDIVIS_API_TOKEN }}
+        run: npm run viz:pull
+
+      - name: Render the explorers
+        run: npm run build:viz
+
       - name: Build
         env:
           ASTRO_BASE: /peekbank-website/
@@ -43,6 +67,7 @@ jobs:
           path: ./dist
 
   deploy:
+    if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -52,5 +77,12 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Verify the deployed explorers have data
+        run: |
+          url="${{ steps.deployment.outputs.page_url }}viz/slices/manifest.json"
+          code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 "$url")
+          echo "$url -> $code"
+          [ "$code" = "200" ] || { echo "::error::deployed slices are not reachable"; exit 1; }
 
 
