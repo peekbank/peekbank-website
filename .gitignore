@@ -3,8 +3,11 @@ dist/
 # generated types
 .astro/
 
+.playwright-mcp
+
 # dependencies
 node_modules/
+.venv/
 
 # logs
 npm-debug.log*
@@ -15,7 +18,14 @@ pnpm-debug.log*
 
 # environment variables
 .env
+.env.local
 .env.production
 
 # macOS-specific files
 .DS_Store
+
+# Generated viz artifacts, same paths in dev and in CI/build
+viz_src/_site/
+viz_src/slices/
+src/components/viz_autogen/
+public/viz/

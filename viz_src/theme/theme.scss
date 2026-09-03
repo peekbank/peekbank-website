@@ -1,0 +1,230 @@
+/*-- scss:defaults --*/
+
+// peekbank branding (from the Astro site: monochrome grays, serif display)
+$primary: #1f2937;
+$body-color: #374151;
+$link-color: #1f2937;
+$navbar-bg: rgba(255, 255, 255, 0.88);
+$navbar-fg: #111827;
+$font-family-serif: "Libre Baskerville", Georgia, serif;
+
+/*-- scss:rules --*/
+
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap');
+
+.navbar {
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.navbar-brand img { height: 34px; }
+
+.pb-hero {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 1.5rem 0 1rem 0;
+
+  img.raccoon { height: 96px; }
+
+  .pb-title {
+    font-family: $font-family-serif;
+    font-weight: 700;
+    font-size: 2.4rem;
+    color: #111827;
+    line-height: 1.1;
+  }
+  p {
+    margin: 0.4rem 0 0 0;
+    color: #4b5563;
+    font-size: 1.05rem;
+  }
+}
+
+h1, h2, h3, .pb-serif {
+  font-family: $font-family-serif;
+  color: #111827;
+}
+
+.pb-stats {
+  font-family: $font-family-serif;
+  font-size: 1.15rem;
+  text-align: center;
+  color: #1f2937;
+  margin: 1rem 0;
+}
+
+// black pill CTA, matching the Astro site
+.pb-cta {
+  display: inline-block;
+  background: #000;
+  color: #fff !important;
+  border-radius: 16px;
+  padding: 0.55rem 1.3rem;
+  text-decoration: none;
+  font-weight: 600;
+  &:hover { background: #1f2937; }
+}
+
+// loading spinner shown until OJS cells produce output
+.pb-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: #6b7280;
+  padding: 2.5rem 0;
+
+  .ring {
+    width: 22px;
+    height: 22px;
+    border: 3px solid #e5e7eb;
+    border-top-color: #374151;
+    border-radius: 50%;
+    animation: pb-spin 0.9s linear infinite;
+  }
+}
+@keyframes pb-spin { to { transform: rotate(360deg); } }
+
+// viz layout
+.pb-controls {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 1rem;
+}
+
+// sidebar + single-viewport analysis layout (wordbank-datapage pattern)
+.viz-layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 991px) {
+  .viz-layout { grid-template-columns: 1fr; }
+}
+
+.viz-sidebar {
+  position: sticky;
+  top: 70px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.85rem;
+
+  form, select { max-width: 100%; width: 100%; }
+  label { font-weight: 600; }
+
+  input[type="range"] { margin-left: 0; }
+
+  .cell-output-display { padding-right: 8px; }
+
+  form > div, form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+// IRW-style dataset cards
+.pb-dataset-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.7rem;
+  background: #fff;
+
+  summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: #111827;
+  }
+  .pb-ds-meta {
+    color: #4b5563;
+    font-size: 0.9rem;
+    margin: 0.3rem 0 0 0;
+  }
+  .pb-ds-chips { margin-top: 0.45rem; }
+  .pb-chip {
+    display: inline-block;
+    background: #eef2f6;
+    border-radius: 10px;
+    padding: 0.1rem 0.55rem;
+    font-size: 0.8rem;
+    margin-right: 0.35rem;
+    color: #1f2937;
+  }
+  .pb-ds-body {
+    margin-top: 0.55rem;
+    font-size: 0.92rem;
+    color: #374151;
+  }
+}
+
+// toggle rows: keep label and checkbox on one line in the sidebar
+.viz-sidebar form:has(input[type="checkbox"]) {
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+
+  label { margin-bottom: 0; }
+  div { flex: 0 0 auto; }
+}
+
+// plain (selection-free) table for the landing page
+.pb-plain-table {
+  width: 100%;
+  font-size: 0.88rem;
+  border-collapse: collapse;
+
+  th, td { padding: 0.3rem 0.6rem; border-bottom: 1px solid #e5e7eb; }
+  th { text-align: left; color: #374151; }
+  td a { text-decoration: none; }
+}
+
+// team gallery (ported from the Astro site's teamgrid)
+.pb-team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.8rem;
+}
+
+.pb-team-card {
+  display: block;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  overflow: hidden;
+  text-decoration: none !important;
+  color: #111827;
+  transition: transform 0.15s ease-out, border-color 0.15s ease-out;
+  background: #fff;
+
+  &:hover { transform: scale(1.04); border-color: #6b7280; }
+
+  img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; }
+
+  .pb-team-name {
+    padding: 0.55rem 0.4rem;
+    text-align: center;
+    font-size: 0.85rem;
+    min-height: 3em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+// landing headline (matches the Astro site's serif hero line)
+.pb-headline {
+  font-family: "Libre Baskerville", Georgia, serif;
+  font-weight: 700;
+  font-size: 1.9rem;
+  line-height: 1.35;
+  color: #111827;
+  text-align: center;
+  max-width: 46rem;
+  margin: 2.2rem auto 0 auto;
+}

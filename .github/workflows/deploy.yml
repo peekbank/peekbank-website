@@ -19,16 +19,46 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm
 
       - name: Install dependencies
         run: npm ci
+
+      # Exact version: setup-uv stopped publishing moving major tags at v7,
+      # while releases run to v10.
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v10.0.1
+        with:
+          # our Python deps are declared in PEP 723 headers rather than a
+          # lockfile, so the scripts are what should invalidate uv's cache
+          cache-dependency-glob: scripts/*.py
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: 1.10.18
+
+      - name: Restore data slices
+        id: slices
+        uses: actions/cache@v6
+        with:
+          path: viz_src/slices
+          key: slices-${{ hashFiles('viz_src/release.json') }}
+
+      - name: Pull data slices
+        if: steps.slices.outputs.cache-hit != 'true'
+        env:
+          REDIVIS_API_TOKEN: ${{ secrets.REDIVIS_API_TOKEN }}
+        run: npm run viz:pull
+
+      - name: Render the explorers
+        run: npm run build:viz
 
       - name: Build
         env:
@@ -38,11 +68,12 @@ jobs:
           npx astro build --base "$ASTRO_BASE"
 
       - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./dist
 
   deploy:
+    if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -51,6 +82,13 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
+
+      - name: Verify the deployed explorers have data
+        run: |
+          url="${{ steps.deployment.outputs.page_url }}viz/slices/manifest.json"
+          code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 30 "$url")
+          echo "$url -> $code"
+          [ "$code" = "200" ] || { echo "::error::deployed slices are not reachable"; exit 1; }
 
 

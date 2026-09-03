@@ -1,0 +1,332 @@
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["redivis", "pyarrow"]
+# ///
+"""
+Ported over from the pb-datapages prototype, originally written by Claude
+Only changed to fit into the repos environment, semantics were tested at gen time and are unchanged
+
+Build the per-dataset JSON slices the explorers fetch at runtime.
+
+Reads the pinned release from Redivis (see viz_src/release.json) and writes
+into viz_src/slices/:
+
+  manifest.json          selector + landing-table metadata
+  datasets/<name>.json   per-dataset slice for the interactive viz
+  words.json, cdi.json   indices the explorers use for filtering
+
+Slice format (compact arrays; aoi coded 0=target 1=distractor 2=other 3=missing):
+  admins:      [[administration_id, age_months(2dp), subject_id], ...]
+  trials:      [[trial_id, trial_order, trial_type_id, excluded01], ...]
+  trial_types: [[trial_type_id, target_label, distractor_label, condition,
+                 vanilla01, novel01], ...]
+  runs:        [[administration_id, trial_id, t0, [[aoi, len], ...]], ...]
+               (runs are contiguous 25 ms samples from t0, matching
+                peekbankr's RLE decode assumptions)
+
+Needs a read-only Redivis token in REDIVIS_API_TOKEN (the redivis package
+reads it from the environment).
+
+Usage: npm run viz:pull    (or: uv run scripts/build_slices.py)
+"""
+
+import json
+import os
+from collections import defaultdict
+from pathlib import Path
+
+import redivis  # pyright: ignore[reportMissingImports]
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+VIZ_SRC = REPO_ROOT / "viz_src"
+AOI_CODE = {"target": 0, "distractor": 1, "other": 2, "missing": 3}
+RELEASE = json.loads((VIZ_SRC / "release.json").read_text())
+
+
+def read(version, table, columns=None):
+    tb = (
+        redivis.organization("datapages")
+        .dataset("peekbank:a3v0", version=RELEASE["redivisVersion"])
+        .table(table)
+    )
+    t = tb.to_arrow_table()
+    return t.select(columns) if columns else t
+
+
+def load_env_local():
+    """Read .env.local if present; the redivis package wants the token in the
+    environment, and npm scripts do not load env files themselves."""
+    f = REPO_ROOT / ".env.local"
+    if not f.exists():
+        return
+    for line in f.read_text().splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            k, v = line.split("=", 1)
+            os.environ.setdefault(k.strip(), v.strip())
+
+
+def main():
+    load_env_local()
+    if not os.environ.get("REDIVIS_API_TOKEN"):
+        raise SystemExit(
+            "REDIVIS_API_TOKEN is not set. Put a read-only token in .env.local "
+            "or export it; see the README."
+        )
+    v = RELEASE["release"]
+    print(f"pulling release {v} (redivis {RELEASE['redivisVersion']})")
+
+    out_root = VIZ_SRC / "slices"
+    (out_root / "datasets").mkdir(parents=True, exist_ok=True)
+
+    datasets = read(v, "datasets").to_pylist()
+    admins = read(
+        v,
+        "administrations",
+        ["administration_id", "age", "dataset_id", "subject_id", "coding_method"],
+    ).to_pylist()
+    subjects = {
+        s["subject_id"]: s
+        for s in read(
+            v, "subjects", ["subject_id", "native_language", "subject_aux_data"]
+        ).to_pylist()
+    }
+    stimuli = {
+        s["stimulus_id"]: s
+        for s in read(
+            v,
+            "stimuli",
+            ["stimulus_id", "english_stimulus_label", "stimulus_novelty", "dataset_id"],
+        ).to_pylist()
+    }
+    trial_types = read(
+        v,
+        "trial_types",
+        [
+            "trial_type_id",
+            "dataset_id",
+            "target_id",
+            "distractor_id",
+            "condition",
+            "vanilla_trial",
+            "full_phrase_language",
+        ],
+    ).to_pylist()
+    trials = read(
+        v, "trials", ["trial_id", "trial_order", "trial_type_id", "excluded"]
+    ).to_pylist()
+
+    tt_by_ds = defaultdict(list)
+    tt_ds = {}
+    for tt in trial_types:
+        tt_by_ds[tt["dataset_id"]].append(tt)
+        tt_ds[tt["trial_type_id"]] = tt["dataset_id"]
+    trials_by_ds = defaultdict(list)
+    trial_ds = {}
+    for t in trials:
+        ds_id = tt_ds[t["trial_type_id"]]
+        trials_by_ds[ds_id].append(t)
+        trial_ds[t["trial_id"]] = ds_id
+    admins_by_ds = defaultdict(list)
+    for a in admins:
+        admins_by_ds[a["dataset_id"]].append(a)
+
+    # RLE runs grouped per dataset -> (admin, trial)
+    rle = read(v, "aoi_timepoints_rle")
+    runs_by_ds = defaultdict(lambda: defaultdict(list))
+    cols = [
+        rle.column(c).to_pylist()
+        for c in ["administration_id", "trial_id", "t_norm", "aoi", "length"]
+    ]
+    for aid, tid, t_norm, aoi, length in zip(*cols):
+        runs_by_ds[trial_ds[tid]][(aid, tid)].append((t_norm, AOI_CODE[aoi], length))
+
+    manifest = {"version": v, "datasets": []}
+    for ds in sorted(datasets, key=lambda d: d["dataset_name"]):
+        ds_id, name = ds["dataset_id"], ds["dataset_name"]
+        da = admins_by_ds[ds_id]
+        dt = trials_by_ds[ds_id]
+        dtt = tt_by_ds[ds_id]
+        ages = [a["age"] for a in da if a["age"] is not None]
+        langs = sorted(
+            {tt["full_phrase_language"] for tt in dtt if tt["full_phrase_language"]}
+        )
+        methods = sorted({a["coding_method"] for a in da if a["coding_method"]})
+        words = sorted(
+            {
+                stimuli[tt["target_id"]]["english_stimulus_label"]
+                for tt in dtt
+                if tt["target_id"] in stimuli
+            }
+        )
+
+        slice_obj = {
+            "dataset": {
+                "id": ds_id,
+                "name": name,
+                "shortcite": ds["shortcite"],
+                "cite": ds["cite"],
+            },
+            "admins": [
+                [
+                    a["administration_id"],
+                    round(a["age"], 2) if a["age"] is not None else None,
+                    a["subject_id"],
+                ]
+                for a in da
+            ],
+            "trials": [
+                [
+                    t["trial_id"],
+                    t["trial_order"],
+                    t["trial_type_id"],
+                    1 if t["excluded"] else 0,
+                ]
+                for t in dt
+            ],
+            "trial_types": [
+                [
+                    tt["trial_type_id"],
+                    stimuli.get(tt["target_id"], {}).get("english_stimulus_label"),
+                    stimuli.get(tt["distractor_id"], {}).get("english_stimulus_label"),
+                    tt["condition"],
+                    1 if tt["vanilla_trial"] else 0,
+                    0
+                    if stimuli.get(tt["target_id"], {}).get("stimulus_novelty")
+                    == "familiar"
+                    else 1,
+                ]
+                for tt in dtt
+            ],
+            "runs": [
+                [aid, tid, runs[0][0], [[aoi, ln] for (_, aoi, ln) in runs]]
+                for (aid, tid), runs in sorted(runs_by_ds[ds_id].items())
+                for runs in [sorted(runs)]
+            ],
+        }
+        out_path = out_root / "datasets" / f"{name}.json"
+        out_path.write_text(json.dumps(slice_obj, separators=(",", ":")))
+
+        admins_per_subject = defaultdict(int)
+        for a in da:
+            admins_per_subject[a["subject_id"]] += 1
+        n_cdi = sum(
+            1
+            for a in da
+            if a["subject_id"] in subjects
+            and (subjects[a["subject_id"]].get("subject_aux_data") or "").find(
+                "cdi_responses"
+            )
+            >= 0
+        )
+
+        manifest["datasets"].append(
+            {
+                "name": name,
+                "shortcite": ds["shortcite"],
+                "cite": ds["cite"],
+                "n_subjects": len({a["subject_id"] for a in da}),
+                "n_admins": len(da),
+                "n_trials": len(dt),
+                "age_min": round(min(ages), 1) if ages else None,
+                "age_max": round(max(ages), 1) if ages else None,
+                "methods": methods,
+                "languages": langs,
+                "n_words": len(words),
+                "native_languages": sorted(
+                    {
+                        subjects[a["subject_id"]]["native_language"] or ""
+                        for a in da
+                        if a["subject_id"] in subjects
+                    }
+                    - {""}
+                ),
+                "longitudinal": max(admins_per_subject.values(), default=1) > 1,
+                "n_subjects_with_cdi": n_cdi,
+                "kb": out_path.stat().st_size // 1024,
+            }
+        )
+        print(
+            f"{name}: {len(da)} admins, {len(dt)} trials, "
+            f"{len(runs_by_ds[ds_id])} run-groups, "
+            f"{out_path.stat().st_size / 1e6:.2f} MB"
+        )
+
+    (out_root / "manifest.json").write_text(json.dumps(manifest, indent=1))
+
+    # word -> datasets index (for the cross-dataset item explorer)
+    word_index = defaultdict(list)
+    for ds in sorted(datasets, key=lambda d: d["dataset_name"]):
+        dtt = tt_by_ds[ds["dataset_id"]]
+        ws = {
+            stimuli[tt["target_id"]]["english_stimulus_label"]
+            for tt in dtt
+            if tt["target_id"] in stimuli
+        }
+        for w in ws:
+            if w:
+                word_index[w].append(ds["dataset_name"])
+    (out_root / "words.json").write_text(
+        json.dumps(dict(sorted(word_index.items())), separators=(",", ":"))
+    )
+    print(f"words.json: {len(word_index)} words")
+
+    # global CDI slice: one row per (subject, cdi response), joined to the
+    # subject's administrations at build time in the page (by closest age)
+    id_to_name = {d["dataset_id"]: d["dataset_name"] for d in datasets}
+    cdi_rows = []
+    subj_dataset = {}
+    for a in admins:
+        subj_dataset.setdefault(a["subject_id"], a["dataset_id"])
+    for sid, s in subjects.items():
+        aux = s.get("subject_aux_data")
+        if not aux or "cdi_responses" not in aux:
+            continue
+        try:
+            responses = json.loads(aux).get("cdi_responses") or []
+        except json.JSONDecodeError:
+            continue
+        ds_name = id_to_name.get(subj_dataset.get(sid))
+        for r in responses:
+            cdi_rows.append(
+                [
+                    ds_name,
+                    sid,
+                    r.get("age"),
+                    r.get("measure"),
+                    r.get("instrument_type"),
+                    r.get("rawscore"),
+                    r.get("percentile"),
+                    r.get("language"),
+                ]
+            )
+    (out_root / "cdi.json").write_text(
+        json.dumps(
+            {
+                "columns": [
+                    "dataset",
+                    "subject_id",
+                    "age",
+                    "measure",
+                    "instrument_type",
+                    "rawscore",
+                    "percentile",
+                    "language",
+                ],
+                "rows": cdi_rows,
+            },
+            separators=(",", ":"),
+        )
+    )
+    print(
+        f"cdi.json: {len(cdi_rows)} CDI responses "
+        f"({(out_root / 'cdi.json').stat().st_size / 1e6:.2f} MB)"
+    )
+
+    total = sum(d["kb"] for d in manifest["datasets"]) / 1024
+    print(f"\n{len(manifest['datasets'])} datasets, {total:.1f} MB total slices")
+
+
+if __name__ == "__main__":
+    main()

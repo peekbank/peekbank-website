@@ -1,0 +1,15 @@
+/* Rules that are added on top of datapage theme's.
+
+/* build-viz.mjs wraps the harvested markup in .pb-viz; the <main> element it
+   replaces carried Quarto's container width and padding. */
+.pb-viz {
+  padding: 1rem 1.5rem 2.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* theme.scss offsets the sticky sidebar below Quarto's navbar; on the site it
+   has to clear Starlight's header instead. */
+.pb-viz .viz-sidebar {
+  top: var(--sl-nav-height, 4.5rem);
+}
