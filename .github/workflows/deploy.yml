@@ -30,13 +30,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # Exact version: setup-uv stopped publishing moving major tags at v7,
-      # while releases run to v10.
       - name: Set up uv
         uses: astral-sh/setup-uv@v10.0.1
         with:
-          # our Python deps are declared in PEP 723 headers rather than a
-          # lockfile, so the scripts are what should invalidate uv's cache
           cache-dependency-glob: scripts/*.py
 
       - name: Set up Quarto
