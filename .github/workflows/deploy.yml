@@ -30,8 +30,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Exact version: setup-uv stopped publishing moving major tags at v7,
+      # while releases run to v10.
       - name: Set up uv
-        uses: astral-sh/setup-uv@v10
+        uses: astral-sh/setup-uv@v10.0.1
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
