@@ -118,6 +118,10 @@ h1, h2, h3, .pb-serif {
   form, select { max-width: 100%; width: 100%; }
   label { font-weight: 600; }
 
+  input[type="range"] { margin-left: 0; }
+
+  .cell-output-display { padding-right: 8px; }
+
   form > div, form {
     flex-direction: column;
     align-items: stretch;
