@@ -45,7 +45,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: viz_src/slices
-          key: slices-${{ hashFiles('viz_src/release.json') }}
+          key: slices-${{ hashFiles('viz_src/release.json', 'scripts/*.py') }}
 
       - name: Pull data slices
         if: steps.slices.outputs.cache-hit != 'true'

@@ -3,6 +3,8 @@ title: How to Cite
 description: asdfasdf
 ---
 
+import DatasetTable from "/src/components/DatasetTable.astro";
+
 Thank you to all of the generous researchers who have contributed data to Peekbank!
 
 1. Researchers publishing or presenting work using data in the Peekbank database must cite the publications linked to that dataset, as shown below in the contributors list. (If there is no linked citation, then no citation for the individual dataset is necessary).
@@ -23,9 +25,9 @@ To contribute your data, please email peekbank-dev[at]lists.stanford.edu. For fu
 
 ## Current Datasets
 
-Below is a list of all datasets currently available in Peekbank (as of 1/9/2024).
+Below is a list of all datasets currently available in Peekbank.
 
-<iframe src={`${import.meta.env.BASE_URL}peekbank_contributors.html`} style="height: 800px; width: 100%; border: none"></iframe>
+<DatasetTable />
 
 ## Dataset Preview
 

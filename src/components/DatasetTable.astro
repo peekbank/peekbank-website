@@ -1,0 +1,71 @@
+---
+// The dataset citation list. Built from the data slice
+// Needs `npm run viz:pull` to be run prior.
+
+interface Dataset {
+  name: string;
+  cite: string;
+  n_subjects: number;
+  age_min: number;
+  age_max: number;
+  languages: string[];
+}
+
+// cannot be a variable due to vite workings, has to be hardcoded string
+// uses the slices in viz_src so they tap into the self contained quarto accessible data.
+const manifests = import.meta.glob("../../viz_src/slices/manifest.json", {
+  import: "default",
+  eager: true,
+});
+const manifest = manifests["../../viz_src/slices/manifest.json"] as
+  | { version: string; datasets: Dataset[] }
+  | undefined;
+if (!manifest && import.meta.env.PROD) {
+  throw new Error("No dataset manifest — run: npm run viz:pull");
+}
+
+const months = (m: number) => +m.toFixed(1);
+---
+
+{
+  manifest ? (
+    <>
+      <p>
+        {manifest.datasets.length} datasets, as of release {manifest.version}.
+      </p>
+      <table class="text-sm">
+        <thead>
+          <tr>
+            <th>Dataset</th>
+            <th>Cite</th>
+            <th>N</th>
+            <th>Age (months)</th>
+            <th>Language</th>
+          </tr>
+        </thead>
+        <tbody>
+          {manifest.datasets.map((d) => (
+            <tr>
+              <td class="whitespace-nowrap">{d.name}</td>
+              <td>{d.cite}</td>
+              <td>{d.n_subjects}</td>
+              <td class="whitespace-nowrap">
+                {months(d.age_min)}-{months(d.age_max)}
+              </td>
+              <td>{d.languages.join(", ")}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
+  ) : (
+    <div class="my-8 rounded-lg border border-dashed border-gray-300 px-5 py-4 text-gray-600">
+      <p class="mt-0 mb-1">
+        <strong>The dataset list has not been built.</strong>
+      </p>
+      <p class="my-1">
+        Run <code>npm run viz:pull</code> to fetch the release manifest.
+      </p>
+    </div>
+  )
+}

@@ -1,11 +1,11 @@
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.11"
-# dependencies = ["redivis", "pyarrow"]
+# dependencies = ["redivis", "pyarrow", "pycountry"]
 # ///
 """
-Ported over from the pb-datapages prototype, originally written by Claude
-Only changed to fit into the repos environment, semantics were tested at gen time and are unchanged
+Mostly ported over from the pb-datapages prototype, originally written by Claude
+Only changed to fit into the repos environment and include some extra data fields
 
 Build the per-dataset JSON slices the explorers fetch at runtime.
 
@@ -36,6 +36,7 @@ import os
 from collections import defaultdict
 from pathlib import Path
 
+import pycountry  # pyright: ignore[reportMissingImports]
 import redivis  # pyright: ignore[reportMissingImports]
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -52,6 +53,24 @@ def read(version, table, columns=None):
     )
     t = tb.to_arrow_table()
     return t.select(columns) if columns else t
+
+
+def language_name(tt):
+    """Display name for a trial type's phrase language. The release stores ISO
+    639-2 codes; a language without one is stored as zxx and its real name can be found in
+    aux data. The schema's non-ISO values (artificial, other) have no entry to
+    look up and fall through capitalized."""
+    code = tt["full_phrase_language"]
+    if code == "zxx":
+        name = json.loads(tt["trial_type_aux_data"] or "{}").get(
+            "full_phrase_language_non_iso"
+        )
+        if name:
+            return name
+    lang = pycountry.languages.get(bibliographic=code) or pycountry.languages.get(
+        alpha_3=code
+    )
+    return lang.name if lang else code.capitalize()
 
 
 def load_env_local():
@@ -111,6 +130,7 @@ def main():
             "condition",
             "vanilla_trial",
             "full_phrase_language",
+            "trial_type_aux_data",
         ],
     ).to_pylist()
     trials = read(
@@ -150,7 +170,14 @@ def main():
         dtt = tt_by_ds[ds_id]
         ages = [a["age"] for a in da if a["age"] is not None]
         langs = sorted(
-            {tt["full_phrase_language"] for tt in dtt if tt["full_phrase_language"]}
+            {
+                language_name(tt)
+                for tt in dtt
+                # "multiple" marks a phrase mixing languages; those languages
+                # are already named by the dataset's other trial types
+                if tt["full_phrase_language"]
+                and tt["full_phrase_language"] != "multiple"
+            }
         )
         methods = sorted({a["coding_method"] for a in da if a["coding_method"]})
         words = sorted(
