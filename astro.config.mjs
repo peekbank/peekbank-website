@@ -16,11 +16,24 @@ export default defineConfig({
   },
   integrations: [
     starlight({
-      title: "peekbank",
+      title: "Peekbank",
       logo: {
         src: "./src/assets/raccoon.png",
       },
       favicon: "/favicon-32x32.png",
+      head: [
+        "LibreBaskerville-Regular",
+        "LibreBaskerville-Bold",
+      ].map((name) => ({
+        tag: "link",
+        attrs: {
+          rel: "preload",
+          href: `${base}fonts/${name}.woff2`,
+          as: "font",
+          type: "font/woff2",
+          crossorigin: true,
+        },
+      })),
       customCss: ["./src/styles/global.css"],
       plugins: [
         starlightThemeNova({

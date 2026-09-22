@@ -5,78 +5,65 @@ template: splash
 head:
   - tag: style
     content: |
-      .content-panel:first-of-type{
-        display: none !important;
+      /* Overwrites for Starlight's default splash wrapper */
+      .content-panel:first-of-type { display: none !important; }
+      .content-panel { border: none !important; padding: 0 !important; }
+      .content-panel > .sl-container {
+        max-width: none !important;
+        margin-inline: 0 !important;
       }
-      .content-panel{
-        border: none !important;
+      .nova-page-frame-header {
+        border-bottom-color: transparent !important;
       }
 ---
 
 import RotatingGallery from "../../components/gallery.jsx";
 import Stats from "../../components/stats.astro";
+import { datasets } from "../../lib/manifest";
 import { Image } from "astro:assets";
 import peekbankVis from "../../assets/peekbank_item_vis.png";
 
-<div class="flex flex-col items-center text-center max-w-4xl mx-auto sm:px-2 md:px-8 grid-pattern">
-
-{" "}
-
-<RotatingGallery client:load />
-<h2 class="font-librebask leading-normal text-2xl md:text-3xl lg:text-4xl mt-8 sm:mt-16 mb-8 font-black text-gray-900 dark:text-white">
-  Peekbank is an open database of infant <wbr />looking-while-listening data
-</h2>
-
-{" "}
-
-<div class="flex gap-6 mb-16 flex-wrap justify-center">
-  <a
-    href="start/gettingstarted"
-    class="font-librebask no-underline bg-black text-white font-medium px-8 py-4 rounded-2xl transition-all hover:scale-105 flex items-center gap-2"
-  >
-    Get Started <span>→</span>
-  </a>
-  <a
-    href="analyses/accuracy"
-    class="hidden sm:block no-underline bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-8 py-4 rounded-2xl transition-all hover:scale-105 flex items-center gap-2"
-  >
-    Explore Analyses <span>→</span>
-  </a>
-</div>
-<Image
-  src={peekbankVis}
-  width={3000}
-  height={1800}
-  alt="Feature showcase"
-  class="w-full max-w-2xl border-3 sm:border-4 border-black rounded-lg p-4 mb-20"
-/>
-
-{/* <Stats /> */}
-
-{" "}
-
-  <div class="max-w-2xl flex-col items-start">
-    <div class="transform text-start">
-      <h1 class="font-librebask">What is peekbank?</h1>
-      <div class="sm:text-lg"> {/* applying directly to p clashes with starlight's theming*/}
-      <p>
-        The Peekbank project is an open database storing
-        eye-tracking data on children's word recognition in a uniform, tabular format. The project brings together data shared by different research groups, spanning <strong>44</strong> datasets with a total of <strong>3915</strong> children tested.
-        
-        If you want to browse existing data while planning a study or want to contrast the data you collected to preexisting experiments on a low level, check out the documentation! We also have pointers if you are interested in contributing your data to peekbank to make infant research more open 🦝
-      </p>
-      </div>
-
-      <div class="flex gap-6 mt-10 flex-wrap justify-start">
-        <a
-          href="start/gettingstarted"
-          class="font-librebask no-underline bg-black text-white font-medium px-6 py-3 rounded-2xl transition-all hover:scale-105 flex items-center gap-2"
-        >
-          Get Started <span>→</span>
-        </a>
-      
-      </div>
+<section class="not-content mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 pt-24 pb-24 lg:grid-cols-2 lg:gap-16 lg:pt-40 lg:pb-32">
+  <div class="flex flex-col items-start gap-6">
+    <h1 class="font-librebask text-3xl leading-tight font-bold tracking-tight text-balance text-ink sm:text-4xl">The open database of infant word&nbsp;recognition</h1>
+    <p class="max-w-md text-base/relaxed text-pretty">Peekbank aggregates looking-while-listening data from {datasets.length} datasets into one uniform, tabular schema. Plan a study, replicate an effect, or reanalyse across the whole literature from a single query.</p>
+    <div class="flex flex-wrap gap-3">
+      <a
+        href="start/gettingstarted"
+        class="inline-flex h-10 items-center gap-2 rounded-lg bg-ink px-4 text-sm font-medium text-white no-underline transition duration-200 ease-out hover:shadow-lg active:scale-95"
+      >
+         Get Started → 
+      </a>
+      <a
+        href="analyses/accuracy"
+        class="inline-flex h-10 items-center gap-2 rounded-lg bg-white px-4 text-sm font-medium text-charcoal no-underline ring-1 ring-black/10 transition duration-200 ease-out hover:bg-gray-50 hover:text-ink hover:ring-black/20 active:scale-95"
+      >
+        Browse Visualisations
+      </a>
     </div>
   </div>
+  <RotatingGallery client:load />
+</section>
+
+<section class="not-content mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 pb-20 lg:grid-cols-2 lg:gap-28">
+  <Image
+    src={peekbankVis}
+    width={3000}
+    height={1800}
+    alt="Proportion of looks to the target image over time, per dataset"
+    class="h-auto w-full rounded-2xl bg-white p-6 shadow-lg ring-1 ring-black/10"
+  />
+  <Stats />
+</section>
+
+<div class="max-w-4xl mx-auto px-6 md:px-8 grid-pattern">
+
+<div class="flex flex-col items-center text-center">
+
+{" "}
+
+
+
+</div>
 
 </div>

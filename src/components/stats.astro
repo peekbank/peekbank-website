@@ -1,24 +1,23 @@
 ---
+import { datasets, total, languageCount, fmt } from "../lib/manifest";
+
 const stats = [
-  { id: 1, name: "Datasets", value: "44" },
-  { id: 2, name: "Children", value: "3915" },
-  { id: 3, name: "Trials", value: "134929" },
+  { value: datasets.length, label: "Datasets" },
+  { value: total("n_subjects"), label: "Children" },
+  { value: total("n_trials"), label: "Trials" },
+  { value: languageCount, label: "Languages" },
 ];
 ---
 
-<div class="bg-white py-24 sm:py-32">
-  <div class="mx-auto max-w-7xl px-6 lg:px-8">
-    <div class="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-3">
-      {
-        stats.map((stat) => (
-          <div class="mx-auto flex max-w-xs flex-col gap-y-2 mt-0">
-            <div class="text-3xl  font-semibold tracking-tight text-gray-900 sm:text-5xl">
-              {stat.value}
-            </div>
-            <div class="text-base/7 text-gray-600">{stat.name}</div>
-          </div>
-        ))
-      }
-    </div>
-  </div>
+<div class="grid grid-cols-2 gap-x-8 gap-y-10">
+  {
+    stats.map((stat) => (
+      <div class="flex flex-col gap-1">
+        <div class="font-librebask text-4xl font-bold tracking-tight tabular-nums text-ink">
+          {fmt(stat.value)}
+        </div>
+        <div class="text-sm text-brown">{stat.label}</div>
+      </div>
+    ))
+  }
 </div>

@@ -1,28 +1,7 @@
 ---
-// The dataset citation list. Built from the data slice
-// Needs `npm run viz:pull` to be run prior.
-
-interface Dataset {
-  name: string;
-  cite: string;
-  n_subjects: number;
-  age_min: number;
-  age_max: number;
-  languages: string[];
-}
-
-// cannot be a variable due to vite workings, has to be hardcoded string
+// The dataset citation list built from the data slice.
 // uses the slices in viz_src so they tap into the self contained quarto accessible data.
-const manifests = import.meta.glob("../../viz_src/slices/manifest.json", {
-  import: "default",
-  eager: true,
-});
-const manifest = manifests["../../viz_src/slices/manifest.json"] as
-  | { version: string; datasets: Dataset[] }
-  | undefined;
-if (!manifest && import.meta.env.PROD) {
-  throw new Error("No dataset manifest — run: npm run viz:pull");
-}
+import { manifest } from "../lib/manifest";
 
 const months = (m: number) => +m.toFixed(1);
 ---

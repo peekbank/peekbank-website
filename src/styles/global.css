@@ -6,7 +6,7 @@
 
 @font-face {
   font-family: "LibreBaskerville";
-  src: url("/fonts/LibreBaskerville-Regular.ttf") format("truetype");
+  src: url("/fonts/LibreBaskerville-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -14,13 +14,45 @@
 
 @font-face {
   font-family: "LibreBaskerville";
-  src: url("/fonts/LibreBaskerville-Bold.ttf") format("truetype");
+  src: url("/fonts/LibreBaskerville-Bold.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 
-/* CSS class for the LB font since Tailwind does not like me today*/
-.font-librebask {
-  font-family: "LibreBaskerville", serif;
+
+/* Roughly rescaled Georgia to Libre Baskerville's proportions, so that the font loading in produces only very little shifting */
+@font-face {
+  font-family: "LibreBaskerville Fallback";
+  src: local("Georgia");
+  font-weight: 400;
+  size-adjust: 116.9%;
+  ascent-override: 83%;
+  descent-override: 23.1%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "LibreBaskerville Fallback";
+  src: local("Georgia Bold"), local("Georgia-Bold"), local("Georgia");
+  font-weight: 700;
+  size-adjust: 102.9%;
+  ascent-override: 94.3%;
+  descent-override: 26.2%;
+  line-gap-override: 0%;
+}
+
+@theme {
+  --font-librebask: "LibreBaskerville", "LibreBaskerville Fallback", Georgia, serif;
+  --color-ink: #121212;
+  --color-charcoal: #343433;
+  --color-brown: #474645;
+}
+
+/* For inserting Libre Baskerville into template generated stuf, but
+   LB ships 400 and 700 only, so putting 700 avoids a synthesised weight
+   where Starlight asks for 600. */
+.sl-container > h1,
+.sl-markdown-content :is(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-librebask);
+  font-weight: 700;
 }
