@@ -22,6 +22,13 @@ import Stats from "../../components/stats.astro";
 import StimulusMarquee from "../../components/StimulusMarquee.astro";
 import LookingCurve from "../../components/LookingCurve.astro";
 import { datasets } from "../../lib/manifest";
+import { Image } from "astro:assets";
+import step1 from "../../assets/comic/step_1.png";
+import step2 from "../../assets/comic/step_2.png";
+import step3 from "../../assets/comic/step_3.png";
+import num1 from "../../assets/comic/num_1.png";
+import num2 from "../../assets/comic/num_2.png";
+import num3 from "../../assets/comic/num_3.png";
 
 <section class="not-content mx-auto grid max-w-6xl grid-cols-1 items-center gap-16 px-6 pt-12 pb-22 md:gap-24 lg:grid-cols-2 lg:gap-16 lg:pt-40 lg:pb-32">
   <StimulusMarquee class="-mx-6 lg:hidden" />
@@ -51,4 +58,29 @@ import { datasets } from "../../lib/manifest";
 <section class="not-content mx-auto grid max-w-6xl grid-cols-1 items-center gap-16 px-6 pb-8 lg:grid-cols-2 lg:gap-28 lg:pb-16">
   <LookingCurve class="mx-auto w-full max-w-xl lg:max-w-none" />
   <Stats />
+</section>
+
+<section class="not-content mx-auto flex max-w-4xl flex-col gap-12 px-10 pt-24 pb-24 md:gap-8 lg:pt-32">
+  <h2 class="mb-16 text-center font-librebask text-2xl font-bold tracking-tight text-ink sm:text-3xl">What is Peekbank?</h2>
+  <div class="grid grid-cols-1 items-center gap-6 md:grid-cols-2 md:gap-10">
+    <Image src={step1} width={896} alt="A child looks at a picture of a bird on a screen while a researcher takes notes" class="mx-auto aspect-video h-auto w-full max-w-sm object-cover md:max-w-none" />
+    <div class="mx-auto flex items-start gap-4 md:mx-0">
+      <Image src={num1} width={192} alt="Step 1" class="hidden aspect-square h-auto w-12 shrink-0 object-cover md:block" />
+      <p class="max-w-md text-[17px]/relaxed md:max-w-xs text-pretty">Various language development studies use the "Looking-While-Listening" task: A child is shown two items, a prompt names one of them, and the child's resulting gaze is recorded.</p>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 items-center gap-6 md:grid-cols-2 md:gap-10">
+    <Image src={step2} width={896} alt="A researcher converts files from many labs into uniform tables stored in Peekbank" class="mx-auto aspect-video h-auto w-full max-w-sm object-cover md:max-w-none" />
+    <div class="mx-auto flex items-start gap-4 md:mx-0">
+      <Image src={num2} width={192} alt="Step 2" class="hidden aspect-square h-auto w-12 shrink-0 object-cover md:block" />
+      <p class="max-w-md text-[17px]/relaxed md:max-w-xs text-pretty">Members of the Peekbank team manually curate these heterogeneous datasets and bring them into one unified format. Automated validation and standardized reviews ensure high data quality.</p>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 items-center gap-6 md:grid-cols-2 md:gap-10">
+    <Image src={step3} width={896} alt="Tables flow from Peekbank to a researcher's laptop" class="mx-auto aspect-video h-auto w-full max-w-sm object-cover md:max-w-none" />
+    <div class="mx-auto flex items-start gap-4 md:mx-0">
+      <Image src={num3} width={192} alt="Step 3" class="hidden aspect-square h-auto w-12 shrink-0 object-cover md:block" />
+      <p class="max-w-md text-[17px]/relaxed md:max-w-xs text-pretty">Once in Peekbank, the cleaned up data is freely accessible to anyone to use in their research. The labs supplying the original data get cited in research outputs.</p>
+    </div>
+  </div>
 </section>
