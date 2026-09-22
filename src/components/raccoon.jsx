@@ -150,7 +150,6 @@ const RaccoonEyes = () => {
   return (
     <div
       className="raccoon-container w-24 h-24 sm:w-28 sm:h-28"
-      style={{ margin: "0 auto" }}
     >
       <svg
         ref={svgRef}

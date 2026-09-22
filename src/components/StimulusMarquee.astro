@@ -1,0 +1,58 @@
+---
+// Band of stimulus images, scrolling sideways.
+import baby from "/src/assets/stimuli/Baby.png?url";
+import ball from "/src/assets/stimuli/Ball.png?url";
+import banana from "/src/assets/stimuli/Banana.png?url";
+import birdy from "/src/assets/stimuli/Birdy.png?url";
+import book from "/src/assets/stimuli/Book.png?url";
+import car from "/src/assets/stimuli/Car.png?url";
+import cookie from "/src/assets/stimuli/Cookie.png?url";
+import juice from "/src/assets/stimuli/Juice.png?url";
+import kitty from "/src/assets/stimuli/Kitty.png?url";
+import shoe from "/src/assets/stimuli/Shoe.png?url";
+import doggy from "/src/assets/stimuli/doggy.png?url";
+
+const { class: className } = Astro.props;
+
+const stimuli = [book, ball, car, baby, doggy, shoe, kitty, birdy, juice, cookie, banana];
+const track = [...stimuli, ...stimuli];
+---
+
+<div class:list={["marquee overflow-hidden", className]} aria-hidden="true">
+  <div class="marquee__track flex w-max items-center">
+    {track.map((src) => <img src={src} alt="" class="mr-8 h-16 w-auto object-contain" />)}
+  </div>
+</div>
+
+<style>
+  .marquee {
+    /* Softens both ends so images do not cut off hard at the screen edge. */
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      black 8%,
+      black 92%,
+      transparent
+    );
+  }
+
+  .marquee__track {
+    animation: marquee-scroll 40s linear infinite;
+    will-change: transform;
+  }
+
+  @keyframes marquee-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee__track {
+      animation: none;
+    }
+  }
+</style>

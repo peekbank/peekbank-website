@@ -19,13 +19,14 @@ head:
 
 import RotatingGallery from "../../components/gallery.jsx";
 import Stats from "../../components/stats.astro";
+import StimulusMarquee from "../../components/StimulusMarquee.astro";
 import { datasets } from "../../lib/manifest";
 import { Image } from "astro:assets";
 import peekbankVis from "../../assets/peekbank_item_vis.png";
 
-<section class="not-content mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 pt-24 pb-24 lg:grid-cols-2 lg:gap-16 lg:pt-40 lg:pb-32">
-  <div class="flex flex-col items-start gap-6">
-    <h1 class="font-librebask text-3xl leading-tight font-bold tracking-tight text-balance text-ink sm:text-4xl">The open database of infant word&nbsp;recognition</h1>
+<section class="not-content mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 pt-12 pb-24 md:gap-24 lg:grid-cols-2 lg:gap-16 lg:pt-40 lg:pb-32">
+  <div class="order-last lg:order-none flex w-full flex-col items-start gap-6 sm:mx-auto sm:max-w-md lg:mx-0 lg:max-w-none">
+    <h1 class="font-librebask text-3xl leading-tight font-bold tracking-tight text-balance text-ink sm:text-4xl">The open database of <br/>infant word&nbsp;recognition</h1>
     <p class="max-w-md text-base/relaxed text-pretty">Peekbank aggregates looking-while-listening data from {datasets.length} datasets into one uniform, tabular schema. Plan a study, replicate an effect, or reanalyse across the whole literature from a single query.</p>
     <div class="flex flex-wrap gap-3">
       <a
@@ -42,16 +43,19 @@ import peekbankVis from "../../assets/peekbank_item_vis.png";
       </a>
     </div>
   </div>
-  <RotatingGallery client:load />
+  <StimulusMarquee class="-mx-6 lg:hidden" />
+  <div class="hidden lg:block">
+    <RotatingGallery client:load />
+  </div>
 </section>
 
-<section class="not-content mx-auto grid max-w-6xl grid-cols-1 items-center gap-10 px-6 pb-20 lg:grid-cols-2 lg:gap-28">
+<section class="not-content mx-auto grid max-w-6xl grid-cols-1 items-center gap-16 px-6 pb-10 lg:grid-cols-2 lg:gap-28 lg:pb-20">
   <Image
     src={peekbankVis}
     width={3000}
     height={1800}
     alt="Proportion of looks to the target image over time, per dataset"
-    class="h-auto w-full rounded-2xl bg-white p-6 shadow-lg ring-1 ring-black/10"
+    class="mx-auto h-auto w-full max-w-xl rounded-2xl bg-white p-6 shadow-xs ring-1 ring-black/10 lg:max-w-none lg:shadow-md"
   />
   <Stats />
 </section>

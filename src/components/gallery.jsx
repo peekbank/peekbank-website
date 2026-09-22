@@ -138,14 +138,6 @@ const RotatingGallery = () => {
   }, [displayText, isTyping, showLayer1, layer1Index, layer2Index, isSmallScreen]);
 
 
-  if (isSmallScreen) {
-    return (
-      <div className="flex items-center justify-center">
-        <RaccoonEyes />
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col gap-4 px-6 pb-2">
       <div className="flex justify-center">
