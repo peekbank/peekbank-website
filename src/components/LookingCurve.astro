@@ -1,0 +1,140 @@
+---
+import { lookingCurves, T_LO, T_HI } from "../lib/looking-curve";
+
+const { class: className } = Astro.props;
+
+const W = 480;
+const H = 270;
+const PAD = { top: 14, right: 14, bottom: 28, left: 42 };
+const P_LO = 0.47;
+const P_HI = 0.8;
+
+const xTicks: [atMs: number, label: string][] = [
+  [0, "0"],
+  [1000, "1s"],
+  [2000, "2s"],
+  [3000, "3s"],
+];
+
+const colors = ["#c78c00", "#00a850", "#1888f8", "#d84838"];
+
+const x = (t: number) =>
+  PAD.left + ((t - T_LO) / (T_HI - T_LO)) * (W - PAD.left - PAD.right);
+const y = (p: number) =>
+  PAD.top + ((P_HI - p) / (P_HI - P_LO)) * (H - PAD.top - PAD.bottom);
+
+const bands = lookingCurves.map(({ label, points }, i) => ({
+  label,
+  color: colors[i],
+  d: points
+    .map(
+      ({ t, proportion }, k) =>
+        `${k ? "L" : "M"}${x(t).toFixed(1)} ${y(proportion).toFixed(1)}`,
+    )
+    .join(""),
+}));
+---
+
+<figure
+  class:list={[
+    "rounded-2xl bg-white text-ink p-6 shadow-xs ring-1 ring-black/10 lg:shadow-md",
+    className,
+  ]}
+>
+  <figcaption class="mb-4 text-center text-sm text-brown">
+    Proportion of looks to the target image
+  </figcaption>
+
+  <svg
+    viewBox={`0 0 ${W} ${H}`}
+    class="block w-full"
+    role="img"
+    aria-label="Proportion of looks to the target image over time, in four age bands. Every band sits at chance until the target word is spoken, then rises — the youngest to about 0.56, the oldest to about 0.77 — before falling away slowly."
+  >
+    {
+      [0.5, 0.6, 0.7].map((p) => (
+        <line
+          x1={PAD.left}
+          x2={W - PAD.right}
+          y1={y(p)}
+          y2={y(p)}
+          stroke="currentColor"
+          stroke-opacity={p === 0.5 ? 0.35 : 0.08}
+          stroke-dasharray={p === 0.5 ? "3 4" : undefined}
+        />
+      ))
+    }
+    <line
+      x1={x(0)}
+      x2={x(0)}
+      y1={PAD.top}
+      y2={H - PAD.bottom}
+      stroke="currentColor"
+      stroke-opacity="0.3"></line>
+
+    {
+      bands.map(({ d, color }) => (
+        <path
+          d={d}
+          fill="none"
+          stroke={color}
+          stroke-width="2.25"
+          vector-effect="non-scaling-stroke"
+          stroke-linejoin="round"
+        />
+      ))
+    }
+
+    {/* The viewBox scales the whole drawing, so label sizes are stepped down
+        as the chart gets wider to land near 11px throughout. */}
+    <g
+      fill="currentColor"
+      fill-opacity="0.55"
+      class="text-[16px] sm:text-[11px] lg:text-[12px]"
+    >
+      {
+        [0.5, 0.6, 0.7].map((p) => (
+          <text
+            x={PAD.left - 7}
+            y={y(p)}
+            text-anchor="end"
+            dominant-baseline="central"
+          >
+            {p.toFixed(1)}
+          </text>
+        ))
+      }
+      {
+        xTicks.map(([t, label]) => (
+          <text
+            x={x(t)}
+            y={H - PAD.bottom + 9}
+            text-anchor="middle"
+            dominant-baseline="hanging"
+          >
+            {label}
+          </text>
+        ))
+      }
+      <text x={x(0) + 6} y={PAD.top + 2} dominant-baseline="hanging"
+        >target word onset</text
+      >
+    </g>
+  </svg>
+
+  <div class="mt-5 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-brown">
+    <span>Age in months</span>
+    {
+      bands.map(({ label, color }) => (
+        <span class="inline-flex items-center gap-1.5">
+          <span
+            class="h-[3px] w-4 rounded-full"
+            style={`background:${color}`}
+            aria-hidden="true"
+          />
+          {label}
+        </span>
+      ))
+    }
+  </div>
+</figure>
