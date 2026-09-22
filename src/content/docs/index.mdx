@@ -15,6 +15,7 @@ head:
       .nova-page-frame-header {
         border-bottom-color: transparent !important;
       }
+      footer { display: none !important; }
 ---
 
 import RotatingGallery from "../../components/gallery.jsx";
@@ -83,4 +84,33 @@ import num3 from "../../assets/comic/num_3.png";
       <p class="max-w-md text-[17px]/relaxed md:max-w-xs text-pretty">Once in Peekbank, the cleaned up data is freely accessible to anyone to use in their research. The labs supplying the original data get cited in research outputs.</p>
     </div>
   </div>
+</section>
+
+<section class="not-content mx-auto max-w-[62rem] px-10 pt-24">
+  <h2 class="mb-24 text-center font-librebask text-2xl font-bold tracking-tight text-ink sm:text-3xl">Want to work with Peekbank?</h2>
+  <div class="mx-auto grid max-w-sm md:max-w-md grid-cols-1 gap-8 lg:max-w-none lg:grid-cols-3">
+    <div class="flex flex-col gap-4 rounded-lg bg-white p-8 ring-1 ring-black/10 transition duration-200 ease-out will-change-transform hover:ring-black/20 motion-safe:hover:scale-[1.03]">
+      <h3 class="font-librebask text-lg font-bold text-ink">Access the data</h3>
+      <p class="text-sm/relaxed text-charcoal">All datasets are free to use in your own research. Our R package loads them in a few lines, in the same format across every study.</p>
+      <div class="mt-auto flex flex-col gap-2 pt-4">
+        <a href="peekbank/dataschema" class="text-sm font-medium text-ink underline decoration-black/20 underline-offset-4 hover:decoration-black/60">Data schema →</a>
+        <a href="start/dataaccess" class="text-sm font-medium text-ink underline decoration-black/20 underline-offset-4 hover:decoration-black/60">Data access tutorial →</a>
+      </div>
+    </div>
+    <div class="flex flex-col gap-4 rounded-lg bg-white p-8 ring-1 ring-black/10 transition duration-200 ease-out will-change-transform hover:ring-black/20 motion-safe:hover:scale-[1.03]">
+      <h3 class="font-librebask text-lg font-bold text-ink">Contribute data</h3>
+      <p class="text-sm/relaxed text-charcoal">We convert your data into the Peekbank format and distribute it via the database. Whenever your dataset is used through Peekbank, your original paper gets cited.</p>
+      <div class="mt-auto flex flex-col gap-2 pt-4">
+        <a href="mailto:adrian.steffan@hotmail.de?subject=Contributing%20data%20to%20Peekbank" class="text-sm font-medium text-ink underline decoration-black/20 underline-offset-4 hover:decoration-black/60">Get in touch →</a>
+      </div>
+    </div>
+    <div class="flex flex-col gap-4 rounded-lg bg-white p-8 ring-1 ring-black/10 transition duration-200 ease-out will-change-transform hover:ring-black/20 motion-safe:hover:scale-[1.03]">
+      <h3 class="font-librebask text-lg font-bold text-ink">Science</h3>
+      <p class="text-sm/relaxed text-charcoal">We wanted to know what a few thousand infants could tell us about their language development. Here is what we have found out:</p>
+      <div class="mt-auto flex flex-col gap-2 pt-4">
+        <a href="https://elifesciences.org/articles/109636" class="text-sm font-medium text-ink underline decoration-black/20 underline-offset-4 hover:decoration-black/60">Developmental paper →</a>
+      </div>
+    </div>
+  </div>
+  <p class="mt-56 text-center text-sm text-brown">Peekbank is built and maintained by a team of developmental researchers. <a href="misc/about#meet-the-peekbank-team" class="text-brown underline decoration-brown/30 underline-offset-4 hover:text-ink hover:decoration-ink/60">Meet the team →</a></p>
 </section>
