@@ -1,0 +1,37 @@
+---
+title: Data Access - Redivis
+description: A guide on how to access peekbank data outside of R.
+---
+
+import { LinkCard } from 'starlight-theme-nova/components'
+
+Outside of R, read the tables straight from Redivis.
+
+<LinkCard
+  title="peekbank on Redivis"
+  href="https://stanford.redivis.com/datasets/a3v0-3drqa89kg"
+  target="_blank"
+  description="Browse and query the tables in the browser"
+/>
+
+## Versions
+
+Every Redivis version of the dataset holds one Peekbank release, named in its `release_info` table. `v1.4` is [2026.1](../../../peekbank/releases/). Pin a version to keep an analysis reproducible.
+
+## Clients
+
+Reading a table with the Python client:
+
+```python
+import redivis  # pip install redivis
+
+table = (
+    redivis.organization("datapages")
+    .dataset("peekbank:a3v0", version="v1.4")
+    .table("administrations")
+)
+
+df = table.to_pandas_dataframe()
+```
+
+Authentication uses a `REDIVIS_API_TOKEN` environment variable. For queries and the R and JavaScript clients, see the <a href="https://apidocs.redivis.com/client-libraries" target="_blank">Redivis client documentation</a>.

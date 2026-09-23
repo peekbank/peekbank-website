@@ -1,0 +1,84 @@
+---
+import codebook from "../data/codebook.json";
+
+interface Props {
+  table: string;
+}
+
+const { table } = Astro.props;
+const entry = codebook.find((t) => t.table === table);
+if (!entry) throw new Error(`No codebook entry for table "${table}"`);
+
+// Beyond this many, an enum is folded away rather than printed in full —
+// full_phrase_language alone accepts 489 ISO codes.
+const INLINE_VALUES = 12;
+
+const segments = (text: string) => text.split(/(https?:\/\/[^\s;,)]+)/g);
+
+const cell = "border-t border-black/10 py-3";
+---
+
+<div
+  class="not-content mt-4 grid grid-cols-1 gap-x-6 text-sm md:grid-cols-[13rem_7rem_minmax(0,1fr)]"
+>
+  <div class="hidden font-medium text-ink md:block">Field</div>
+  <div class="hidden font-medium text-ink md:block">Type</div>
+  <div class="hidden font-medium text-ink md:block">Description</div>
+
+  {
+    entry.fields.map((field) => (
+      <>
+        <div class={`${cell} min-w-0 pb-1 md:pb-3`}>
+          <code class="font-mono text-[0.85em] break-words text-ink">{field.name}</code>
+          {field.key === "primary" && <span class="text-xs text-brown"> key</span>}
+          {field.references && (
+            <span class="text-xs text-brown"> → {field.references}</span>
+          )}
+        </div>
+
+        <div
+          class={`${cell} min-w-0 border-t-0 py-0 text-xs text-brown md:border-t md:py-3 md:text-sm`}
+        >
+          {field.type}
+          {!field.required && <span> · optional</span>}
+        </div>
+
+        <div class={`${cell} min-w-0 border-t-0 pt-1 break-words md:border-t md:pt-3`}>
+          {segments(field.description).map((part) =>
+            /^https?:\/\//.test(part) ? (
+              <a href={part} target="_blank" class="break-all">
+                {part}
+              </a>
+            ) : (
+              part
+            ),
+          )}
+
+          {field.values.length > 0 && field.values.length <= INLINE_VALUES && (
+            <>
+              {" "}One of{" "}
+              {field.values.map((v, i) => (
+                <>
+                  {i > 0 && ", "}
+                  <code class="font-mono text-[0.85em]">{v}</code>
+                </>
+              ))}
+              .
+            </>
+          )}
+
+          {field.values.length > INLINE_VALUES && (
+            <details class="mt-2">
+              <summary class="cursor-pointer text-xs text-brown">
+                {field.values.length} accepted values
+              </summary>
+              <p class="mt-1 font-mono text-xs break-words text-brown">
+                {field.values.join(", ")}
+              </p>
+            </details>
+          )}
+        </div>
+      </>
+    ))
+  }
+</div>

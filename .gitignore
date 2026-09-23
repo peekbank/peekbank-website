@@ -31,3 +31,6 @@ src/components/viz_autogen/
 public/viz/
 
 .tmp
+
+# python
+__pycache__/

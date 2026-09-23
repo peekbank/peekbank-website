@@ -52,7 +52,7 @@
    LB ships 400 and 700 only, so putting 700 avoids a synthesised weight
    where Starlight asks for 600. */
 .sl-container > h1,
-.sl-markdown-content :is(h1, h2, h3, h4, h5, h6) {
+.sl-markdown-content :is(h1) {
   font-family: var(--font-librebask);
   font-weight: 700;
 }

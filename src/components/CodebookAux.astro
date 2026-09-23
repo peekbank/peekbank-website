@@ -1,0 +1,45 @@
+---
+import aux from "../data/codebook-aux.json";
+
+const cell = "border-t border-black/10 py-3";
+---
+
+{
+  aux.map((group) => (
+    <>
+      <h3 id={group.column}>{group.column}</h3>
+
+      <div class="not-content mt-4 grid grid-cols-1 gap-x-6 text-sm md:grid-cols-[13rem_7rem_minmax(0,1fr)]">
+        {group.entries.map((entry) => (
+          <>
+            <div class={`${cell} min-w-0 pb-1 md:pb-3`}>
+              <code class="font-mono text-[0.85em] break-words text-ink">{entry.name}</code>
+            </div>
+            <div class={`${cell} min-w-0 border-t-0 py-0 text-xs text-brown md:border-t md:py-3 md:text-sm`}>
+              {entry.type}
+              {!entry.required && <span> · optional</span>}
+            </div>
+            <div class={`${cell} min-w-0 border-t-0 pt-1 break-words md:border-t md:pt-3`}>
+              {entry.description}
+            </div>
+
+            {entry.children.map((child) => (
+              <>
+                <div class="min-w-0 pl-4 pb-1 md:pb-2">
+                  <code class="font-mono text-[0.85em] break-words text-brown">{child.name}</code>
+                </div>
+                <div class="min-w-0 py-0 text-xs text-brown md:py-2">
+                  {child.type}
+                  {!child.required && <span> · optional</span>}
+                </div>
+                <div class="min-w-0 pt-1 pb-2 break-words text-brown md:pt-0 md:pb-2">
+                  {child.description}
+                </div>
+              </>
+            ))}
+          </>
+        ))}
+      </div>
+    </>
+  ))
+}

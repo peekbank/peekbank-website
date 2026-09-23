@@ -1,0 +1,91 @@
+---
+title: Data Access - PeekbankR
+description: A guide on how to access peekbank data using peekbankr.
+---
+
+import { LinkCard } from 'starlight-theme-nova/components'
+
+The `peekbankr` package loads the Peekbank tables into R as tidy data frames, reading from the <a href="https://stanford.redivis.com/datasets/a3v0-3drqa89kg" target="_blank">versioned peekbank dataset on Redivis</a>.
+
+## Installation
+
+```r
+# install.packages("remotes")
+remotes::install_github("peekbank/peekbankr")
+```
+
+## Authorising Redivis
+
+You need a free <a href="https://redivis.com" target="_blank">Redivis account</a>. The first data request opens a browser window asking you to grant access; approve it once and later sessions reuse it.
+
+Scripts that cannot open a browser use a personal API token instead. Create one in your <a href="https://redivis.com/workspace" target="_blank">Redivis workspace</a> settings and put it in your `.Renviron`:
+
+```
+REDIVIS_API_TOKEN=your-token-here
+```
+
+## Basic Usage
+
+A connection pins one database version for everything that follows:
+
+```r
+library(peekbankr)
+
+con <- connect_to_peekbank()
+```
+
+Pass it to the `get_` functions:
+
+```r
+datasets <- get_datasets(connection = con)
+head(datasets)
+
+pomper_admins <- get_administrations(dataset_name = "pomper_saffran_2016", connection = con)
+head(pomper_admins)
+```
+
+Leaving `connection` out works, but re-resolves the version on every call and warns — a long analysis can end up spanning two releases.
+
+## Pinning a Release
+
+`connect_to_peekbank()` uses the latest release by default. Pin the one you wrote your analysis against to keep it reproducible:
+
+```r
+get_db_info() # available releases, and the Redivis version each maps to
+
+con <- connect_to_peekbank(db_version = "2025.1")
+```
+
+See [Releases](../../peekbank/releases/) for what each release contains.
+
+## Quick Analysis Example
+
+```r
+library(dplyr)
+library(ggplot2)
+
+aoi_data <- get_aoi_timepoints(dataset_name = "pomper_saffran_2016", connection = con)
+
+target_looks <- aoi_data %>%
+  group_by(t_norm) %>%
+  summarise(prop_target = mean(aoi == "target", na.rm = TRUE), .groups = "drop")
+
+ggplot(target_looks, aes(x = t_norm, y = prop_target)) +
+  geom_line() +
+  labs(x = "Time (ms)", y = "Proportion target", title = "Target looking")
+```
+
+## Reference
+
+<LinkCard
+  title="PeekbankR functions"
+  href="functions/"
+  description="What each function returns and which filters it takes"
+/>
+
+<LinkCard
+  title="peekbankr function reference"
+  href="https://peekbank.github.io/peekbankr/reference/index.html"
+  target="_blank"
+  description="Full argument lists, generated from the package source"
+/>

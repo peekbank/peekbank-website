@@ -58,18 +58,27 @@ export default defineConfig({
           label: "Start Here",
           items: [
             { label: "Getting Started", slug: "start/gettingstarted" },
-            { label: "Data Access - PeekbankR", slug: "start/dataaccess" },
-            { label: "Data Access - SQL", slug: "start/dataaccesssql" },
+            {
+              label: "Data Access",
+              items: [
+                { label: "PeekbankR", slug: "start/dataaccess" },
+                {
+                  label: "PeekbankR Functions",
+                  slug: "start/dataaccess/functions",
+                },
+                { label: "Redivis", slug: "start/dataaccess/redivis" },
+              ],
+            },
             { label: "Important Links", slug: "start/importantlinks" },
           ],
         },
         {
           label: "Peekbank",
           items: [
-            { label: "Framework", slug: "peekbank/framework" },
             { label: "Data Schema", slug: "peekbank/dataschema" },
             { label: "Codebook", slug: "peekbank/codebook" },
             { label: "Releases", slug: "peekbank/releases" },
+            { label: "Framework", slug: "peekbank/framework" },
           ],
         },
         {

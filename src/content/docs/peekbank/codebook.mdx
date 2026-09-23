@@ -1,0 +1,53 @@
+---
+title: Codebook
+description: Every column in the Peekbank schema, table by table.
+---
+
+import CodebookTable from "../../../components/CodebookTable.astro";
+import CodebookAux from "../../../components/CodebookAux.astro";
+
+Every column in the Peekbank schema. See [Data Schema](../dataschema/) for how the tables fit together.
+
+Fields are required unless marked optional, and a `→` points at the table a foreign key refers to.
+
+## datasets
+
+<CodebookTable table="datasets" />
+
+## subjects
+
+<CodebookTable table="subjects" />
+
+## administrations
+
+<CodebookTable table="administrations" />
+
+## trials
+
+<CodebookTable table="trials" />
+
+## trial_types
+
+<CodebookTable table="trial_types" />
+
+## stimuli
+
+<CodebookTable table="stimuli" />
+
+## aoi_timepoints
+
+<CodebookTable table="aoi_timepoints" />
+
+## xy_timepoints
+
+<CodebookTable table="xy_timepoints" />
+
+## aoi_region_sets
+
+<CodebookTable table="aoi_region_sets" />
+
+## Auxiliary data
+
+The `*_aux_data` columns hold JSON. What a contributing lab may record in them is documented below; the top-level keys are optional, and the indented fields sit inside them.
+
+<CodebookAux />

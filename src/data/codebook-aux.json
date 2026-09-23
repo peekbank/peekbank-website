@@ -1,0 +1,183 @@
+[
+ {
+  "table": "subjects",
+  "column": "subject_aux_data",
+  "entries": [
+   {
+    "name": "cdi_responses",
+    "type": "JSON",
+    "required": false,
+    "description": "JSON object for CDI responses",
+    "children": [
+     {
+      "name": "instrument_type",
+      "type": "string",
+      "required": false,
+      "description": "CDI version/instrument used (e.g., wg / ws / wsshort)"
+     },
+     {
+      "name": "measure",
+      "type": "string",
+      "required": false,
+      "description": "CDI measure (comprehension or production)"
+     },
+     {
+      "name": "rawscore",
+      "type": "numeric",
+      "required": false,
+      "description": "CDI raw vocabulary score"
+     },
+     {
+      "name": "percentile",
+      "type": "numeric",
+      "required": false,
+      "description": "CDI percentile (as reported in the raw data)"
+     },
+     {
+      "name": "age",
+      "type": "numeric",
+      "required": false,
+      "description": "age of the participant in months at the time the instrument was administered (conversion from days to months: days / (365.25/12)); conversion from decimal years to months: years * 12; conversion from whole number years to months: years * 12 + 6)"
+     },
+     {
+      "name": "language",
+      "type": "string",
+      "required": false,
+      "description": "CDI language (in Wordbank format: Wordbank to ISOcode Mapping)"
+     }
+    ]
+   },
+   {
+    "name": "lui_responses",
+    "type": "JSON",
+    "required": false,
+    "description": "JSON object for Language Use Inventory responses",
+    "children": [
+     {
+      "name": "rawscore",
+      "type": "numeric",
+      "required": false,
+      "description": "LUI raw score"
+     },
+     {
+      "name": "age",
+      "type": "numeric",
+      "required": false,
+      "description": "age of the participant in months at the time the instrument was administered (conversion from days to months: days / (365.25/12)); conversion from decimal years to months: years * 12; conversion from whole number years to months: years * 12 + 6)"
+     },
+     {
+      "name": "language",
+      "type": "string",
+      "required": false,
+      "description": "LUI language (in Wordbank format)"
+     }
+    ]
+   },
+   {
+    "name": "lds_rawscore",
+    "type": "JSON",
+    "required": false,
+    "description": "JSON object for Language Development Survey responses",
+    "children": [
+     {
+      "name": "rawscore",
+      "type": "numeric",
+      "required": false,
+      "description": "LDS raw score"
+     },
+     {
+      "name": "age",
+      "type": "numeric",
+      "required": false,
+      "description": "age of the participant in months at the time the instrument was administered (conversion from days to months: days / (365.25/12)); conversion from decimal years to months: years * 12; conversion from whole number years to months: years * 12 + 6)"
+     },
+     {
+      "name": "language",
+      "type": "string",
+      "required": false,
+      "description": "LDS language (in Wordbank format)"
+     }
+    ]
+   },
+   {
+    "name": "lab_visit_num",
+    "type": "numeric",
+    "required": false,
+    "description": "number of times the participant has been involved in previous experiments",
+    "children": []
+   },
+   {
+    "name": "lang_exposures",
+    "type": "JSON",
+    "required": false,
+    "description": "JSON object for language exposures",
+    "children": [
+     {
+      "name": "language",
+      "type": "string",
+      "required": false,
+      "description": "language that a child is exposed to (in Wordbank format: Wordbank to ISOcode Mapping)"
+     },
+     {
+      "name": "exposure",
+      "type": "numeric",
+      "required": false,
+      "description": "percentage exposure in a given language"
+     }
+    ]
+   },
+   {
+    "name": "lang_measures",
+    "type": "JSON",
+    "required": false,
+    "description": "JSON object for language measures other than the CDI",
+    "children": [
+     {
+      "name": "instrument_type",
+      "type": "string",
+      "required": false,
+      "description": "The specific language development measure used (e.g., LUI, LDS)"
+     },
+     {
+      "name": "rawscore",
+      "type": "numeric",
+      "required": false,
+      "description": "raw score in the language measure instrument"
+     },
+     {
+      "name": "age",
+      "type": "numeric",
+      "required": false,
+      "description": "age of the participant in months at the time the instrument was administered (conversion from days to months: days / (365.25/12)); conversion from decimal years to months: years * 12; conversion from whole number years to months: years * 12 + 6)"
+     },
+     {
+      "name": "language",
+      "type": "string",
+      "required": false,
+      "description": "language of the measure (in Wordbank format)"
+     }
+    ]
+   },
+   {
+    "name": "native_language_non_iso",
+    "type": "string",
+    "required": false,
+    "description": "name of participants' native language if the language is not represented in ISO 6390-2",
+    "children": []
+   }
+  ]
+ },
+ {
+  "table": "trial_types",
+  "column": "trial_type_aux_data",
+  "entries": [
+   {
+    "name": "full_phrase_language_non_iso",
+    "type": "string",
+    "required": false,
+    "description": "language of the full phrase if the language is not represented in ISO 6390-2",
+    "children": []
+   }
+  ]
+ }
+]

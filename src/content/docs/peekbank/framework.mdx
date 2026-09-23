@@ -1,36 +1,18 @@
 ---
 title: Framework
-description: A guide in my new Starlight docs site.
+description: How Peekbank data is processed, released and accessed.
 ---
 
-import { Image } from 'astro:assets';
-import flowchartImage from "/src/assets/legacy/peekbankflowchartv6.png";
+The Peekbank data framework consists of three components:
 
-<div class="flex flex-col xl:flex-row gap-8 md:gap-8 items-center lg:items-start">
-  <div class="flex-1">
-    The Peekbank data framework consists of three components (see Figure on right):
+1. processing raw experimental datasets
+2. publishing them as a versioned release
+3. providing an interface to the data
 
-    1. processing raw experimental datasets
-    2. populating a relational database
-    3. providing an interface to the database
+The code used to process raw datasets is hosted in <a target="_blank" class="no-underline" href="https://github.com/peekbank/peekbank-data-import" style="color:#3399f3"><code>peekbank-data-import</code></a>, which holds one import script per dataset, converting each lab's raw eye-tracking data into the common schema. The conversion and validation helpers those scripts rely on ship as part of <a target="_blank" class="no-underline" href="https://github.com/peekbank/peekbankr" style="color:#3399f3"><code>peekbankr</code></a>.
 
-    The code used to process raw datasets is hosted in <a target="_blank" class="no-underline" href="https://github.com/peekbank/peekbank-data-import" style="color:#3399f3"><code>peekbank-data-import</code></a> and processed data files are hosted on the public <a target="_blank" href="https://osf.io/pr6wu/" style="color:#3399f3">Peekbank OSF repository</a>.
+Each release is published to Redivis: the tables themselves in the <a target="_blank" class="no-underline" href="https://stanford.redivis.com/datasets/a3v0-3drqa89kg" style="color:#3399f3">peekbank dataset</a>, and the raw data, processed data and per-dataset READMEs in <a target="_blank" class="no-underline" href="https://stanford.redivis.com/datasets/frvk-5c922jwkx" style="color:#3399f3"><code>peekbank_files</code></a>. Every Redivis version holds one named Peekbank release, such as 2026.1, so an analysis can be pinned to the data it was run against.
 
-    The <a target="_blank" class="no-underline" href="https://github.com/peekbank/peekbank" style="color:#3399f3"><code>peekbank</code></a> module (Python) creates a database with the relational schema and populates it with the standardized datasets produced by peekds.
-    The database is implemented in MySQL, an industry standard relational database, which may be accessed by a variety of programming languages over the internet.
+The <a target="_blank" class="no-underline" href="https://peekbank.github.io/peekbankr/index.html" style="color:#3399f3"><code>peekbankr</code></a> library (R) provides an application programming interface, or API, that offers high-level abstractions for accessing that data. Other languages can read the tables from Redivis directly.
 
-    The <a target="_blank" class="no-underline" href="https://peekbank.github.io/peekbankr/index.html" style="color:#3399f3"><code>peekbankr</code></a> library (R) provides an application programming interface, or API, that offers high-level abstractions for accessing data in Peekbank and helps researchers convert and validate existing datasets to use the relational format of the database.
-
-    The <a class="no-underline" href="../../analyses/accuracy/" style="color:#3399f3">interactive analyses</a> provide a tool for exploring the data in the browser.
-
-  </div>
-  <div class="flex-shrink-0 mx-auto md:mx-0">
-    <Image 
-      src={flowchartImage} 
-      width={720}
-      height={960}
-      alt="Peekbank data framework flowchart"
-      class="max-w-[360px] h-auto"
-    />
-  </div>
-</div>
+The <a class="no-underline" href="../../analyses/accuracy/" style="color:#3399f3">interactive analyses</a> provide a tool for exploring the data in the browser.

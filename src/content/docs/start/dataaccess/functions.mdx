@@ -1,0 +1,73 @@
+---
+title: PeekbankR Functions
+description: What each peekbankr function returns and which filters it takes.
+---
+
+Every function here takes the `connection` created by `connect_to_peekbank()`, as described in [Data Access - PeekbankR](../../../start/dataaccess/).
+
+## Tables
+
+One function per table in the [data schema](../../../peekbank/dataschema/), which describes what each table holds. Every one takes a `connection`; the rest of the arguments narrow what comes back.
+
+| Function | Table | Filter arguments | Size in 2026.1 |
+| --- | --- | --- | --- |
+| `get_datasets()` | `datasets` | - | 44 rows |
+| `get_subjects()` | `subjects` | - | 3,915 rows |
+| `get_administrations()` | `administrations` | `dataset_name`, `dataset_id`, `age` | 5,596 rows |
+| `get_trials()` | `trials` | `dataset_name`, `dataset_id` | 134,929 rows |
+| `get_trial_types()` | `trial_types` | `dataset_name`, `dataset_id` | 6,918 rows |
+| `get_stimuli()` | `stimuli` | `dataset_name`, `dataset_id` | 1,834 rows |
+| `get_aoi_timepoints()` | `aoi_timepoints` | `dataset_name`, `dataset_id`, `age` | 36.1M rows, 3.4 GB |
+| `get_xy_timepoints()` | `xy_timepoints` | `dataset_name`, `dataset_id`, `age` | 10.0M rows, 994 MB |
+| `get_aoi_region_sets()` | `aoi_region_sets` | - | 44 rows |
+
+`dataset_name` and `dataset_id` are separate arguments that do the same job, and each takes a vector, so `dataset_name = c("pomper_saffran_2016", "reflook_v4")` works. `age` takes a single age in months or a minimum and maximum. Called without filters, a function returns its whole table, so filter the timepoints unless you really want all of it.
+
+### Auxiliary data
+
+`datasets`, `subjects`, `administrations`, `trials`, `trial_types` and `stimuli` each carry a `*_aux_data` column holding JSON: CDI scores on `subjects`, and whatever else a contributing lab recorded that the schema has no column for. The `get_` functions return it as a raw string, so unpack it before use:
+
+```r
+subjects <- get_subjects(connection = con) %>%
+  unpack_aux_data()
+```
+
+## Other Functions
+
+### get_sql_query()
+
+An escape hatch for anything the `get_` functions do not cover. Takes BigQuery Standard SQL against the tables above; string comparison is case-sensitive.
+
+```r
+get_sql_query("SELECT dataset_name, shortcite FROM datasets", connection = con)
+```
+
+### get_readmes()
+
+Downloads the per-dataset READMEs, which record import decisions and dataset quirks, into `dataset_readmes/`. These always come from the latest released files, not from the release your connection is pinned to.
+
+```r
+get_readmes(datasets = "pomper_saffran_2016")
+```
+
+### download_stimuli()
+
+Downloads the stimulus images into `stimulus_data/`, skipping any already on disk, and returns the stimulus table with a column of local paths.
+
+```r
+stimuli <- download_stimuli(con, datasets = "reflook_v4")
+```
+
+### populate_cdi_percentiles()
+
+CDI scores arrive as JSON in `subject_aux_data`. Once unpacked and cleaned, this adds the reference age and year used along with gender-specific and general percentiles.
+
+```r
+cdi <- get_subjects(connection = con) %>%
+  unpack_aux_data() %>%
+  tidyr::unnest(subject_aux_data) %>%
+  dplyr::filter(!is.na(cdi_responses)) %>%
+  tidyr::unnest(cdi_responses) %>%
+  cleanup_cdi_data() %>%
+  populate_cdi_percentiles()
+```
