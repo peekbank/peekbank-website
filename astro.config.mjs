@@ -85,6 +85,7 @@ export default defineConfig({
           label: "Misc",
           items: [
             { label: "How to Cite", slug: "misc/howtocite" },
+            { label: "Sharing Data", slug: "misc/sharing" },
             { label: "About", slug: "misc/about" },
           ],
         },
