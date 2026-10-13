@@ -1,4 +1,6 @@
-"""Emit D2 source for the peekbank schema, read from the release on Redivis.
+"""Emit D2 source for the peekbank schema, read from a release on Redivis.
+
+Pass a Redivis version tag (v1.1) to read that version instead of the latest.
 
 Column names and types come from the dataset itself. Relationships do not:
 Redivis records no foreign keys, so they are declared below and must be kept in
@@ -6,9 +8,10 @@ step with peekbankr/inst/peekbank-schema.json.
 """
 
 import json
+import sys
 import urllib.request
 
-API = "https://redivis.com/api/v1/tables/datapages.peekbank:a3v0"
+DATASET = "https://redivis.com/api/v1/tables/datapages.peekbank:a3v0"
 
 TABLES = ["datasets", "subjects", "administrations", "trials", "trial_types",
           "stimuli", "aoi_timepoints", "xy_timepoints", "aoi_region_sets"]
@@ -41,19 +44,19 @@ TARGET_COLOURS = {
 }
 
 
-def columns(table):
-    with urllib.request.urlopen(f"{API}.{table}/variables") as r:
+def columns(dataset, table):
+    with urllib.request.urlopen(f"{dataset}.{table}/variables") as r:
         return [v["name"] for v in json.load(r)["results"]]
 
 
-def emit():
+def emit(dataset):
     keys = {src for src, _ in FKS} | {dst for _, dst in FKS}
     lines = []
 
     for table in TABLES:
         lines.append(f"{table}: {{")
         lines.append("  shape: sql_table")
-        for i, name in enumerate(columns(table)):
+        for i, name in enumerate(columns(dataset, table)):
             # Types are dropped: every key is an integer, and the column cost
             # a third of the diagram's width.
             if i == 0:  # every table leads with its primary key
@@ -73,4 +76,7 @@ def emit():
 
 
 if __name__ == "__main__":
-    print(emit())
+    dataset = DATASET
+    if len(sys.argv) > 1:
+        dataset += ":" + sys.argv[1].replace(".", "_")  # the API spells v1.1 as v1_1
+    print(emit(dataset))

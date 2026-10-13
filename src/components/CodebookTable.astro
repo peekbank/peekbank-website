@@ -1,11 +1,14 @@
 ---
-import codebook from "../data/codebook.json";
+import current from "../data/codebook.json";
+import schema2021 from "../data/codebook-2021.json";
 
 interface Props {
   table: string;
+  schema?: "2021";
 }
 
-const { table } = Astro.props;
+const { table, schema } = Astro.props;
+const codebook = schema === "2021" ? schema2021 : current;
 const entry = codebook.find((t) => t.table === table);
 if (!entry) throw new Error(`No codebook entry for table "${table}"`);
 

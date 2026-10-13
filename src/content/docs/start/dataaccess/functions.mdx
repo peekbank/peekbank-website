@@ -25,7 +25,7 @@ One function per table in the [data schema](../../../peekbank/dataschema/), whic
 
 ### Auxiliary data
 
-`datasets`, `subjects`, `administrations`, `trials`, `trial_types` and `stimuli` each carry a `*_aux_data` column holding JSON: CDI scores on `subjects`, and whatever else a contributing lab recorded that the schema has no column for. The `get_` functions return it as a raw string, so unpack it before use:
+`datasets`, `subjects`, `administrations`, `trials`, `trial_types` and `stimuli` each carry a `*_aux_data` column holding JSON: CDI scores on `subjects`, and whatever else a contributing lab recorded that the schema has no column for. These columns exist from release 2025.1 on. The `get_` functions return them as raw strings, so unpack them before use:
 
 ```r
 subjects <- get_subjects(connection = con) %>%

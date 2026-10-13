@@ -3,24 +3,57 @@ title: Data Schema
 description: A guide in my new Starlight docs site.
 ---
 
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
 The Peekbank schema consists of a set of tables, each tracking different types of information about a given dataset. Each table can be accessed through functions in the <code>peekbankr</code> R package. Table columns are linked through connecting IDs (indicated by links in the schema figure below).
+
+The schema changed with release 2025.1, so pick the one that matches the release you are working with.
+
+<Tabs syncKey="schema">
+<TabItem label="2025.1 onward">
 
 - **datasets**: Information about the eyetracking dataset, including citation info
 - **subjects**: Data on individual participants
 - **administrations**: Properties of a specific session in which an individual subject participated
 - **trial_types**: Properties of each trial, including the stimuli, target location, and carrier phrase.
 - **stimuli**: Stimuli in the form of word-image pairs
-- **trials**: A record of the specific order in which a subject completed trials
+- **trials**: One row per trial a subject completed, in order, with whether the original study excluded it
 - **aoi_timepoints**: Participant looking to the areas of interest (target vs. distractor) sampled at regular time intervals
 - **xy_timepoints**: Gaze coordinates of participants' looking to the screen sampled at regular time intervals (if available)
 - **aoi_region_sets**: Positional information about areas of interest (if available)
 
-
+Most tables also carry an `*_aux_data` column holding optional JSON, described in the [codebook](/peekbank/codebook/).
 
 <div class="not-content pt-12">
   <img
-    src="/diagrams/schema-preview.svg"
-    alt="Peekbank schema, nine tables with their columns and foreign keys"
+    src="/diagrams/schema-2025.svg"
+    alt="Peekbank schema from 2025.1 onward, nine tables with their columns and foreign keys"
     class="w-full h-auto"
   />
 </div>
+
+</TabItem>
+<TabItem label="2021.0 – 2022.1">
+
+- **datasets**: Information about the eyetracking dataset, including citation info
+- **subjects**: Data on individual participants
+- **administrations**: Properties of a specific session in which an individual subject participated
+- **trial_types**: Properties of each trial, including the stimuli, target location, and carrier phrase.
+- **stimuli**: Stimuli in the form of word-image pairs
+- **trials**: One row per trial type and position in a dataset, shared by every subject who saw that trial type at that position
+- **aoi_timepoints**: Participant looking to the areas of interest (target vs. distractor) sampled at regular time intervals
+- **xy_timepoints**: Gaze coordinates of participants' looking to the screen sampled at regular time intervals (if available)
+- **aoi_region_sets**: Positional information about areas of interest (if available)
+
+These releases have no `*_aux_data` columns, no trial exclusions and no `vanilla_trial` flag. Because a `trials` row means something different here, counts and joins on `trials` do not carry over to later releases unchanged.
+
+<div class="not-content pt-12">
+  <img
+    src="/diagrams/schema-2021.svg"
+    alt="Peekbank schema for releases 2021.0 to 2022.1, nine tables with their columns and foreign keys"
+    class="w-full h-auto"
+  />
+</div>
+
+</TabItem>
+</Tabs>

@@ -1,9 +1,11 @@
 ---
 title: Releases
-description: .
+description: The Peekbank database releases and the Redivis version each maps to.
 ---
 
-We release new versions of the Peekbank database as new data becomes available. To ensure reproducibility, we maintain database versions associated with each publication by the Peekbank team. `peekbankr` uses the most recent release by default. To pin an earlier one, pass it to `connect_to_peekbank()` as `db_version`; `get_db_info()` lists the releases available and the Redivis version each maps to.
+We release new versions of the Peekbank database as new data becomes available. To ensure reproducibility, we maintain database versions associated with each publication by the Peekbank team. To pin one, pass it to `connect_to_peekbank()` as `db_version`; `get_db_info()` lists the releases available and the Redivis version each maps to.
+
+**`connect_to_peekbank()` currently defaults to 2021.0, pass `db_version = "2026.1"` for the full current database.**
 
 <div class="my-8">
   <div class="max-w-4xl mx-auto">
@@ -18,7 +20,21 @@ We release new versions of the Peekbank database as new data becomes available. 
         </div>
         <div class="flex-1 mt-0">
           <p class="text-gray-700">
-            Current release: 44 datasets, 3,915 children.
+            Latest full release: 44 datasets, 3,915 children.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-4 items-center">
+        <div class="flex-shrink-0">
+          <h4 class="text-blue-500 text-xl font-semibold">
+            <a name="2025.2"></a>
+            2025.2
+          </h4>
+        </div>
+        <div class="flex-1 mt-0">
+          <p class="text-gray-700">
+            Incremental update to 2025.1, adding one dataset.
           </p>
         </div>
       </div>
@@ -58,7 +74,8 @@ We release new versions of the Peekbank database as new data becomes available. 
               href="https://doi.org/10.3758/s13428-022-01906-4" 
               target="_blank"
               class="text-blue-600 hover:text-blue-800 underline"
-            > https://doi.org/10.3758/s13428-022-01906-4</a>.
+            > https://doi.org/10.3758/s13428-022-01906-4</a>. Holds the same data as
+            release 2021.1.
           </p>
         </div>
       </div>
@@ -66,19 +83,21 @@ We release new versions of the Peekbank database as new data becomes available. 
       <div class="flex flex-col sm:flex-row gap-4 items-center">
         <div class="flex-shrink-0">
           <h4 class="text-blue-500 text-xl font-semibold">
-            <a name="2021.1"></a>
-            2021.1
+            <a name="2021.0"></a>
+            2021.0
           </h4>
         </div>
         <div class="flex-1 mt-0">
           <p class="text-gray-700">
-            <strong>Initial release</strong>. Peekbank version for reproducing Zettersten et al. (2021),
+            Peekbank version for reproducing Zettersten et al. (2021),
             <em>CogSci</em>,
             <a
               href="https://psyarxiv.com/ep693"
               target="_blank"
               class="text-blue-600 hover:text-blue-800 underline"
-            >https://psyarxiv.com/ep693</a>.
+            >https://psyarxiv.com/ep693</a>. The 15 datasets that paper analysed, subset
+            from 2022.1 and released in 2026: the sample it used was never cut as a
+            release at the time.
           </p>
         </div>
       </div>

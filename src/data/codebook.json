@@ -54,7 +54,7 @@
     "references": null,
     "required": false,
     "values": [],
-    "description": "optional additional information about the dataset in the format of a JSON (see aux_data tab for information about existing columns)"
+    "description": "optional additional information about the dataset in the format of a JSON (see Auxiliary data below for the keys in use)"
    }
   ]
  },
@@ -109,7 +109,7 @@
     "references": null,
     "required": false,
     "values": [],
-    "description": "optional additional information about the subject in the format of a JSON (see aux_data tab for information about existing columns)"
+    "description": "optional additional information about the subject in the format of a JSON (see Auxiliary data below for the keys in use)"
    }
   ]
  },
@@ -232,7 +232,7 @@
     "references": null,
     "required": false,
     "values": [],
-    "description": "optional additional information about the administration in the format of a JSON (see aux_data tab for information about existing columns)"
+    "description": "optional additional information about the administration in the format of a JSON (see Auxiliary data below for the keys in use)"
    }
   ]
  },
@@ -291,7 +291,7 @@
     "references": null,
     "required": false,
     "values": [],
-    "description": "optional additional information about the trial in the format of a JSON (see aux_data tab for information about existing columns)"
+    "description": "optional additional information about the trial in the format of a JSON (see Auxiliary data below for the keys in use)"
    }
   ]
  },
@@ -906,7 +906,7 @@
     "references": null,
     "required": false,
     "values": [],
-    "description": "optional additional information about the trial type in the format of a JSON (see aux_data tab for information about existing columns)"
+    "description": "optional additional information about the trial type in the format of a JSON (see Auxiliary data below for the keys in use)"
    }
   ]
  },
@@ -1008,7 +1008,7 @@
     "references": null,
     "required": false,
     "values": [],
-    "description": "optional additional information about the stimulus in the format of a JSON (see aux_data tab for information about existing columns)"
+    "description": "optional additional information about the stimulus in the format of a JSON (see Auxiliary data below for the keys in use)"
    }
   ]
  },

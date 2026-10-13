@@ -1,14 +1,24 @@
 ---
 title: Codebook
 description: Every column in the Peekbank schema, table by table.
+# Every heading appears in both tabs, so the ToC lists none of them.
+tableOfContents:
+  minHeadingLevel: 6
+  maxHeadingLevel: 6
 ---
 
+import { Tabs, TabItem } from "@astrojs/starlight/components";
 import CodebookTable from "../../../components/CodebookTable.astro";
 import CodebookAux from "../../../components/CodebookAux.astro";
 
-Every column in the Peekbank schema. See [Data Schema](../dataschema/) for how the tables fit together.
+Every column in the Peekbank schema. See [Data Schema](../dataschema/) for how the tables fit together. The schema changed with release 2025.1, so pick the one that matches the release you are working with.
 
 Fields are required unless marked optional, and a `→` points at the table a foreign key refers to.
+
+<Tabs syncKey="schema">
+<TabItem label="2025.1 onward">
+
+[datasets](#datasets) · [subjects](#subjects) · [administrations](#administrations) · [trials](#trials) · [trial_types](#trial_types) · [stimuli](#stimuli) · [aoi_timepoints](#aoi_timepoints) · [xy_timepoints](#xy_timepoints) · [aoi_region_sets](#aoi_region_sets) · [Auxiliary data](#auxiliary-data)
 
 ## datasets
 
@@ -51,3 +61,49 @@ Fields are required unless marked optional, and a `→` points at the table a fo
 The `*_aux_data` columns hold JSON. What a contributing lab may record in them is documented below; the top-level keys are optional, and the indented fields sit inside them.
 
 <CodebookAux />
+
+</TabItem>
+<TabItem label="2021.0 – 2022.1">
+
+[datasets](#datasets-1) · [subjects](#subjects-1) · [administrations](#administrations-1) · [trials](#trials-1) · [trial_types](#trial_types-1) · [stimuli](#stimuli-1) · [aoi_timepoints](#aoi_timepoints-1) · [xy_timepoints](#xy_timepoints-1) · [aoi_region_sets](#aoi_region_sets-1)
+
+## datasets
+
+<CodebookTable table="datasets" schema="2021" />
+
+## subjects
+
+<CodebookTable table="subjects" schema="2021" />
+
+## administrations
+
+<CodebookTable table="administrations" schema="2021" />
+
+## trials
+
+In these releases a `trials` row is not one trial a child saw. It stands for a trial type at a position and is shared by every administration that saw that trial type there, so the trials a child saw come from the `administration_id` and `trial_id` pairs in `aoi_timepoints`.
+
+<CodebookTable table="trials" schema="2021" />
+
+## trial_types
+
+<CodebookTable table="trial_types" schema="2021" />
+
+## stimuli
+
+<CodebookTable table="stimuli" schema="2021" />
+
+## aoi_timepoints
+
+<CodebookTable table="aoi_timepoints" schema="2021" />
+
+## xy_timepoints
+
+<CodebookTable table="xy_timepoints" schema="2021" />
+
+## aoi_region_sets
+
+<CodebookTable table="aoi_region_sets" schema="2021" />
+
+</TabItem>
+</Tabs>
