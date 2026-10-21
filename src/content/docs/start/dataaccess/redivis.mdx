@@ -3,27 +3,27 @@ title: Data Access - Redivis
 description: A guide on how to access peekbank data outside of R.
 ---
 
-import { LinkCard } from 'starlight-theme-nova/components'
+import RedivisReleases from '../../../../components/RedivisReleases.astro'
 
-Outside of R, read the tables straight from Redivis.
-
-<LinkCard
-  title="peekbank on Redivis"
-  href="https://stanford.redivis.com/datasets/a3v0-3drqa89kg"
-  target="_blank"
-  description="Browse and query the tables in the browser"
-/>
+If you are not using R, you can read the tables directly from <a href="https://stanford.redivis.com/datasets/a3v0-3drqa89kg" target="_blank">peekbank on Redivis</a>, or browse and query them there in the browser.
 
 ## Versions
 
-Every Redivis version of the dataset holds one Peekbank release, named in its `release_info` table. The newest version is `v2.0`, holding [2021.0](../../../peekbank/releases/); the latest full release is `v1.4`, [2026.1](../../../peekbank/releases/). Version tags and release names do not run in step, so pin by the tag you want rather than assuming the highest one is the newest data.
+Every Redivis version of the dataset holds one Peekbank [release](../../../peekbank/releases/), named in its `release_info` table.
+
+<details>
+<summary>Which Redivis version holds which release</summary>
+
+<RedivisReleases />
+
+</details>
 
 ## Clients
 
 Reading a table with the Python client:
 
 ```python
-import redivis  # pip install redivis
+import redivis  # uv add redivis
 
 table = (
     redivis.organization("datapages")
@@ -34,4 +34,15 @@ table = (
 df = table.to_pandas_dataframe()
 ```
 
-Authentication uses a `REDIVIS_API_TOKEN` environment variable. For queries and the R and JavaScript clients, see the <a href="https://apidocs.redivis.com/client-libraries" target="_blank">Redivis client documentation</a>.
+Authentication uses a `REDIVIS_API_TOKEN` environment variable. For queries and the JavaScript client, see the <a href="https://apidocs.redivis.com/client-libraries" target="_blank">Redivis client documentation</a>.
+
+<details>
+<summary>Differences to peekbankr</summary>
+
+peekbankr reshapes some of the Redivis tables before handing them out, creating minor differences to what you would get with direct access:
+
+- peekbankr fetches the `aoi_timepoints` table in the compressed run-length encoding. Accessing the raw table via the Redivis client is a larger transfer, so either run your queries on Redivis before fetching or pull `aoi_timepoints_rle` directly and expand the table yourself.
+- peekbankr automatically adds a `dataset_name` column to `administrations`, `subjects`, `trials`, `trial_types` and `stimuli`.
+- `trials.excluded` and `trial_types.vanilla_trial` are 0/1 on Redivis, while peekbankr transforms them to TRUE/FALSE.
+
+</details>

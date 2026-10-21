@@ -9,7 +9,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "build:viz": "node scripts/build-viz.mjs",
-    "viz:pull": "uv run scripts/build_slices.py && uv run scripts/build_word_categories.py"
+    "viz:pull": "uv run scripts/build_slices.py && uv run scripts/build_word_categories.py && npm run releases:pull",
+    "releases:pull": "uv run scripts/build_releases.py"
   },
   "dependencies": {
     "@astrojs/react": "^4.3.0",

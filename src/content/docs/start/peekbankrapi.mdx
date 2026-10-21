@@ -1,0 +1,139 @@
+---
+title: PeekbankR API
+description: The peekbankr client and helper functions, and how to use them.
+---
+
+A more detailed overview of the peekbankr functions. For every argument of every function, see the <a href="https://peekbank.github.io/peekbankr/reference/index.html" target="_blank">full function reference</a>.
+
+## Creating a Client
+
+`peekbank()` returns a client pinned to one Peekbank release, which is used to invoke most functions of peekbankr.
+
+```r
+pb <- peekbank("2026.1")
+```
+
+`peekbank_releases()` lists the releases you can pass. Alternatively, `"current"` takes whichever version was published most recently.
+
+## Tables
+
+The peekbank client has one field for every table in the [data schema](../../peekbank/dataschema/). Reading a field downloads and returns the whole table. The downloads are cached, so subsequent accesses do not retrigger the download.
+
+Each table is reachable three ways, with the same columns in the same order:
+
+| | |
+| --- | --- |
+| `pb$trials` | the whole table, fetched once per session and reused after that |
+| `pb$subset$trials(...)` | narrowed by `dplyr` predicates |
+| `pb$db$trials` | a `dbplyr` handle, transferred on `collect()` |
+
+`pb$db` also holds `aoi_timepoints_rle`, one row per run of a constant AOI.
+
+In addition to the fields described in the schema, `datasets`, `subjects`, `administrations`, `trials`, `trial_types` and `stimuli` also carry a `dataset_name` column when returned by peekbankr to make filtering easier.
+
+### Auxiliary data
+
+`datasets`, `subjects`, `administrations`, `trials`, `trial_types` and `stimuli` each carry a `*_aux_data` column holding JSON: CDI scores on `subjects`, and whatever else a contributing lab recorded that the schema has no column for. These columns exist from release 2025.1 on. The tables return them as raw strings, so unpack them before use:
+
+```r
+subjects <- pb$subjects %>%
+  unpack_aux_data()
+```
+
+## Client Fields
+
+| Field | What it holds |
+| --- | --- |
+| `pb$release` | the Peekbank release this client is pinned to, e.g. `"2026.1"` |
+| `pb$redivis_tag` | the Redivis version holding it, e.g. `"v1.4"` |
+| `pb$tables` | the names of the tables in this release |
+
+Printing the client shows the release it is pinned to and what is on it:
+
+```r
+pb
+#> <peekbank> release 2026.1 (Redivis version v1.4)
+#>   tables:  datasets subjects administrations trials trial_types stimuli
+#>            aoi_region_sets aoi_timepoints xy_timepoints
+#>   methods: clear_cache() download_stimuli() query() readmes()
+#>   subset:  $subset$<table>(<dplyr predicates>)
+#>   db:      $db$<table> for a dbplyr handle, read on collect()
+```
+
+## Methods
+
+### pb$query()
+
+An escape hatch for anything the tables above do not cover. Takes BigQuery Standard SQL against this release; string comparison is case-sensitive.
+
+```r
+pb$query("SELECT dataset_name, shortcite FROM datasets")
+```
+
+### pb$readmes()
+
+Downloads the per-dataset READMEs, which record import decisions and dataset quirks, into `dataset_readmes/`. These always come from the latest released files, not from the release the client is pinned to.
+
+```r
+pb$readmes(datasets = "pomper_saffran_2016")
+```
+
+### pb$download_stimuli()
+
+Downloads the stimulus images into `stimulus_data/`, skipping any already on disk, and returns the stimulus table with a column of local paths.
+
+```r
+stimuli <- pb$download_stimuli(datasets = "reflook_v4")
+```
+
+### pb$clear_cache()
+
+Drops the tables and query results cached for this release, so the next read fetches them again.
+
+```r
+pb$clear_cache()
+```
+
+## Helper Functions
+
+### peekbank_releases()
+
+The releases `peekbank()` can be pinned to, with the Redivis version each maps to and which one `"current"` resolves to.
+
+```r
+peekbank_releases()
+```
+
+### unpack_aux_data()
+
+Parses every `*_aux_data` column of a table from its JSON string into a nested list column.
+
+```r
+subjects <- pb$subjects %>%
+  unpack_aux_data()
+```
+
+### cleanup_cdi_data()
+
+Takes unnested CDI scores and checks them for duplicate scores of the same administration. Duplicates are reported with a warning and only the highest score is kept.
+
+### populate_cdi_percentiles()
+
+Adds the reference age and year used, along with gender-specific and general percentiles, to cleaned CDI scores.
+
+### append_relative_cdi_scores()
+
+Adds `cdi_relative`, the raw score as a share of the items on the instrument. Instruments with an unknown length get `NA`.
+
+The CDI helpers work on the unnested scores in `subject_aux_data`:
+
+```r
+cdi <- pb$subjects %>%
+  unpack_aux_data() %>%
+  tidyr::unnest(subject_aux_data) %>%
+  dplyr::filter(!is.na(cdi_responses)) %>%
+  tidyr::unnest(cdi_responses) %>%
+  cleanup_cdi_data() %>%
+  populate_cdi_percentiles() %>%
+  append_relative_cdi_scores()
+```

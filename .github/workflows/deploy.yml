@@ -53,6 +53,12 @@ jobs:
           REDIVIS_API_TOKEN: ${{ secrets.REDIVIS_API_TOKEN }}
         run: npm run viz:pull
 
+      # not cached, so a newly published Redivis version shows on the next deploy
+      - name: Pull release list
+        env:
+          REDIVIS_API_TOKEN: ${{ secrets.REDIVIS_API_TOKEN }}
+        run: npm run releases:pull
+
       - name: Render the explorers
         run: npm run build:viz
 

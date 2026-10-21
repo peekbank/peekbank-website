@@ -1,0 +1,39 @@
+---
+// Which Redivis version holds which release, pulled by scripts/build_releases.py.
+const files = import.meta.glob("../../viz_src/releases.json", {
+  import: "default",
+  eager: true,
+});
+const releases = files["../../viz_src/releases.json"] as
+  | { release: string; redivisVersion: string }[]
+  | undefined;
+
+if (!releases && import.meta.env.PROD) {
+  throw new Error("No release list — run: npm run releases:pull");
+}
+---
+
+{
+  releases ? (
+    <table>
+      <thead>
+        <tr>
+          <th>Release</th>
+          <th>Redivis version</th>
+        </tr>
+      </thead>
+      <tbody>
+        {releases.map((r) => (
+          <tr>
+            <td>{r.release}</td>
+            <td>{r.redivisVersion}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  ) : (
+    <p>
+      Run <code>npm run releases:pull</code> to fetch the release list.
+    </p>
+  )
+}

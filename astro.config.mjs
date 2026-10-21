@@ -62,13 +62,10 @@ export default defineConfig({
               label: "Data Access",
               items: [
                 { label: "PeekbankR", slug: "start/dataaccess" },
-                {
-                  label: "PeekbankR Functions",
-                  slug: "start/dataaccess/functions",
-                },
                 { label: "Redivis", slug: "start/dataaccess/redivis" },
               ],
             },
+            { label: "PeekbankR API", slug: "start/peekbankrapi" },
             { label: "Important Links", slug: "start/importantlinks" },
           ],
         },

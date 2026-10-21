@@ -3,9 +3,7 @@ title: Data Access - PeekbankR
 description: A guide on how to access peekbank data using peekbankr.
 ---
 
-import { LinkCard } from 'starlight-theme-nova/components'
-
-The `peekbankr` package loads the Peekbank tables into R as tidy data frames, reading from the <a href="https://stanford.redivis.com/datasets/a3v0-3drqa89kg" target="_blank">versioned peekbank dataset on Redivis</a>.
+The `peekbankr` package offers a set of wrappers that enable you to access the peekbank data in R.
 
 ## Installation
 
@@ -16,76 +14,110 @@ remotes::install_github("peekbank/peekbankr")
 
 ## Authorising Redivis
 
-You need a free <a href="https://redivis.com" target="_blank">Redivis account</a>. The first data request opens a browser window asking you to grant access; approve it once and later sessions reuse it.
+You need a free <a href="https://redivis.com" target="_blank">Redivis account</a>. The first data request opens a browser window asking you to authenticate.
 
-Scripts that cannot open a browser use a personal API token instead. Create one in your <a href="https://redivis.com/workspace" target="_blank">Redivis workspace</a> settings and put it in your `.Renviron`:
+<details>
+<summary>I have an environment that cannot authenticate via browser</summary>
+
+Use a personal API token instead. Create one in your <a href="https://redivis.com/workspace" target="_blank">Redivis workspace</a> settings, give it the `data.metadata` scope, and put it in your `.Renviron`:
 
 ```
 REDIVIS_API_TOKEN=your-token-here
 ```
 
+</details>
+
 ## Basic Usage
 
-A connection pins one database version for everything that follows:
+Create a client for a peekbank release and then access the tables through the object:
 
 ```r
 library(peekbankr)
 
-con <- connect_to_peekbank()
+pb <- peekbank("2026.1")
+
+data <- pb$aoi_timepoints |>
+  merge(pb$administrations)
 ```
 
-Pass it to the `get_` functions:
-
-```r
-datasets <- get_datasets(connection = con)
-head(datasets)
-
-pomper_admins <- get_administrations(dataset_name = "pomper_saffran_2016", connection = con)
-head(pomper_admins)
-```
-
-Leaving `connection` out works, but re-resolves the version on every call and warns — a long analysis can end up spanning two releases.
+Every table in the [data schema](../../peekbank/dataschema/) is a field on the client. This downloads the tables automatically for the first access and caches them for subsequent use.
 
 ## Pinning a Release
 
-`connect_to_peekbank()` uses the latest release by default. Pin the one you wrote your analysis against to keep it reproducible:
+`peekbank()` requires you to specify a release:
 
 ```r
-get_db_info() # available releases, and the Redivis version each maps to
+peekbank_releases() # prints available releases
 
-con <- connect_to_peekbank(db_version = "2025.1")
+pb <- peekbank("2026.1")
+pb$release   # "2026.1"
 ```
+
+Pass `"current"` to take whichever version was published most recently (don't do this in reproducible analysis code, as what release "current" refers to will naturally change in the future)
 
 See [Releases](../../peekbank/releases/) for what each release contains.
 
-## Quick Analysis Example
+## Subsetting
+
+If you only want to download a subset of the release, `pb$subset$<table>()` takes `dplyr` expressions and returns only the matching rows:
+
+```r
+aoi_timepoints <- pb$subset$aoi_timepoints(dataset_name == "pomper_saffran_2016")
+
+ps_data <- aoi_timepoints |>
+  merge(pb$administrations)
+```
+
+A predicate can name any column of the table, or columns of any table that a row of the queried table is connected to:
+
+```r
+pb$subset$aoi_timepoints(age >= 24, age <= 36, sex == "female")
+
+pb$subset$aoi_timepoints(vanilla_trial, !excluded)
+
+pb$subset$administrations(sex == "female")
+
+pb$subset$trials(vanilla_trial)
+```
+
+These work across tables:
+
+```r
+pb$subset$aoi_timepoints(dataset_name == "pomper_saffran_2016",
+                         age < 24, vanilla_trial)
+```
+
+For the timepoint tables specifically, the predicates are translated to remote SQL queries to limit transfer size, so only a subset of predicates is available. The functions emit error messages to inform you if you try to use an untranslatable predicate.
+
+<details>
+<summary>Filtering on t_norm</summary>
+
+**`t_norm`** on `pb$subset$aoi_timepoints()` cannot be directly filtered on due to the transfer encoding of the table. If you need to filter t_norm, either do it on the fetched result OR pass `rle = FALSE` to read the expanded table directly (which will make the fetch take a lot longer):
+
+```r
+pb$subset$aoi_timepoints(dataset_name == "pomper_saffran_2016") |>
+  subset(t_norm > 0)
+
+pb$subset$aoi_timepoints(dataset_name == "pomper_saffran_2016", t_norm > 0,
+                         rle = FALSE)
+```
+
+Every other column filters normally, and `pb$subset$xy_timepoints()` has no such restriction.
+
+</details>
+
+## Server-side Queries
+
+`pb$db` holds a <a href="https://dbplyr.tidyverse.org/" target="_blank">dbplyr</a> handle on each table. `dplyr` verbs on it compile to SQL and run on the server; data transfer happens when you `collect()`. Here is an example that summarises a timepoint table without pulling it:
 
 ```r
 library(dplyr)
-library(ggplot2)
 
-aoi_data <- get_aoi_timepoints(dataset_name = "pomper_saffran_2016", connection = con)
-
-target_looks <- aoi_data %>%
-  group_by(t_norm) %>%
-  summarise(prop_target = mean(aoi == "target", na.rm = TRUE), .groups = "drop")
-
-ggplot(target_looks, aes(x = t_norm, y = prop_target)) +
-  geom_line() +
-  labs(x = "Time (ms)", y = "Proportion target", title = "Target looking")
+pb$db$aoi_timepoints |>
+  count(aoi) |>
+  collect()
 ```
 
-## Reference
+## PeekbankR API
 
-<LinkCard
-  title="PeekbankR functions"
-  href="functions/"
-  description="What each function returns and which filters it takes"
-/>
-
-<LinkCard
-  title="peekbankr function reference"
-  href="https://peekbank.github.io/peekbankr/reference/index.html"
-  target="_blank"
-  description="Full argument lists, generated from the package source"
-/>
+The [PeekbankR API](../peekbankrapi/) page covers every table and method on the client, and the helper functions.

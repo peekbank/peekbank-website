@@ -17,7 +17,7 @@ const cell = "border-t border-black/10 py-3";
             </div>
             <div class={`${cell} min-w-0 border-t-0 py-0 text-xs text-brown md:border-t md:py-3 md:text-sm`}>
               {entry.type}
-              {!entry.required && <span> · optional</span>}
+              {!entry.required && <span class="text-gray-400"> · optional</span>}
             </div>
             <div class={`${cell} min-w-0 border-t-0 pt-1 break-words md:border-t md:pt-3`}>
               {entry.description}
@@ -30,7 +30,7 @@ const cell = "border-t border-black/10 py-3";
                 </div>
                 <div class="min-w-0 py-0 text-xs text-brown md:py-2">
                   {child.type}
-                  {!child.required && <span> · optional</span>}
+                  {!child.required && <span class="text-gray-400"> · optional</span>}
                 </div>
                 <div class="min-w-0 pt-1 pb-2 break-words text-brown md:pt-0 md:pb-2">
                   {child.description}

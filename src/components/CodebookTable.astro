@@ -33,9 +33,9 @@ const cell = "border-t border-black/10 py-3";
       <>
         <div class={`${cell} min-w-0 pb-1 md:pb-3`}>
           <code class="font-mono text-[0.85em] break-words text-ink">{field.name}</code>
-          {field.key === "primary" && <span class="text-xs text-brown"> key</span>}
+          {field.key === "primary" && <span class="ml-1 whitespace-nowrap rounded border border-black/15 px-1 py-px text-xs text-brown">key</span>}
           {field.references && (
-            <span class="text-xs text-brown"> → {field.references}</span>
+            <span class="ml-1 whitespace-nowrap rounded border border-black/15 px-1 py-px text-xs text-brown">→ {field.references}</span>
           )}
         </div>
 
@@ -43,7 +43,7 @@ const cell = "border-t border-black/10 py-3";
           class={`${cell} min-w-0 border-t-0 py-0 text-xs text-brown md:border-t md:py-3 md:text-sm`}
         >
           {field.type}
-          {!field.required && <span> · optional</span>}
+          {!field.required && <span class="text-gray-400"> · optional</span>}
         </div>
 
         <div class={`${cell} min-w-0 border-t-0 pt-1 break-words md:border-t md:pt-3`}>
