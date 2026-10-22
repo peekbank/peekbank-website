@@ -6,6 +6,10 @@ This repository contains the source code for the Peekbank website and documentat
 
 We use Github Pages to deploy this site, so pushing to the main branch will update the live page.
 
+The build pulls the data slices and the release list from Redivis, so the
+repository needs a read-only Redivis token as an Actions secret named
+`REDIVIS_API_TOKEN`. The token needs `data.metadata` scope.
+
 ## Development
 
 To install the dependencies and run the dev server, you need an installation of [Node and npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm).
