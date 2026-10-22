@@ -33,11 +33,12 @@ Create a client for a peekbank release and then access the tables through the ob
 
 ```r
 library(peekbankr)
+library(dplyr)
 
 pb <- peekbank("2026.1")
 
 data <- pb$aoi_timepoints |>
-  merge(pb$administrations)
+  left_join(pb$administrations)
 ```
 
 Every table in the [data schema](../../peekbank/dataschema/) is a field on the client. This downloads the tables automatically for the first access and caches them for subsequent use.
@@ -65,7 +66,7 @@ If you only want to download a subset of the release, `pb$subset$<table>()` take
 aoi_timepoints <- pb$subset$aoi_timepoints(dataset_name == "pomper_saffran_2016")
 
 ps_data <- aoi_timepoints |>
-  merge(pb$administrations)
+  left_join(pb$administrations)
 ```
 
 A predicate can name any column of the table, or columns of any table that a row of the queried table is connected to:
