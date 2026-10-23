@@ -3,7 +3,7 @@
 //
 // Rough overview of what this script does:
 //   quarto render viz_src/ files      -> viz_src/_site/<slug>.html
-//   harvest <main> + the OJS sources  -> src/components/viz_autogen/<slug>.fragment.html
+//   harvest <main> + the OJS sources  -> src/components/analyses/viz_autogen/<slug>.fragment.html
 //   copy the runtime                  -> public/viz/
 //   scope Quarto's compiled bootstrap under .pb-viz, append viz-embed.css
 //                                     -> public/viz/viz.css
@@ -22,7 +22,7 @@ import explorers from "../viz_src/explorers.js";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const src = path.join(root, "viz_src");
 const site = path.join(src, "_site");
-const fragments = path.join(root, "src", "components", "viz_autogen");
+const fragments = path.join(root, "src", "components", "analyses", "viz_autogen");
 const publicViz = path.join(root, "public", "viz");
 
 if (!process.argv.includes("--no-render")) {

@@ -1,7 +1,7 @@
 ---
 // The dataset citation list built from the data slice.
 // uses the slices in viz_src so they tap into the self contained quarto accessible data.
-import { manifest } from "../lib/manifest";
+import { manifest } from "../../lib/manifest";
 
 const months = (m: number) => +m.toFixed(1);
 ---
@@ -12,7 +12,7 @@ const months = (m: number) => +m.toFixed(1);
       <p>
         {manifest.datasets.length} datasets, as of release {manifest.version}.
       </p>
-      <table class="text-sm">
+      <table class="text-sm" data-mdast="ignore">
         <thead>
           <tr>
             <th>Dataset</th>

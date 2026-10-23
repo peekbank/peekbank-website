@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import RaccoonEyes from "./raccoon";
+import RaccoonEyes from "./RaccoonEyes";
 
 import babyImg from "/src/assets/stimuli/Baby.png?url";
 import ballImg from "/src/assets/stimuli/Ball.png?url";

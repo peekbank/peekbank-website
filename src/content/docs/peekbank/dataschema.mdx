@@ -7,9 +7,9 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 export const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-The Peekbank schema consists of a set of tables, each tracking different types of information about a given dataset. Each table can be accessed through the <code>peekbankr</code> R package. Table columns are linked through connecting IDs (indicated by links in the schema figure below).
+The Peekbank schema is a set of tables linked by IDs (the lines in the figure below), each available through <code>peekbankr</code>.
 
-The schema changed with release 2025.1, so pick the one that matches the release you are working with.
+The schema changed with release 2025.1; pick the tab for your release.
 
 <Tabs syncKey="schema">
 <TabItem label="2025.1 onward">
@@ -24,13 +24,14 @@ The schema changed with release 2025.1, so pick the one that matches the release
 - **xy_timepoints**: Gaze coordinates of participants' looking to the screen sampled at regular time intervals (if available)
 - **aoi_region_sets**: Positional information about areas of interest (if available)
 
-Most tables also carry an `*_aux_data` column holding optional JSON, described in the [codebook](/peekbank/codebook/).
+Most tables also carry an `*_aux_data` column holding optional JSON, described in the [codebook](../codebook/).
 
 <div class="not-content pt-12">
   <img
     src={`${base}/diagrams/schema-2025.svg`}
     alt="Peekbank schema from 2025.1 onward, nine tables with their columns and foreign keys"
     class="w-full h-auto"
+    data-mdast="ignore"
   />
 </div>
 
@@ -48,12 +49,12 @@ Most tables also carry an `*_aux_data` column holding optional JSON, described i
 - **aoi_region_sets**: Positional information about areas of interest (if available)
 
 These releases have no `*_aux_data` columns, no trial exclusions and no `vanilla_trial` flag. Because a `trials` row means something different here, counts and joins on `trials` do not carry over to later releases unchanged.
-
 <div class="not-content pt-12">
   <img
     src={`${base}/diagrams/schema-2021.svg`}
     alt="Peekbank schema for releases 2021.0 to 2022.1, nine tables with their columns and foreign keys"
     class="w-full h-auto"
+    data-mdast="ignore"
   />
 </div>
 

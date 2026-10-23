@@ -59,4 +59,20 @@
 
 .sl-markdown-content summary {
   font-weight: 400;
+  user-select: none;
+}
+
+.sl-markdown-content .nova-code-copy-button {
+  cursor: pointer;
+}
+.sl-markdown-content .nova-code-copy-button:hover {
+  background-color: #e5e7eb;
+  border-color: var(--sl-color-gray-4);
+}
+
+/* on one-line code blocks, center the copy button vertically, with the same
+   gap to the right edge as to the top and bottom */
+.sl-markdown-content .nova-code-container:not(:has(.line + .line)) .nova-code-copy-button {
+  top: calc(50% - 0.75rem);
+  right: 0.75rem;
 }

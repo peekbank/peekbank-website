@@ -3,40 +3,106 @@ title: PeekbankR API
 description: The peekbankr client and helper functions, and how to use them.
 ---
 
-A more detailed overview of the peekbankr functions. For every argument of every function, see the <a href="https://peekbank.github.io/peekbankr/reference/index.html" target="_blank">full function reference</a>.
+import SubsetColumns from '../../../components/codebook/SubsetColumns.astro'
+
+An overview of the peekbankr client and helpers. For full argument lists, see the <a href="https://peekbank.github.io/peekbankr/reference/index.html" target="_blank">full function reference</a>.
 
 ## Creating a Client
 
-`peekbank()` returns a client pinned to one Peekbank release, which is used to invoke most functions of peekbankr.
+`peekbank()` returns a client pinned to one <a href="../../peekbank/releases/" target="_blank">Peekbank release</a>, through which most of peekbankr is used.
 
 ```r
 pb <- peekbank("2026.1")
 ```
 
-`peekbank_releases()` lists the releases you can pass. Alternatively, `"current"` takes whichever version was published most recently.
+`peekbank_releases()` lists the releases you can pass. `"current"` takes the most recently published one.
 
 ## Tables
 
-The peekbank client has one field for every table in the [data schema](../../peekbank/dataschema/). Reading a field downloads and returns the whole table. The downloads are cached, so subsequent accesses do not retrigger the download.
-
-Each table is reachable three ways, with the same columns in the same order:
+The client has one field per table in the [data schema](../../peekbank/dataschema/), each reachable three ways (here `trials`):
 
 | | |
 | --- | --- |
 | `pb$trials` | the whole table, fetched once per session and reused after that |
-| `pb$subset$trials(...)` | narrowed by `dplyr` predicates |
+| <code class="whitespace-nowrap">{"pb$subset$trials(...)"}</code> | narrowed by `dplyr` predicates |
 | `pb$db$trials` | a `dbplyr` handle, transferred on `collect()` |
 
-`pb$db` also holds `aoi_timepoints_rle`, one row per run of a constant AOI.
+In addition to the fields described in the schema, `datasets`, `subjects`, `administrations`, `trials`, `trial_types` and `stimuli` also carry a `dataset_name` column when returned by peekbankr.
 
-In addition to the fields described in the schema, `datasets`, `subjects`, `administrations`, `trials`, `trial_types` and `stimuli` also carry a `dataset_name` column when returned by peekbankr to make filtering easier.
+### Whole tables
+
+`pb$<table>` returns the whole table as a tibble. It is downloaded once on first access and kept for the rest of the R session for subsequent use.
+
+<div class="grid gap-2 md:grid-cols-3 [&>*]:mt-0">
+
+```r
+pb$datasets
+```
+
+```r
+pb$subjects
+```
+
+```r
+pb$administrations
+```
+
+```r
+pb$trials
+```
+
+```r
+pb$trial_types
+```
+
+```r
+pb$stimuli
+```
+
+```r
+pb$aoi_region_sets
+```
+
+```r
+pb$aoi_timepoints
+```
+
+```r
+pb$xy_timepoints
+```
+
+</div>
+
+### Subsets
+
+`pb$subset$<table>(...)` returns only the rows matching the `dplyr` predicates you pass. You can pass multiple predicates separated by comma, which are then combined with AND. A predicate can name the table's own columns and the columns of anything a row is uniquely linked to:
+
+<SubsetColumns />
+
+The result has only the table's own columns and is cached for the session.
+
+**The timepoint tables** are filtered on the server before data transfer, limiting predicates to what can be <a href="https://docs.redivis.com/api/client-libraries/redivis-r/reference/redivis/redivisusdconnect_dbi#supported-dplyr-functions" target="_blank">translated to SQL</a>. Local variables are filled in automatically, but if you want to evaluate a function before sending it to the server (e.g. to compare some external values), you need to prefix with `!!`, e.g. <code class="whitespace-nowrap">{"age < !!max(local_ages)"}</code>, as the function would otherwise be sent to the server for translation.
+
+All other tables are filtered locally and take any `dplyr` expression.
+
+### Server-side queries
+
+`pb$db$<table>` is a lazy `dbplyr` table on Redivis. `dplyr` verbs on it compile to SQL and run on the server, and the results are fetched on calling `collect()`.
+
+```r
+pb$db$aoi_timepoints |>
+  dplyr::count(aoi) |>
+  dplyr::collect()
+```
+
+`pb$db` also holds `aoi_timepoints_rle`, a compressed form of `aoi_timepoints`: one row per run of a constant AOI, starting at `t_norm` and `length` samples long.
 
 ### Auxiliary data
 
-`datasets`, `subjects`, `administrations`, `trials`, `trial_types` and `stimuli` each carry a `*_aux_data` column holding JSON: CDI scores on `subjects`, and whatever else a contributing lab recorded that the schema has no column for. These columns exist from release 2025.1 on. The tables return them as raw strings, so unpack them before use:
+From release 2025.1 on, `datasets`, `subjects`, `administrations`, `trials`, `trial_types` and `stimuli` each carry a `*_aux_data` column holding JSON data on things recorded that don't fit into the schema, most notably <a href="https://mb-cdi.stanford.edu/" target="_blank">CDI scores</a> on `subjects`. The tables return the JSON as a raw string, so unpack before use:
 
 ```r
-subjects <- pb$subjects %>%
+subjects <- pb$subjects |>
   unpack_aux_data()
 ```
 
@@ -55,7 +121,7 @@ pb
 #> <peekbank> release 2026.1 (Redivis version v1.4)
 #>   tables:  datasets subjects administrations trials trial_types stimuli
 #>            aoi_region_sets aoi_timepoints xy_timepoints
-#>   methods: clear_cache() download_stimuli() query() readmes()
+#>   methods: clear_cache() images() query() readmes()
 #>   subset:  $subset$<table>(<dplyr predicates>)
 #>   db:      $db$<table> for a dbplyr handle, read on collect()
 ```
@@ -64,31 +130,48 @@ pb
 
 ### pb$query()
 
-An escape hatch for anything the tables above do not cover. Takes BigQuery Standard SQL against this release; string comparison is case-sensitive.
+Runs BigQuery Standard SQL against the pinned release and returns a tibble. String comparison is case-sensitive. Results are cached for the session.
 
 ```r
 pb$query("SELECT dataset_name, shortcite FROM datasets")
 ```
 
-### pb$readmes()
+### pb$images()
 
-Downloads the per-dataset READMEs, which record import decisions and dataset quirks, into `dataset_readmes/`. These always come from the latest released files, not from the release the client is pinned to.
+Downloads the stimulus images to `<dir>/<dataset_name>/raw_data/<stimulus_image_path>` and returns a tibble with:
+
+- one row per stimulus that has an image, in the requested datasets
+- the columns of `pb$stimuli`, plus `local_image_path`: the path the image was saved to, or `NA` where the download failed
+
+| Argument | Default | |
+| --- | --- | --- |
+| `datasets` | all datasets | names of the datasets to download images for |
+| `dir` | {'"stimulus_data"'} | directory to save them to |
+| `skip_existing` | TRUE | skip images already on disk |
 
 ```r
-pb$readmes(datasets = "pomper_saffran_2016")
+stimuli <- pb$images(datasets = "reflook_v4")
 ```
 
-### pb$download_stimuli()
+### pb$readmes()
 
-Downloads the stimulus images into `stimulus_data/`, skipping any already on disk, and returns the stimulus table with a column of local paths.
+Downloads the per-dataset READMEs, which record import decisions and dataset quirks, to `<dir>/<dataset_name>.md` and returns a tibble with:
+
+- one row per requested dataset in the release
+- the columns of `pb$datasets`, plus `local_readme_path`: the path the README was saved to, and `readme`: its text (both `NA` where the download failed)
+
+| Argument | Default | |
+| --- | --- | --- |
+| `datasets` | all datasets | names of the datasets to download READMEs for |
+| `dir` | {'"dataset_readmes"'} | directory to save them to |
 
 ```r
-stimuli <- pb$download_stimuli(datasets = "reflook_v4")
+readmes <- pb$readmes(datasets = "pomper_saffran_2016")
 ```
 
 ### pb$clear_cache()
 
-Drops the tables and query results cached for this release, so the next read fetches them again.
+Drops this release's cached tables and query results.
 
 ```r
 pb$clear_cache()
@@ -98,7 +181,10 @@ pb$clear_cache()
 
 ### peekbank_releases()
 
-The releases `peekbank()` can be pinned to, with the Redivis version each maps to and which one `"current"` resolves to.
+Returns a tibble with:
+
+- one row per release `peekbank()` can be pinned to, most recently published first
+- the columns `release`, `redivis_tag` (the Redivis version holding it) and `current` (`TRUE` for the one `"current"` resolves to)
 
 ```r
 peekbank_releases()
@@ -109,7 +195,7 @@ peekbank_releases()
 Parses every `*_aux_data` column of a table from its JSON string into a nested list column.
 
 ```r
-subjects <- pb$subjects %>%
+subjects <- pb$subjects |>
   unpack_aux_data()
 ```
 
@@ -128,12 +214,12 @@ Adds `cdi_relative`, the raw score as a share of the items on the instrument. In
 The CDI helpers work on the unnested scores in `subject_aux_data`:
 
 ```r
-cdi <- pb$subjects %>%
-  unpack_aux_data() %>%
-  tidyr::unnest(subject_aux_data) %>%
-  dplyr::filter(!is.na(cdi_responses)) %>%
-  tidyr::unnest(cdi_responses) %>%
-  cleanup_cdi_data() %>%
-  populate_cdi_percentiles() %>%
+cdi <- pb$subjects |>
+  unpack_aux_data() |>
+  tidyr::unnest(subject_aux_data) |>
+  dplyr::filter(!is.na(cdi_responses)) |>
+  tidyr::unnest(cdi_responses) |>
+  cleanup_cdi_data() |>
+  populate_cdi_percentiles() |>
   append_relative_cdi_scores()
 ```

@@ -3,7 +3,7 @@ title: Data Access - Redivis
 description: A guide on how to access peekbank data outside of R.
 ---
 
-import RedivisReleases from '../../../../components/RedivisReleases.astro'
+import RedivisReleases from '../../../../components/docs/RedivisReleases.astro'
 
 If you are not using R, you can read the tables directly from <a href="https://stanford.redivis.com/datasets/a3v0-3drqa89kg" target="_blank">peekbank on Redivis</a>, or browse and query them there in the browser.
 
@@ -34,7 +34,7 @@ table = (
 df = table.to_pandas_dataframe()
 ```
 
-Authentication uses a `REDIVIS_API_TOKEN` environment variable. For queries and the JavaScript client, see the <a href="https://apidocs.redivis.com/client-libraries" target="_blank">Redivis client documentation</a>.
+Authentication uses a `REDIVIS_API_TOKEN` environment variable. For queries and the JavaScript client, see the <a href="https://docs.redivis.com/api/client-libraries" target="_blank">Redivis client documentation</a>.
 
 <details>
 <summary>Differences to peekbankr</summary>
@@ -42,7 +42,7 @@ Authentication uses a `REDIVIS_API_TOKEN` environment variable. For queries and 
 peekbankr reshapes some of the Redivis tables before handing them out, creating minor differences to what you would get with direct access:
 
 - peekbankr fetches the `aoi_timepoints` table in the compressed run-length encoding. Accessing the raw table via the Redivis client is a larger transfer, so either run your queries on Redivis before fetching or pull `aoi_timepoints_rle` directly and expand the table yourself.
-- peekbankr automatically adds a `dataset_name` column to `administrations`, `subjects`, `trials`, `trial_types` and `stimuli`.
+- peekbankr adds a `dataset_name` column to `administrations`, `subjects`, `trials`, `trial_types` and `stimuli`.
 - `trials.excluded` and `trial_types.vanilla_trial` are 0/1 on Redivis, while peekbankr transforms them to TRUE/FALSE.
 
 </details>

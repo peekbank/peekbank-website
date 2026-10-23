@@ -1,0 +1,21 @@
+<script>
+  // The table of contents links to the 2025.1 tab's headings. While the 2021
+  // tab is open, point each entry at that tab's copy ("-1") instead, and hide
+  // the entries that tab has no copy of.
+  const legacyPanel = document.querySelectorAll<HTMLElement>("starlight-tabs [role=tabpanel]")[1];
+  const links = document.querySelectorAll<HTMLAnchorElement>(
+    ":is(starlight-toc, mobile-starlight-toc) a:not([href='#_top'])",
+  );
+
+  function followTab() {
+    for (const link of links) {
+      const id = (link.dataset.heading ??= link.hash.slice(1));
+      const legacyCopy = document.getElementById(`${id}-1`);
+      link.setAttribute("href", !legacyPanel.hidden && legacyCopy ? `#${id}-1` : `#${id}`);
+      link.parentElement!.hidden = !legacyPanel.hidden && !legacyCopy;
+    }
+  }
+
+  followTab();
+  new MutationObserver(followTab).observe(legacyPanel, { attributeFilter: ["hidden"] });
+</script>

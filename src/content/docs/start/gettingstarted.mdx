@@ -4,35 +4,43 @@ description: How to get started with Peekbank
 ---
 
 import { LinkCard } from 'starlight-theme-nova/components'
-import { Aside } from '@astrojs/starlight/components'
 
 
 #### Welcome to Peekbank!
 
 This quickstart guide will set you up so that you can work with the data offered by peekbank. Here are some ways to get started:
 
-<LinkCard
-  title="I want an overview of the Peekbank framwork and data structure"
-  href="../../peekbank/framework/"
-  description="Get familiar with the data schema of Peekbank"
-/>
+<div data-mdast="ignore">
 
-<LinkCard
-  title="I am working in R and want to use the peekbankr package to access the data"
-  href="../../start/dataaccess"
-  description="Use our provided package to load the data into your R environment"
-/>
+  
 
-<LinkCard
-  title="I am not working in R and want to access the data directly"
-  href="../../start/dataaccess/redivis"
-  description="Read the tables straight from Redivis, in the browser or from Python"
-/>
+  <LinkCard
+    title="I want to access the data using R"
+    href="../../start/dataaccess"
+    description="Use our provided package to load the data into your R environment"
+  />
 
-{/*<LinkCard
-  title="I have my own data and want to bring it into the peekbank format"
-  description="Coming Soon"
-/>*/}
+  <LinkCard
+    title="I am not working in R and want to access the data"
+    href="../../start/dataaccess/redivis"
+    description="Read the tables straight from Redivis"
+  />
+
+  <LinkCard
+    title="I want an overview of the Peekbank data structure"
+    href="../../peekbank/dataschema/"
+    description="Get familiar with the data schema of Peekbank"
+  />
+
+  <div class="mt-10">
+
+    #### Using a coding agent?
+
+    <a href="../../llms-full.txt" target="_blank">llms-full.txt</a> contains these docs in one agent-friendly markdown file.
+
+  </div>
+
+</div>
 
 
 

@@ -1,0 +1,129 @@
+---
+// The columns each pb$subset$<table>() predicate can name, derived from the
+// codebook by following the same joins as predicate_view() in peekbankr's
+// R/tables.R.
+import codebook from "../../data/codebook.json";
+
+interface Column {
+  name: string;
+  from: string;
+  // which of a trial type's two stimuli, for columns from stimuli
+  role?: string;
+  // the codebook anchor of the field it comes from
+  ref: string;
+}
+
+const raw = (table: string) =>
+  codebook.find((t) => t.table === table)!.fields.map((f) => f.name);
+
+// a table's own columns. The dataset_id and dataset_name peekbankr adds to some
+// tables are listed under datasets, which every such table is joined to below.
+const view = (table: string): Column[] => {
+  // aoi_timepoints is read run-length encoded, where t_norm cannot be filtered on
+  const names =
+    table === "aoi_timepoints" ? ["administration_id", "trial_id", "aoi"] : raw(table);
+  return names.map((name) => ({ name, from: table, ref: `${table}-${name}` }));
+};
+
+// a many-to-one join, adding only the columns the frame does not have yet
+const widen = (frame: Column[], other: Column[]) => [
+  ...frame,
+  ...other.filter((c) => !frame.some((f) => f.name === c.name)),
+];
+
+const rawColumns = (table: string) =>
+  raw(table).map((name) => ({ name, from: table, ref: `${table}-${name}` }));
+
+const stimulus = (prefix: string) =>
+  raw("stimuli")
+    .filter((n) => n !== "dataset_id" && n !== "stimulus_id")
+    .map((n) => ({
+      name: prefix + n,
+      from: "stimuli",
+      role: prefix.slice(0, -1),
+      ref: `stimuli-${n}`,
+    }));
+
+const trialTypeLinks = (frame: Column[]) => [
+  ...frame,
+  ...stimulus("target_"),
+  ...stimulus("distractor_"),
+  ...rawColumns("aoi_region_sets").filter((c) => c.name !== "aoi_region_set_id"),
+];
+
+const predicateView = (table: string): Column[] => {
+  const frame = view(table);
+  switch (table) {
+    case "administrations":
+      return widen(widen(frame, rawColumns("subjects")), rawColumns("datasets"));
+    case "trials":
+      return widen(
+        widen(frame, trialTypeLinks(view("trial_types"))),
+        rawColumns("datasets"),
+      );
+    case "trial_types":
+      return widen(trialTypeLinks(frame), rawColumns("datasets"));
+    case "subjects":
+    case "stimuli":
+      return widen(frame, rawColumns("datasets"));
+    case "aoi_timepoints":
+    case "xy_timepoints":
+      return widen(
+        widen(frame, predicateView("administrations")),
+        predicateView("trials"),
+      );
+    default:
+      return frame;
+  }
+};
+
+const tables = codebook.map((t) => t.table);
+
+const groups = (table: string) => {
+  const byOrigin = new Map<string, Column[]>();
+  for (const c of predicateView(table)) {
+    const key = c.role ? `${c.from} (${c.role})` : c.from;
+    byOrigin.set(key, [...(byOrigin.get(key) ?? []), c]);
+  }
+  return [...byOrigin.values()];
+};
+---
+
+<div class="pb-2">
+  {
+    tables.map((table) => (
+      <details>
+        <summary>
+          <code>{table}</code>
+        </summary>
+        <div class="grid grid-cols-1 gap-x-3 gap-y-4 pl-6 md:grid-cols-[max-content_1fr] [&>*]:mt-0">
+          {groups(table).map((columns) => (
+            <>
+              <div>
+                {columns[0].from === table ? (
+                  "Own columns:"
+                ) : (
+                  <>
+                    From <code>{columns[0].from}</code>
+                    {columns[0].role ? ` (${columns[0].role}):` : ":"}
+                  </>
+                )}
+              </div>
+              <div>
+                {/* one line, since Astro renders the line breaks between elements as spaces */}
+                {columns.map((c, i) => <>{i > 0 && ", "}<a href={`../../peekbank/codebook/#${c.ref}`} target="_blank" class="no-underline"><code>{c.name}</code></a></>)}
+                {table === "aoi_timepoints" && columns[0].from === table && (
+                  <p class="mt-2">
+                    <code>t_norm</code> is missing because the table is transferred run-length
+                    encoded. To filter on it, pass <code class="whitespace-nowrap">rle = FALSE</code>;
+                    see <a href="../dataaccess/#subsetting" target="_blank">Filtering on t_norm</a>.
+                  </p>
+                )}
+              </div>
+            </>
+          ))}
+        </div>
+      </details>
+    ))
+  }
+</div>

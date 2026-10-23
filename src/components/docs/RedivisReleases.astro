@@ -1,10 +1,10 @@
 ---
 // Which Redivis version holds which release, pulled by scripts/build_releases.py.
-const files = import.meta.glob("../../viz_src/releases.json", {
+const files = import.meta.glob("../../../viz_src/releases.json", {
   import: "default",
   eager: true,
 });
-const releases = files["../../viz_src/releases.json"] as
+const releases = files["../../../viz_src/releases.json"] as
   | { release: string; redivisVersion: string }[]
   | undefined;
 

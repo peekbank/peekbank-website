@@ -3,6 +3,7 @@ import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import starlight from "@astrojs/starlight";
 import starlightThemeNova from "starlight-theme-nova";
+import starlightLlmsTxt from "starlight-llms-txt";
 
 import react from "@astrojs/react";
 
@@ -13,6 +14,19 @@ export default defineConfig({
   base,
   vite: {
     plugins: [tailwindcss()],
+  },
+  markdown: {
+    shikiConfig: {
+      transformers: [
+        {
+          // starlight-llms-txt reads a code block's language from a
+          // language-* class on <code>, which Shiki doesn't set.
+          code(node) {
+            this.addClassToHast(node, `language-${this.options.lang}`);
+          },
+        },
+      ],
+    },
   },
   integrations: [
     starlight({
@@ -35,7 +49,13 @@ export default defineConfig({
         },
       })),
       customCss: ["./src/styles/global.css"],
+      routeMiddleware: "./src/routeData.ts",
       plugins: [
+        starlightLlmsTxt({
+          description:
+            "Peekbank is an open database of looking-while-listening eye-tracking data from young children, converted from many labs into one shared schema and loaded in R with the peekbankr package.",
+          promote: ["start/gettingstarted", "start/**", "peekbank/**"],
+        }),
         starlightThemeNova({
           nav: [
             { label: "Docs", href: `${base}start/gettingstarted` },
@@ -51,7 +71,7 @@ export default defineConfig({
         },
       ],
       components: {
-        ThemeProvider: "./src/components/_disabledark.astro",
+        ThemeProvider: "./src/components/overrides/DisableDark.astro",
       },
       sidebar: [
         {
@@ -66,7 +86,7 @@ export default defineConfig({
               ],
             },
             { label: "PeekbankR API", slug: "start/peekbankrapi" },
-            { label: "Important Links", slug: "start/importantlinks" },
+            { label: "External Links", slug: "start/externallinks" },
           ],
         },
         {
@@ -75,11 +95,10 @@ export default defineConfig({
             { label: "Data Schema", slug: "peekbank/dataschema" },
             { label: "Codebook", slug: "peekbank/codebook" },
             { label: "Releases", slug: "peekbank/releases" },
-            { label: "Framework", slug: "peekbank/framework" },
           ],
         },
         {
-          label: "Misc",
+          label: "Project",
           items: [
             { label: "How to Cite", slug: "misc/howtocite" },
             { label: "Sharing Data", slug: "misc/sharing" },

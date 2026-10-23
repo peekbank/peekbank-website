@@ -29,7 +29,7 @@ REDIVIS_API_TOKEN=your-token-here
 
 ## Basic Usage
 
-Create a client for a peekbank release and then access the tables through the object:
+Create a client for a release and read the tables from it:
 
 ```r
 library(peekbankr)
@@ -41,26 +41,26 @@ data <- pb$aoi_timepoints |>
   left_join(pb$administrations)
 ```
 
-Every table in the [data schema](../../peekbank/dataschema/) is a field on the client. This downloads the tables automatically for the first access and caches them for subsequent use.
+Every table in the [data schema](../../peekbank/dataschema/) is a field on the client. <br/> They are downloaded on first access and cached for the session.
 
 ## Pinning a Release
 
 `peekbank()` requires you to specify a release:
 
 ```r
-peekbank_releases() # prints available releases
+peekbank_releases() # available releases
 
 pb <- peekbank("2026.1")
 pb$release   # "2026.1"
 ```
 
-Pass `"current"` to take whichever version was published most recently (don't do this in reproducible analysis code, as what release "current" refers to will naturally change in the future)
+Alternatively, `"current"` gets you the most recently published version. Avoid this in contexts where reproducibility is important, as "current" might point to a different release by the time the code is rerun.
 
 See [Releases](../../peekbank/releases/) for what each release contains.
 
 ## Subsetting
 
-If you only want to download a subset of the release, `pb$subset$<table>()` takes `dplyr` expressions and returns only the matching rows:
+To download only part of a table, `pb$subset$<table>()` takes `dplyr` expressions and returns only the matching rows:
 
 ```r
 aoi_timepoints <- pb$subset$aoi_timepoints(dataset_name == "pomper_saffran_2016")
@@ -69,7 +69,7 @@ ps_data <- aoi_timepoints |>
   left_join(pb$administrations)
 ```
 
-A predicate can name any column of the table, or columns of any table that a row of the queried table is connected to:
+Predicates can name columns of the table and of anything a row is linked to:
 
 ```r
 pb$subset$aoi_timepoints(age >= 24, age <= 36, sex == "female")
@@ -79,16 +79,12 @@ pb$subset$aoi_timepoints(vanilla_trial, !excluded)
 pb$subset$administrations(sex == "female")
 
 pb$subset$trials(vanilla_trial)
-```
 
-These work across tables:
-
-```r
 pb$subset$aoi_timepoints(dataset_name == "pomper_saffran_2016",
                          age < 24, vanilla_trial)
 ```
 
-For the timepoint tables specifically, the predicates are translated to remote SQL queries to limit transfer size, so only a subset of predicates is available. The functions emit error messages to inform you if you try to use an untranslatable predicate.
+For the timepoint tables specifically, the predicates are translated to remote SQL queries to limit transfer size, meaning only a subset of predicates is available. The functions emit error messages to inform you if you try to use an untranslatable predicate.
 
 <details>
 <summary>Filtering on t_norm</summary>

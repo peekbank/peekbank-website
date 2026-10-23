@@ -1,0 +1,34 @@
+---
+// The 2021 schema is the current one minus a few fields, so llms-full.txt gets
+// that diff instead of every 2021 table. It is hidden on the site, which shows
+// the full tablesfor both; starlight-llms-txt still converts hidden elements.
+import current from "../../data/codebook.json";
+import schema2021 from "../../data/codebook-2021.json";
+
+type Field =
+  | (typeof current)[number]["fields"][number]
+  | (typeof schema2021)[number]["fields"][number];
+
+// Descriptions are left out, since they get reworded without the field changing.
+const shape = (table: string, f: Field) =>
+  JSON.stringify([table, f.name, f.type, f.key, f.references, f.required, f.values]);
+
+const currentShapes = new Set(current.flatMap((t) => t.fields.map((f) => shape(t.table, f))));
+for (const t of schema2021) {
+  for (const f of t.fields) {
+    if (!currentShapes.has(shape(t.table, f))) {
+      throw new Error(`2021 field ${t.table}.${f.name} differs from the current codebook`);
+    }
+  }
+}
+
+const missing = current.flatMap((t) => {
+  const names = new Set(schema2021.find((o) => o.table === t.table)?.fields.map((f) => f.name));
+  return t.fields.filter((f) => !names.has(f.name)).map((f) => `${t.table}.${f.name}`);
+});
+---
+
+<p hidden>
+  These releases have the same tables and fields as 2025.1 onward, except that these fields do
+  not exist: {missing.map((name, i) => <>{i > 0 && ", "}<code>{name}</code></>)}.
+</p>

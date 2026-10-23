@@ -28,7 +28,7 @@ pnpm-debug.log*
 viz_src/_site/
 viz_src/slices/
 viz_src/releases.json
-src/components/viz_autogen/
+src/components/analyses/viz_autogen/
 public/viz/
 
 .tmp

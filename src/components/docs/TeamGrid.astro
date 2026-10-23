@@ -36,6 +36,7 @@ const images = import.meta.glob<{ default: ImageMetadata }>(
               src={imageModule.default}
               alt={member.alt}
               class="w-full h-auto aspect-square object-cover"
+              data-mdast="ignore"
             />
           )}
           <div class="p-4 text-center text-sm h-16 mt-0 flex items-center justify-center">
