@@ -9,9 +9,10 @@ type Field =
   | (typeof current)[number]["fields"][number]
   | (typeof schema2021)[number]["fields"][number];
 
-// Descriptions are left out, since they get reworded without the field changing.
+// Descriptions get reworded and NA flags follow each release's data, so neither
+// says whether the field itself changed.
 const shape = (table: string, f: Field) =>
-  JSON.stringify([table, f.name, f.type, f.key, f.references, f.required, f.values]);
+  JSON.stringify([table, f.name, f.type, f.key, f.references, f.values]);
 
 const currentShapes = new Set(current.flatMap((t) => t.fields.map((f) => shape(t.table, f))));
 for (const t of schema2021) {

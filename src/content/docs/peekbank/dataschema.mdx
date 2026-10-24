@@ -7,24 +7,25 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 export const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 
-The Peekbank schema is a set of tables linked by IDs (the lines in the figure below), each available through <code>peekbankr</code>.
+The Peekbank schema is a set of tables linked by IDs, each accessible through <a href="../../start/peekbankrapi/" target="_blank">peekbankr</a>. For details on the fields of each table, refer to the <a href="../codebook/" target="_blank">codebook</a>.
 
-The schema changed with release 2025.1; pick the tab for your release.
+The schema changed with release 2025.1; pick the tab for the release you are using.
 
 <Tabs syncKey="schema">
 <TabItem label="2025.1 onward">
 
-- **datasets**: Information about the eyetracking dataset, including citation info
-- **subjects**: Data on individual participants
-- **administrations**: Properties of a specific session in which an individual subject participated
-- **trial_types**: Properties of each trial, including the stimuli, target location, and carrier phrase.
-- **stimuli**: Stimuli in the form of word-image pairs
-- **trials**: One row per trial a subject completed, in order, with whether the original study excluded it
-- **aoi_timepoints**: Participant looking to the areas of interest (target vs. distractor) sampled at regular time intervals
-- **xy_timepoints**: Gaze coordinates of participants' looking to the screen sampled at regular time intervals (if available)
-- **aoi_region_sets**: Positional information about areas of interest (if available)
+| Table | One row is |
+| --- | --- |
+| <a href="../codebook/#datasets" target="_blank" class="whitespace-nowrap no-underline"><code>datasets</code></a> | a contributed dataset, with its citation |
+| <a href="../codebook/#subjects" target="_blank" class="whitespace-nowrap no-underline"><code>subjects</code></a> | a participant |
+| <a href="../codebook/#administrations" target="_blank" class="whitespace-nowrap no-underline"><code>administrations</code></a> | one session a participant took part in, with their age and the tracker used |
+| <a href="../codebook/#trials" target="_blank" class="whitespace-nowrap no-underline"><code>trials</code></a> | a trial a participant completed, in order, with whether the original study excluded it |
+| <a href="../codebook/#trial_types" target="_blank" class="whitespace-nowrap no-underline"><code>trial_types</code></a> | a type of trial, defined by its target and distractor stimuli, target side and carrier phrase |
+| <a href="../codebook/#stimuli" target="_blank" class="whitespace-nowrap no-underline"><code>stimuli</code></a> | a word–image pair |
+| <a href="../codebook/#aoi_timepoints" target="_blank" class="whitespace-nowrap no-underline"><code>aoi_timepoints</code></a> | a 25 ms gaze sample: target, distractor, other or missing |
+| <a href="../codebook/#xy_timepoints" target="_blank" class="whitespace-nowrap no-underline"><code>xy_timepoints</code></a> | a 25 ms gaze sample as screen coordinates (where available) |
+| <a href="../codebook/#aoi_region_sets" target="_blank" class="whitespace-nowrap no-underline"><code>aoi_region_sets</code></a> | the screen positions of the left and right areas of interest (where available) |
 
-Most tables also carry an `*_aux_data` column holding optional JSON, described in the [codebook](../codebook/).
 
 <div class="not-content pt-12">
   <img
@@ -38,17 +39,18 @@ Most tables also carry an `*_aux_data` column holding optional JSON, described i
 </TabItem>
 <TabItem label="2021.0 – 2022.1">
 
-- **datasets**: Information about the eyetracking dataset, including citation info
-- **subjects**: Data on individual participants
-- **administrations**: Properties of a specific session in which an individual subject participated
-- **trial_types**: Properties of each trial, including the stimuli, target location, and carrier phrase.
-- **stimuli**: Stimuli in the form of word-image pairs
-- **trials**: One row per trial type and position in a dataset, shared by every subject who saw that trial type at that position
-- **aoi_timepoints**: Participant looking to the areas of interest (target vs. distractor) sampled at regular time intervals
-- **xy_timepoints**: Gaze coordinates of participants' looking to the screen sampled at regular time intervals (if available)
-- **aoi_region_sets**: Positional information about areas of interest (if available)
+| Table | One row is |
+| --- | --- |
+| <a href="../codebook/#datasets-1" target="_blank" class="whitespace-nowrap no-underline"><code>datasets</code></a> | a contributed dataset, with its citation |
+| <a href="../codebook/#subjects-1" target="_blank" class="whitespace-nowrap no-underline"><code>subjects</code></a> | a participant |
+| <a href="../codebook/#administrations-1" target="_blank" class="whitespace-nowrap no-underline"><code>administrations</code></a> | one session a participant took part in, with their age and the tracker used |
+| <a href="../codebook/#trials-1" target="_blank" class="whitespace-nowrap no-underline"><code>trials</code></a> | a trial type at one position in a dataset, shared by every participant who saw it there |
+| <a href="../codebook/#trial_types-1" target="_blank" class="whitespace-nowrap no-underline"><code>trial_types</code></a> | a type of trial, defined by its target and distractor stimuli, target side and carrier phrase |
+| <a href="../codebook/#stimuli-1" target="_blank" class="whitespace-nowrap no-underline"><code>stimuli</code></a> | a word–image pair |
+| <a href="../codebook/#aoi_timepoints-1" target="_blank" class="whitespace-nowrap no-underline"><code>aoi_timepoints</code></a> | a 25 ms gaze sample: target, distractor, other or missing |
+| <a href="../codebook/#xy_timepoints-1" target="_blank" class="whitespace-nowrap no-underline"><code>xy_timepoints</code></a> | a 25 ms gaze sample as screen coordinates (where available) |
+| <a href="../codebook/#aoi_region_sets-1" target="_blank" class="whitespace-nowrap no-underline"><code>aoi_region_sets</code></a> | the screen positions of the left and right areas of interest (where available) |
 
-These releases have no `*_aux_data` columns, no trial exclusions and no `vanilla_trial` flag. Because a `trials` row means something different here, counts and joins on `trials` do not carry over to later releases unchanged.
 <div class="not-content pt-12">
   <img
     src={`${base}/diagrams/schema-2021.svg`}

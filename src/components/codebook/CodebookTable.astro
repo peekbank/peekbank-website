@@ -22,6 +22,7 @@ const th = "p-0 text-left font-medium text-ink";
 const td = "block p-0 align-top md:table-cell";
 // The rules sit on an inner div so the column padding leaves a gap in them.
 const cell = "border-t border-black/10 py-3";
+const valueCode = "whitespace-nowrap rounded border border-gray-300 bg-gray-100 px-1 py-0.5 font-mono text-[0.85em]";
 ---
 
 <div class="not-content mt-4 text-sm">
@@ -43,15 +44,22 @@ const cell = "border-t border-black/10 py-3";
                 <code class="font-mono text-[0.85em] break-words text-ink">{field.name}</code>
                 {field.key === "primary" && <span class="ml-1 whitespace-nowrap rounded border border-black/15 px-1 py-px text-xs text-brown">key</span>}
                 {field.references && (
-                  <span class="ml-1 whitespace-nowrap rounded border border-black/15 px-1 py-px text-xs text-brown">→ {field.references}</span>
+                  <span class="mt-1 block">
+                    {/* the 2021 tab repeats the headings, so Starlight suffixes their ids with -1 */}
+                    <a
+                      href={`#${field.references}${schema ? "-1" : ""}`}
+                      class="whitespace-nowrap rounded border border-black/15 px-1 py-px text-xs text-brown no-underline hover:border-black/40 hover:text-ink"
+                    >
+                      → {field.references}
+                    </a>
+                  </span>
                 )}
               </div>
             </td>
 
             <td class={`${td} md:pr-6`}>
               <div class={`${cell} border-t-0 py-0 text-xs text-brown md:border-t md:py-3 md:text-sm`}>
-                {field.type}
-                {!field.required && <span class="text-gray-400"> · optional</span>}
+                {field.type}{field.can_be_na && "?"}
               </div>
             </td>
 
@@ -67,11 +75,43 @@ const cell = "border-t border-black/10 py-3";
                   ),
                 )}
 
+                {field.list && (
+                  <>
+                    {/* llms-full.txt can't have a list inside a table cell */}
+                    <span class="hidden">{[field.list.summary, field.list.items.join("; ")].filter(Boolean).join(": ")}.</span>
+                    {field.list.summary ? (
+                      <details class="mt-2" data-mdast="ignore">
+                        <summary class="cursor-pointer text-sm text-brown">{field.list.summary}</summary>
+                        <ul class="mt-2 list-disc space-y-1.5 pl-5 text-sm text-brown">
+                          {field.list.items.map((item) => <li>{item}</li>)}
+                        </ul>
+                      </details>
+                    ) : (
+                      <ul class="mt-2 list-disc space-y-1.5 pl-5" data-mdast="ignore">
+                        {field.list.items.map((item) => <li>{item}</li>)}
+                      </ul>
+                    )}
+                  </>
+                )}
+
                 {field.values.length > 0 && field.values.length <= INLINE_VALUES && (
                   <>
-                    {/* one line, since Astro renders the line breaks between elements as spaces */}
-                    {" "}One of {field.values.map((v, i) => <>{i > 0 && ", "}<code class="font-mono text-[0.85em]">{v}</code></>)}.
+                    {/* with value descriptions, the sentence is only for llms-full.txt, which can't have a list inside a table cell */}
+                    <span class={field.value_descriptions ? "hidden" : undefined}>
+                      {/* one line, since Astro renders the line breaks between elements as spaces */}
+                      {" "}One of {field.values.map((v, i) => <>{i > 0 && ", "}<code class={valueCode}>{v}</code>{field.value_descriptions && ` (${field.value_descriptions[v]})`}</>)}.
+                    </span>
                   </>
+                )}
+
+                {field.value_descriptions && (
+                  <ul class="mt-2 list-disc space-y-1.5 pl-5" data-mdast="ignore">
+                    {field.values.map((v) => (
+                      <li>
+                        <code class={valueCode}>{v}</code>: {field.value_descriptions[v]}
+                      </li>
+                    ))}
+                  </ul>
                 )}
 
                 {field.values.length > INLINE_VALUES && (

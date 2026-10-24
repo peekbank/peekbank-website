@@ -35,7 +35,6 @@ const cell = "border-t border-black/10 py-3";
                   <td class={`${td} md:w-[8.5rem] md:pr-6`}>
                     <div class={`${cell} border-t-0 py-0 text-xs text-brown md:border-t md:py-3 md:text-sm`}>
                       {entry.type}
-                      {!entry.required && <span class="text-gray-400"> · optional</span>}
                     </div>
                   </td>
 
@@ -58,7 +57,6 @@ const cell = "border-t border-black/10 py-3";
                     <td class={`${td} md:pr-6`}>
                       <div class="py-0 text-xs text-brown md:py-2">
                         {child.type}
-                        {!child.required && <span class="text-gray-400"> · optional</span>}
                       </div>
                     </td>
 

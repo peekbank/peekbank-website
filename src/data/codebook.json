@@ -7,7 +7,7 @@
     "type": "integer",
     "key": "primary",
     "references": null,
-    "required": true,
+    "can_be_na": false,
     "values": [],
     "description": "row identifier for the datasets table indexing from zero"
    },
@@ -16,7 +16,7 @@
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
     "description": "lab-internal short name of the dataset"
    },
@@ -25,16 +25,16 @@
     "type": "string",
     "key": null,
     "references": null,
-    "required": true,
+    "can_be_na": false,
     "values": [],
-    "description": "a descriptive label, could be a short citation. Needs to be unique in the database"
+    "description": "the name used for that dataset in Peekbank"
    },
    {
     "name": "shortcite",
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [],
     "description": "shortened citation (author (year) APA-style in-text citation)"
    },
@@ -43,7 +43,7 @@
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [],
     "description": "full citation (APA format)"
    },
@@ -52,7 +52,7 @@
     "type": "json",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
     "description": "optional additional information about the dataset in the format of a JSON (see Auxiliary data below for the keys in use)"
    }
@@ -66,48 +66,48 @@
     "type": "integer",
     "key": "primary",
     "references": null,
-    "required": true,
+    "can_be_na": false,
     "values": [],
-    "description": "database unique participant identifier (indexing from zero)"
+    "description": "row identifier for the subjects table indexing from zero"
    },
    {
     "name": "sex",
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [
      "female",
      "male",
      "other",
      "unspecified"
     ],
-    "description": "sex of the participants (male/ female/ other/ unspecified)"
+    "description": "sex of the participants."
    },
    {
     "name": "native_language",
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [],
-    "description": "participants' native language (in ISO 6390-2); potentially a string of multiple language codes separated by a \", \" (in the case of bilinguals; note that there *must* be a space after the comma)"
+    "description": "participants' native language as an ISO 639-2 code; bilingual participants can have several codes, separated by \", \""
    },
    {
     "name": "lab_subject_id",
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [],
-    "description": "lab unique participant identifer"
+    "description": "lab unique participant identifier"
    },
    {
     "name": "subject_aux_data",
     "type": "json",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
     "description": "optional additional information about the subject in the format of a JSON (see Auxiliary data below for the keys in use)"
    }
@@ -121,7 +121,7 @@
     "type": "integer",
     "key": "primary",
     "references": null,
-    "required": true,
+    "can_be_na": false,
     "values": [],
     "description": "row identifier for the administrations table indexing from zero"
    },
@@ -130,57 +130,64 @@
     "type": "integer",
     "key": "foreign",
     "references": "datasets",
-    "required": true,
+    "can_be_na": false,
     "values": [],
-    "description": "row identifier for datasets indexing from zero (linked to datasets)"
+    "description": "ID of the dataset"
    },
    {
     "name": "age",
     "type": "float",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
-    "description": "age of the participant in months (conversion from days to months: days / (365.25/12)); conversion from decimal years to months: years * 12; conversion from whole number years to months: years * 12 + 6)"
+    "description": "age of the participant in months, converted from the age the lab recorded:",
+    "list": {
+     "items": [
+      "days: days / (365.25/12)",
+      "months: unchanged",
+      "decimal years: years * 12",
+      "whole years: years * 12 + 6"
+     ]
+    }
    },
    {
     "name": "lab_age",
     "type": "float",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
-    "description": "lab-internal age recorded for subject (before converting to standardized age in months; conversion from days to months: days / (365.25/12))"
+    "description": "age of the participant as recorded by the lab, in lab_age_units"
    },
    {
     "name": "lab_age_units",
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [
      "days",
      "months",
-     "years",
-     "epochs"
+     "years"
     ],
-    "description": "unit used for lab-internal age recorded for subject (before converting to standardized age in months); should typically be days, months, or years"
+    "description": "unit of lab_age."
    },
    {
     "name": "subject_id",
     "type": "integer",
     "key": "foreign",
     "references": "subjects",
-    "required": true,
+    "can_be_na": false,
     "values": [],
-    "description": "row identifier for subjects indexing from zero (linked to subjects)"
+    "description": "ID of the subject"
    },
    {
     "name": "monitor_size_x",
     "type": "integer",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
     "description": "width of the monitor (in pixels)"
    },
@@ -189,7 +196,7 @@
     "type": "integer",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
     "description": "height of the monitor (in pixels)"
    },
@@ -198,7 +205,7 @@
     "type": "float",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
     "description": "sampling rate of the eyetracker (in Hz) / frame rate for manual gaze coding"
    },
@@ -207,7 +214,7 @@
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
     "description": "name of the eye-tracker type/ data source (SMI/ iCoder/ Tobii/ etc.)"
    },
@@ -216,21 +223,27 @@
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [
      "eyetracking",
      "manual gaze coding",
      "automated gaze coding",
      "preprocessed eyetracking"
     ],
-    "description": "method used in the experiment for coding gaze data (eyetracking, manual gaze coding, automated gaze coding, preprocessed eyetracking - meaning eyetracking with only aoi data available)"
+    "value_descriptions": {
+     "eyetracking": "gaze recorded by an eye tracker",
+     "manual gaze coding": "looking coded by hand, frame by frame, from video",
+     "automated gaze coding": "looking coded from video by software",
+     "preprocessed eyetracking": "eyetracking with only AOI data available"
+    },
+    "description": "method used in the experiment for coding gaze data."
    },
    {
     "name": "administration_aux_data",
     "type": "json",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
     "description": "optional additional information about the administration in the format of a JSON (see Auxiliary data below for the keys in use)"
    }
@@ -244,7 +257,7 @@
     "type": "integer",
     "key": "primary",
     "references": null,
-    "required": true,
+    "can_be_na": false,
     "values": [],
     "description": "row identifier for the trials table indexing from zero"
    },
@@ -253,7 +266,7 @@
     "type": "integer",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [],
     "description": "index of the trial in order of presentation for this participant during the experiment"
    },
@@ -262,16 +275,16 @@
     "type": "integer",
     "key": "foreign",
     "references": "trial_types",
-    "required": true,
+    "can_be_na": false,
     "values": [],
-    "description": "row identifier for the trial_types table indexing from zero"
+    "description": "ID of the trial type"
    },
    {
     "name": "excluded",
     "type": "boolean",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [],
     "description": "whether or not the trial was excluded in the data analysis conducted in the original experiment for which the data was collected"
    },
@@ -280,7 +293,7 @@
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
     "description": "the reason the trial was excluded in the original experiment that is the source of the data"
    },
@@ -289,7 +302,7 @@
     "type": "json",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
     "description": "optional additional information about the trial in the format of a JSON (see Auxiliary data below for the keys in use)"
    }
@@ -303,7 +316,7 @@
     "type": "integer",
     "key": "primary",
     "references": null,
-    "required": true,
+    "can_be_na": false,
     "values": [],
     "description": "row identifier for the trial_types table indexing from zero"
    },
@@ -312,43 +325,43 @@
     "type": "integer",
     "key": "foreign",
     "references": "aoi_region_sets",
-    "required": false,
+    "can_be_na": true,
     "values": [],
-    "description": "unique aoi_region identifier (indexing from zero)"
+    "description": "ID of the AOI region set"
    },
    {
     "name": "dataset_id",
     "type": "integer",
     "key": "foreign",
     "references": "datasets",
-    "required": true,
+    "can_be_na": false,
     "values": [],
-    "description": "row identifier for the datasets table indexing from zero"
+    "description": "ID of the dataset"
    },
    {
     "name": "distractor_id",
     "type": "integer",
     "key": "foreign",
     "references": "stimuli",
-    "required": true,
+    "can_be_na": false,
     "values": [],
-    "description": "row identifier for the distractor stimulus indexing from zero"
+    "description": "ID of the distractor stimulus"
    },
    {
     "name": "target_id",
     "type": "integer",
     "key": "foreign",
     "references": "stimuli",
-    "required": true,
+    "can_be_na": false,
     "values": [],
-    "description": "row identifier for the target stimulus indexing from zero"
+    "description": "ID of the target stimulus"
    },
    {
     "name": "full_phrase",
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
     "description": "Full phrase prompting the target"
    },
@@ -357,7 +370,7 @@
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [
      "aar",
      "abk",
@@ -849,14 +862,14 @@
      "artificial",
      "other"
     ],
-    "description": "language of the full phrase (options: ISO 639-2/B language 3 digits code, multiple, artificial); see here for table and information on ISO 639-2/B language 3 digits code (use code from 639-2/B column): https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes; other link: https://gist.github.com/gantian127/8345007938faf611fa6d)"
+    "description": "language of the full phrase: an ISO 639-2/B code, or multiple, artificial or other. The codes are listed in the 639-2/B column of https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes"
    },
    {
     "name": "point_of_disambiguation",
     "type": "integer",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [],
     "description": "target onset time (relative to trial onset) in ms"
    },
@@ -865,28 +878,28 @@
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [
      "left",
      "right"
     ],
-    "description": "part of the screen in which the target stimulus appears (left or right in 2-choice design)"
+    "description": "part of the screen in which the target stimulus appears."
    },
    {
     "name": "condition",
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
-    "description": "information on the condition manipulation in the given trial (as close as possible as language from the original study)"
+    "description": "condition of the trial, worded as closely as possible to the original study"
    },
    {
     "name": "lab_trial_id",
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
     "description": "trial label assigned within lab (or descriptive label of the trial)"
    },
@@ -895,16 +908,30 @@
     "type": "boolean",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [],
-    "description": "whether or not the trial is a \"standard\" (\"vanilla\") looking-while-listening trial or includes additional manipulations. Some requirements for being considered a standard/ vanilla trial include: Familiar words (also no part-words), both target and distractor are familiar objects (i.e., each could be valid familiar targets; non-prototypical objects are OK, but unnatural/ artificially modified exemplars are not), target word is the first point of disambiguation, well-formed/grammatical carrier phrase, no relevant \u201cstuff\u201d/information prenominally (e.g. semantically informative verbs, adjectives), no nonsense words anywhere (including carrier phrase), no language/ speaker/ accent/ etc. switching within trial, no duplicated target words, no intentional background noise or audio filtering. For a full list of current criteria, see the tab \"current vanilla criteria\". Reach out to the Peekbank team for guidance on handling borderline cases."
+    "description": "whether or not the trial is a \"standard\" (\"vanilla\") looking-while-listening trial or includes additional manipulations.",
+    "list": {
+     "summary": "Some requirements for being considered a standard/ vanilla trial",
+     "items": [
+      "Familiar words (also no part-words)",
+      "Both target and distractor are familiar objects (i.e., each could be valid familiar targets; non-prototypical objects are OK, but unnatural/ artificially modified exemplars are not)",
+      "Target word is the first point of disambiguation",
+      "Well-formed/grammatical carrier phrase",
+      "No relevant \u201cstuff\u201d/information prenominally (e.g. semantically informative verbs, adjectives)",
+      "No nonsense words anywhere (including carrier phrase)",
+      "No language/ speaker/ accent/ etc. switching within trial",
+      "No duplicated target words",
+      "No intentional background noise or audio filtering"
+     ]
+    }
    },
    {
     "name": "trial_type_aux_data",
     "type": "json",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
     "description": "optional additional information about the trial type in the format of a JSON (see Auxiliary data below for the keys in use)"
    }
@@ -918,7 +945,7 @@
     "type": "integer",
     "key": "primary",
     "references": null,
-    "required": true,
+    "can_be_na": false,
     "values": [],
     "description": "row identifier for the stimuli table indexing from zero"
    },
@@ -927,37 +954,37 @@
     "type": "integer",
     "key": "foreign",
     "references": "datasets",
-    "required": true,
+    "can_be_na": false,
     "values": [],
-    "description": "row identifier for datasets indexing from zero (linked to datasets)"
+    "description": "ID of the dataset"
    },
    {
     "name": "stimulus_novelty",
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [
      "novel",
      "familiar"
     ],
-    "description": "whether the stimulus word (not image) is novel or familiar (options: novel, familiar)"
+    "description": "whether the stimulus word (not image) is novel or familiar."
    },
    {
     "name": "original_stimulus_label",
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
-    "description": "label (i.e. label for the image when it appears in target position or the label for the image as described in the experiment design) assigned to the stimulus (in the original language of the study)"
+    "description": "label of the stimulus in the original language of the study: the word used for the image when it is the target, or its label in the experiment design"
    },
    {
     "name": "english_stimulus_label",
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
     "description": "label assigned to the stimulus translated into English"
    },
@@ -966,16 +993,16 @@
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
-    "description": "relative file path to the visual image stimulus (relative to raw_data/) - has to point to an existing file, should be NA if no such file exists in the raw data"
+    "description": "path to the image file, relative to raw_data/; NA if the raw data has no image file"
    },
    {
     "name": "lab_stimulus_id",
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
     "description": "an id or name assigned to the stimulus by the original authors"
    },
@@ -984,29 +1011,34 @@
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
-    "description": "a short natural language description of the image (can be multiple words)"
+    "description": "a short natural language description of the image"
    },
    {
     "name": "image_description_source",
     "type": "string",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [
      "image path",
      "experiment documentation",
      "Peekbank discretion"
     ],
-    "description": "an explanation of the source of  the natural language  description (Options: taken from the image path; based on experiment documentation; generated by the importer/ Peekbank team)"
+    "value_descriptions": {
+     "image path": "taken from the image path",
+     "experiment documentation": "based on experiment documentation",
+     "Peekbank discretion": "generated by the importer/ Peekbank team"
+    },
+    "description": "source of the natural language description."
    },
    {
     "name": "stimulus_aux_data",
     "type": "json",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
     "description": "optional additional information about the stimulus in the format of a JSON (see Auxiliary data below for the keys in use)"
    }
@@ -1020,7 +1052,7 @@
     "type": "integer",
     "key": "primary",
     "references": null,
-    "required": true,
+    "can_be_na": false,
     "values": [],
     "description": "row identifier for the aoi_timepoints table indexing from zero"
    },
@@ -1029,41 +1061,47 @@
     "type": "string",
     "key": null,
     "references": null,
-    "required": true,
+    "can_be_na": false,
     "values": [
      "target",
      "distractor",
      "other",
      "missing"
     ],
-    "description": "name of the looking location (target, distractor, other, missing). other = on-screen looking, but not in the AOI regions for target or distractor. missing = missing data (could be off-screen look, blink, tracker error, etc.)"
+    "value_descriptions": {
+     "target": "looking at the target",
+     "distractor": "looking at the distractor",
+     "other": "on-screen looking, but not in the AOI regions for target or distractor",
+     "missing": "missing data, e.g. an off-screen look, blink or tracker error"
+    },
+    "description": "name of the looking location."
    },
    {
     "name": "administration_id",
     "type": "integer",
     "key": "foreign",
     "references": "administrations",
-    "required": true,
+    "can_be_na": false,
     "values": [],
-    "description": "row identifier for the administrations table indexing from zero (linked to administrations)"
+    "description": "ID of the administration"
    },
    {
     "name": "t_norm",
     "type": "integer",
     "key": null,
     "references": null,
-    "required": true,
+    "can_be_na": false,
     "values": [],
-    "description": "timestamp in ms, centered on the point of disambiguation of the target (= 0 ms)"
+    "description": "timestamp in ms, centered on the point of disambiguation of the target (= 0 ms); samples are 25 ms apart (40 Hz)"
    },
    {
     "name": "trial_id",
     "type": "integer",
     "key": "foreign",
     "references": "trials",
-    "required": true,
+    "can_be_na": false,
     "values": [],
-    "description": "row identifier for the trials table indexing from zero (linked to trials)"
+    "description": "ID of the trial"
    }
   ]
  },
@@ -1075,7 +1113,7 @@
     "type": "integer",
     "key": "primary",
     "references": null,
-    "required": true,
+    "can_be_na": false,
     "values": [],
     "description": "row identifier for the xy_timepoints table indexing from zero"
    },
@@ -1084,25 +1122,25 @@
     "type": "integer",
     "key": "foreign",
     "references": "administrations",
-    "required": true,
+    "can_be_na": false,
     "values": [],
-    "description": "row identifier for the administrations table indexing from zero (linked to administrations)"
+    "description": "ID of the administration"
    },
    {
     "name": "trial_id",
     "type": "integer",
     "key": "foreign",
     "references": "trials",
-    "required": true,
+    "can_be_na": false,
     "values": [],
-    "description": "row identifier for the trials table indexing from zero (linked to trials)"
+    "description": "ID of the trial"
    },
    {
     "name": "x",
     "type": "integer",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
     "description": "x-coordinate of gaze position at timepoint t (origin (0,0) is bottom left)"
    },
@@ -1111,7 +1149,7 @@
     "type": "integer",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": true,
     "values": [],
     "description": "y-coordinate of gaze position at timepoint t (origin (0,0) is bottom left)"
    },
@@ -1120,9 +1158,9 @@
     "type": "integer",
     "key": null,
     "references": null,
-    "required": true,
+    "can_be_na": false,
     "values": [],
-    "description": "timestamp in ms, centered on the point of disambiguation of the target (= 0 ms)"
+    "description": "timestamp in ms, centered on the point of disambiguation of the target (= 0 ms); samples are 25 ms apart (40 Hz)"
    }
   ]
  },
@@ -1134,7 +1172,7 @@
     "type": "integer",
     "key": "primary",
     "references": null,
-    "required": true,
+    "can_be_na": false,
     "values": [],
     "description": "row identifier for the aoi_region_sets table indexing from zero"
    },
@@ -1143,7 +1181,7 @@
     "type": "integer",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [],
     "description": "maximum x-coordinate of the left AOI region (with the bottom left corner of the screen as origin (0,0))"
    },
@@ -1152,7 +1190,7 @@
     "type": "integer",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [],
     "description": "minimum x-coordinate of the left AOI region (with the bottom left corner of the screen as origin (0,0))"
    },
@@ -1161,7 +1199,7 @@
     "type": "integer",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [],
     "description": "maximum y-coordinate of the left AOI region (with the bottom left corner of the screen as origin (0,0))"
    },
@@ -1170,7 +1208,7 @@
     "type": "integer",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [],
     "description": "minimum y-coordinate of the left AOI region (with the bottom left corner of the screen as origin (0,0))"
    },
@@ -1179,7 +1217,7 @@
     "type": "integer",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [],
     "description": "maximum x-coordinate of the right AOI region (with the bottom left corner of the screen as origin (0,0))"
    },
@@ -1188,7 +1226,7 @@
     "type": "integer",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [],
     "description": "minimum x-coordinate of the right AOI region (with the bottom left corner of the screen as origin (0,0))"
    },
@@ -1197,7 +1235,7 @@
     "type": "integer",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [],
     "description": "maximum y-coordinate of the right AOI region (with the bottom left corner of the screen as origin (0,0))"
    },
@@ -1206,7 +1244,7 @@
     "type": "integer",
     "key": null,
     "references": null,
-    "required": false,
+    "can_be_na": false,
     "values": [],
     "description": "minimum y-coordinate of the right AOI region (with the bottom left corner of the screen as origin (0,0))"
    }
