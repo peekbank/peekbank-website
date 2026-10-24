@@ -1,16 +1,17 @@
 ---
 // Band of stimulus images, scrolling sideways.
-import baby from "/src/assets/stimuli/Baby.png?url";
-import ball from "/src/assets/stimuli/Ball.png?url";
-import banana from "/src/assets/stimuli/Banana.png?url";
-import birdy from "/src/assets/stimuli/Birdy.png?url";
-import book from "/src/assets/stimuli/Book.png?url";
-import car from "/src/assets/stimuli/Car.png?url";
-import cookie from "/src/assets/stimuli/Cookie.png?url";
-import juice from "/src/assets/stimuli/Juice.png?url";
-import kitty from "/src/assets/stimuli/Kitty.png?url";
-import shoe from "/src/assets/stimuli/Shoe.png?url";
-import doggy from "/src/assets/stimuli/doggy.png?url";
+import { Image } from "astro:assets";
+import baby from "/src/assets/stimuli/Baby.png";
+import ball from "/src/assets/stimuli/Ball.png";
+import banana from "/src/assets/stimuli/Banana.png";
+import birdy from "/src/assets/stimuli/Birdy.png";
+import book from "/src/assets/stimuli/Book.png";
+import car from "/src/assets/stimuli/Car.png";
+import cookie from "/src/assets/stimuli/Cookie.png";
+import juice from "/src/assets/stimuli/Juice.png";
+import kitty from "/src/assets/stimuli/Kitty.png";
+import shoe from "/src/assets/stimuli/Shoe.png";
+import doggy from "/src/assets/stimuli/doggy.png";
 
 const { class: className } = Astro.props;
 
@@ -20,7 +21,7 @@ const track = [...stimuli, ...stimuli];
 
 <div class:list={["marquee overflow-hidden", className]} aria-hidden="true">
   <div class="marquee__track flex w-max items-center">
-    {track.map((src) => <img src={src} alt="" class="mr-8 h-16 w-auto object-contain" />)}
+    {track.map((src) => <Image src={src} width={64} densities={[1, 2, 3]} loading="eager" alt="" class="mr-8 h-16 w-auto object-contain" />)}
   </div>
 </div>
 
