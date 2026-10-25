@@ -27,7 +27,7 @@ The client has one field per table in the [data schema](../../peekbank/dataschem
 | <code class="whitespace-nowrap">{"pb$subset$trials(...)"}</code> | narrowed by `dplyr` predicates |
 | `pb$db$trials` | a `dbplyr` handle, transferred on `collect()` |
 
-In addition to the fields described in the schema, `datasets`, `subjects`, `administrations`, `trials`, `trial_types` and `stimuli` also carry a `dataset_name` column when returned by peekbankr.
+In addition to the fields described in the schema, `subjects`, `administrations`, `trials`, `trial_types` and `stimuli` also carry a `dataset_name` column when returned by peekbankr.
 
 ### Whole tables
 
@@ -96,15 +96,6 @@ pb$db$aoi_timepoints |>
 ```
 
 `pb$db` also holds `aoi_timepoints_rle`, a compressed form of `aoi_timepoints`: one row per run of a constant AOI, starting at `t_norm` and `length` samples long.
-
-### Auxiliary data
-
-From release 2025.1 on, `datasets`, `subjects`, `administrations`, `trials`, `trial_types` and `stimuli` each carry a `*_aux_data` column holding JSON data on things recorded that don't fit into the schema, most notably <a href="https://mb-cdi.stanford.edu/" target="_blank">CDI scores</a> on `subjects`. The tables return the JSON as a raw string, so unpack before use:
-
-```r
-subjects <- pb$subjects |>
-  unpack_aux_data()
-```
 
 ## Client Fields
 
@@ -190,36 +181,101 @@ Returns a tibble with:
 peekbank_releases()
 ```
 
-### unpack_aux_data()
+### unnest_aux()
 
-Parses every `*_aux_data` column of a table from its JSON string into a nested list column.
+Turns one key of a table's `*_aux_data` JSON into rows and returns a tibble.
 
-```r
-subjects <- pb$subjects |>
-  unpack_aux_data()
-```
+E.g., for `pb$subjects`, a subject with three CDI scores gets three rows in the output, each with that subject's columns plus the fields of one score. Subjects without the key are dropped. A key holding a single value, like `native_language_non_iso`, becomes one column named after it.
 
-### cleanup_cdi_data()
 
-Takes unnested CDI scores and checks them for duplicate scores of the same administration. Duplicates are reported with a warning and only the highest score is kept.
+See [codebook](../../peekbank/codebook/#auxiliary-data) for compatible versions and keys.
 
-### populate_cdi_percentiles()
-
-Adds the reference age and year used, along with gender-specific and general percentiles, to cleaned CDI scores.
-
-### append_relative_cdi_scores()
-
-Adds `cdi_relative`, the raw score as a share of the items on the instrument. Instruments with an unknown length get `NA`.
-
-The CDI helpers work on the unnested scores in `subject_aux_data`:
+| Argument | Default | |
+| --- | --- | --- |
+| `df` | required | a table with a `*_aux_data` column, e.g. `pb$subjects` |
+| `key` | required | the key to expand, e.g. {'"cdi_responses"'} |
 
 ```r
 cdi <- pb$subjects |>
-  unpack_aux_data() |>
-  tidyr::unnest(subject_aux_data) |>
-  dplyr::filter(!is.na(cdi_responses)) |>
-  tidyr::unnest(cdi_responses) |>
-  cleanup_cdi_data() |>
-  populate_cdi_percentiles() |>
-  append_relative_cdi_scores()
+  unnest_aux("cdi_responses")
+```
+
+<details class="[&_table]:text-sm [&_td]:whitespace-nowrap [&_td]:px-2 [&_th]:px-2 [&_pre]:text-[13px]!">
+<summary>Example: Unnesting CDI JSON</summary>
+
+This subject in `pb$subjects`
+
+| subject_id | sex | native_language | lab_subject_id | dataset_id | dataset_name |
+| --- | --- | --- | --- | --- | --- |
+| 1836 | female | eng | 6356 | 25 | fmw_2013 |
+
+has this `subject_aux_data`:
+
+```json
+{
+  "cdi_responses": [
+    {"instrument_type": "ws", "measure": "prod", "age": 18,
+     "rawscore": 138, "percentile": 61, "language": "English (American)"},
+    {"instrument_type": "ws", "measure": "prod", "age": 24,
+     "rawscore": 313, "percentile": 45, "language": "English (American)"}
+  ]
+}
+```
+
+Running the code example above turns it into two rows, one per CDI score (with this unnesting being repeated for all subjects):
+
+| subject_id | sex | … | instrument_type | measure | age | rawscore | percentile | language |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1836 | female | … | ws | prod | 18 | 138 | 61 | English (American) |
+| 1836 | female | … | ws | prod | 24 | 313 | 45 | English (American) |
+
+</details>
+
+### add_cdi_percentiles()
+
+Looks up where each CDI score falls in the vocabulary norms for its language, form, measure and age, and returns the scores with:
+
+- `norm_age`: the age whose norms were used (input ages are rounded to the nearest month)
+- `norm_percentile`: the highest norm percentile (5, 10, …, 95, 99) the score reaches, or `1` if below the 5th
+- `norm_percentile_sex`: the same against children of the same sex (`NA` for sexes other than female and male)
+
+The norms cover English (American) only:
+
+- WG and WG short form, comprehension and production, 8 to 18 months
+- WS and WS short form, production, 16 to 30 months
+
+WG and WS use the 2022 Wordbank norms, the short forms the MB-CDI short-form norms: Level I for WG short and Level IIA for WS short.
+
+| Argument | Default | |
+| --- | --- | --- |
+| `cdi` | required | CDI scores from <code class="whitespace-nowrap">{'unnest_aux(pb$subjects, "cdi_responses")'}</code> |
+
+Example usage:
+
+```r
+cdi <- pb$subjects |>
+  unnest_aux("cdi_responses") |>
+  add_cdi_percentiles()
+```
+
+### add_cdi_proportions()
+
+Divides each CDI score by the number of words on its form, taken from the form's item list in Wordbank, and returns the scores along with:
+
+- `n_items`: the number of words on the form
+- `proportion`: the raw score divided by it
+
+Forms without a Wordbank item list get `NA`.
+
+| Argument | Default | |
+| --- | --- | --- |
+| `cdi` | required | CDI scores from <code class="whitespace-nowrap">{'unnest_aux(pb$subjects, "cdi_responses")'}</code> |
+
+The CDI helpers can be chained on the scores from `unnest_aux()`:
+
+```r
+cdi <- pb$subjects |>
+  unnest_aux("cdi_responses") |>
+  add_cdi_percentiles() |>
+  add_cdi_proportions()
 ```

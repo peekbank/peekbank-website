@@ -11,7 +11,7 @@
      {
       "name": "instrument_type",
       "type": "string",
-      "description": "CDI version/instrument used (e.g., wg / ws / wsshort)"
+      "description": "CDI version/instrument used (wg, ws, wgshort or wsshort)"
      },
      {
       "name": "measure",
@@ -41,56 +41,6 @@
     ]
    },
    {
-    "name": "lui_responses",
-    "type": "JSON",
-    "description": "JSON object for Language Use Inventory responses",
-    "children": [
-     {
-      "name": "rawscore",
-      "type": "numeric",
-      "description": "LUI raw score"
-     },
-     {
-      "name": "age",
-      "type": "numeric",
-      "description": "age of the participant in months when the instrument was administered"
-     },
-     {
-      "name": "language",
-      "type": "string",
-      "description": "LUI language (in Wordbank format)"
-     }
-    ]
-   },
-   {
-    "name": "lds_rawscore",
-    "type": "JSON",
-    "description": "JSON object for Language Development Survey responses",
-    "children": [
-     {
-      "name": "rawscore",
-      "type": "numeric",
-      "description": "LDS raw score"
-     },
-     {
-      "name": "age",
-      "type": "numeric",
-      "description": "age of the participant in months when the instrument was administered"
-     },
-     {
-      "name": "language",
-      "type": "string",
-      "description": "LDS language (in Wordbank format)"
-     }
-    ]
-   },
-   {
-    "name": "lab_visit_num",
-    "type": "numeric",
-    "description": "number of times the participant has been involved in previous experiments",
-    "children": []
-   },
-   {
     "name": "lang_exposures",
     "type": "JSON",
     "description": "JSON object for language exposures",
@@ -110,12 +60,12 @@
    {
     "name": "lang_measures",
     "type": "JSON",
-    "description": "JSON object for language measures other than the CDI",
+    "description": "Scores on language measures other than the CDI",
     "children": [
      {
       "name": "instrument_type",
       "type": "string",
-      "description": "The specific language development measure used (e.g., LUI, LDS)"
+      "description": "The specific language development measure used (e.g., LUI, LDS, DVAP)"
      },
      {
       "name": "rawscore",
