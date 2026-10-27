@@ -7,6 +7,7 @@ description: Where to find Peekbank's data, tools, papers and code.
 
 - <a href="https://stanford.redivis.com/datasets/a3v0-3drqa89kg" target="_blank">Peekbank on Redivis</a>, the released data tables
 - <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx" target="_blank">peekbank_files on Redivis</a>, raw and processed data
+- <a href="https://docs.google.com/spreadsheets/d/1nGXWRu6_q7ATGrdWrFDuDmb9VoGHCnTO9NLhqhpuN28/edit?usp=sharing" target="_blank">Peekbank datasets sheet</a>, every dataset with its import status and its citation
 - <a href="../../analyses/accuracy/" target="_blank">Interactive analyses</a> for exploring the data in the browser
 
 ## Repositories

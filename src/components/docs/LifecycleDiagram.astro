@@ -1,0 +1,140 @@
+---
+import "@fontsource/kalam/400.css";
+import rough from "roughjs";
+
+// Where a dataset's data sits on its way through Peekbank: the two Redivis
+// datasets on top, the people who move the data between them below. Rough.js
+// draws it at build time, so the page ships a plain SVG, and fixed seeds keep
+// the wobble the same on every build. Each place links to its section.
+
+type Path = { d: string; stroke: string; strokeWidth: number; fill?: string };
+
+const gen = rough.generator();
+const ink = "#343433";
+const brown = "#474645";
+let seed = 1;
+const opts = (extra = {}) => ({ stroke: ink, strokeWidth: 1.2, roughness: 1.1, seed: seed++, ...extra });
+
+const box = (x: number, y: number, w: number, h: number): Path[] =>
+  gen.toPaths(gen.rectangle(x, y, w, h, opts({ fill: "#fff", fillStyle: "solid" })));
+
+const outline = (x: number, y: number, w: number, h: number, stroke: string, fill: string): Path[] =>
+  gen.toPaths(
+    gen.rectangle(x, y, w, h, opts({ stroke, roughness: 1.6, fill, fillStyle: "hachure", hachureGap: 7, fillWeight: 0.6 })),
+  );
+
+// y is the top of the head
+const person = (x: number, y: number): Path[] => [
+  ...gen.toPaths(gen.circle(x, y + 9, 18, opts())),
+  ...gen.toPaths(gen.line(x, y + 18, x, y + 42, opts())),
+  ...gen.toPaths(gen.line(x - 13, y + 27, x + 13, y + 27, opts())),
+  ...gen.toPaths(gen.linearPath([[x - 10, y + 60], [x, y + 42], [x + 10, y + 60]], opts())),
+];
+
+type Label = { x: number; y: number; angle: number; text: string };
+
+function arrow(x1: number, y1: number, x2: number, y2: number, text: string): { paths: Path[]; label: Label } {
+  const a = Math.atan2(y2 - y1, x2 - x1);
+  const head = (t: number): [number, number] => [x2 - 10 * Math.cos(a + t), y2 - 10 * Math.sin(a + t)];
+  return {
+    paths: [
+      ...gen.toPaths(gen.line(x1, y1, x2, y2, opts({ stroke: brown }))),
+      ...gen.toPaths(gen.linearPath([head(0.45), [x2, y2], head(-0.45)], opts({ stroke: brown }))),
+    ],
+    label: { x: (x1 + x2) / 2, y: (y1 + y2) / 2, angle: (a * 180) / Math.PI, text },
+  };
+}
+
+const outlines = [
+  ...outline(188, 40, 340, 92, "#c78c00", "#f3dfae"),
+  ...outline(560, 40, 318, 92, "#1888f8", "#b9dafc"),
+];
+const titles = [
+  { x: 200, y: 60, text: "peekbank_files on Redivis" },
+  { x: 572, y: 60, text: "Peekbank on Redivis" },
+];
+
+const arrows = [
+  arrow(124, 218, 192, 218, "sends"),
+  arrow(224, 186, 248, 124, "upload"),
+  arrow(290, 124, 344, 184, "download"),
+  arrow(372, 184, 424, 124, "upload"),
+  arrow(480, 124, 530, 184, "download"),
+  arrow(554, 184, 606, 124, "upload"),
+  arrow(698, 96, 740, 96, "publish"),
+  arrow(798, 124, 804, 182, "read"),
+];
+
+type Place = {
+  href: string;
+  paths: Path[];
+  lines: { x: number; y: number; text: string; small?: boolean }[];
+};
+
+const boxed = (href: string, x: number, text: string): Place => ({
+  href,
+  paths: box(x, 74, 124, 44),
+  lines: [{ x: x + 62, y: 97, text }],
+});
+
+const people = (href: string, xs: number[], name: string, notes: string[]): Place => ({
+  href,
+  paths: xs.flatMap((x) => person(x, 190)),
+  lines: [
+    { x: (xs[0] + xs.at(-1)!) / 2, y: 272, text: name },
+    ...notes.map((text, i) => ({ x: (xs[0] + xs.at(-1)!) / 2, y: 291 + i * 17, text, small: true })),
+  ],
+});
+
+const places: Place[] = [
+  people("#raw-data-in-peekbank_files", [104], "a lab", ["study data"]),
+  people("#raw-data-in-peekbank_files", [214], "a team member", []),
+  boxed("#raw-data-in-peekbank_files", 202, "raw data"),
+  people("#import", [358], "an importer", ["writes & runs", "import.R"]),
+  boxed("#import", 390, "processed data"),
+  people("#ingestion", [542], "a maintainer", ["runs the ingestion"]),
+  boxed("#ingestion", 574, "draft"),
+  boxed("#release", 740, "release"),
+  people("#access", [788, 818], "users", ["PeekbankR, Redivis", "or this website"]),
+];
+
+---
+
+<svg
+  viewBox="60 0 830 330"
+  class="w-full"
+  font-family="Kalam, cursive"
+  role="img"
+  aria-label="A lab sends its data to a team member, who uploads it to peekbank_files on Redivis. From there it moves down to an importer and back up as processed data, down to a maintainer and up into a draft of Peekbank on Redivis, which is published as a release that users read."
+>
+  {outlines.map((p) => <path d={p.d} stroke={p.stroke} stroke-width={p.strokeWidth} fill={p.fill ?? "none"} />)}
+  {titles.map((t) => <text x={t.x} y={t.y} font-size="14" fill={brown}>{t.text}</text>)}
+
+  {arrows.flatMap((a) => a.paths).map((p) => <path d={p.d} stroke={p.stroke} stroke-width={p.strokeWidth} fill={p.fill ?? "none"} />)}
+  {
+    arrows.map(({ label }) => (
+      <text transform={`translate(${label.x} ${label.y}) rotate(${label.angle})`} y="-6" text-anchor="middle" font-size="13" fill={brown}>
+        {label.text}
+      </text>
+    ))
+  }
+
+  {
+    places.map((p) => (
+      <a href={p.href}>
+        {p.paths.map((s) => <path d={s.d} stroke={s.stroke} stroke-width={s.strokeWidth} fill={s.fill ?? "none"} />)}
+        {p.lines.map((l) => (
+          <text x={l.x} y={l.y} text-anchor="middle" dominant-baseline="middle" font-size={l.small ? 14 : 17} fill={l.small ? brown : ink}>
+            {l.text}
+          </text>
+        ))}
+      </a>
+    ))
+  }
+</svg>
+
+<style>
+  a:hover text {
+    text-decoration: underline;
+  }
+</style>

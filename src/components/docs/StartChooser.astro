@@ -1,0 +1,78 @@
+---
+import ChooserStep, { type Choice, type Link } from "./ChooserStep.astro";
+
+
+const tree: Choice = {
+  label: "",
+  choices: [
+    {
+      label: "Access the data",
+      question: "Which language do you work in?",
+      choices: [
+        {
+          label: "R",
+          links: [{ title: "Data Access with PeekbankR", href: "../../start/dataaccess/" }],
+        },
+        {
+          label: "Other Languages",
+          links: [
+            { title: "Data Access with Redivis", href: "../../start/dataaccess/redivis/" },
+          ],
+        },
+      ],
+    },
+    {
+      label: "Learn about the paradigm",
+      links: [
+        { title: "Looking while listening", href: "https://pmc.ncbi.nlm.nih.gov/articles/PMC9950292/#S1", external: true },
+      ],
+    },
+    {
+      label: "Understand how the data is structured",
+      links: [
+        { title: "Data Schema", href: "../../peekbank/dataschema/", description: "The tables and their relations" },
+        { title: "Codebook", href: "../../peekbank/codebook/", description: "Details on the columns within the tables" },
+      ],
+    },
+    {
+      label: "Look at visualisations in the browser",
+      links: [
+        { title: "Interactive analyses", href: "../../analyses/accuracy/" },
+      ],
+    },
+    {
+      label: "Share my own study data",
+      links: [{ title: "Sharing Data", href: "../../misc/sharing/" }],
+    },
+    {
+      label: "Check docs for contributors",
+      links: [
+        { title: "Task Index", href: "../../contribute/tasks/", description: "How to do common tasks in the project" },
+        { title: "Dataset Lifecycle", href: "../../contribute/lifecycle/", description: "How a dataset moves through Peekbank" },
+      ],
+    }
+  ],
+};
+
+// for llms-full.txt, one line per leaf
+const leaves: { trail: string[]; links: Link[] }[] = [];
+function collect(node: Choice, trail: string[]) {
+  if (node.links) leaves.push({ trail, links: node.links });
+  node.choices?.forEach((c) => collect(c, [...trail, c.label]));
+}
+collect(tree, []);
+---
+
+<div class="not-content mt-4 mb-8" data-mdast="ignore">
+  <ChooserStep node={tree} />
+</div>
+
+<ul class="hidden">
+  {
+    leaves.map((leaf) => (
+      <li>
+        {leaf.trail.join(" › ")}: {leaf.links.map((l, i) => <>{i > 0 && ", "}<a href={l.href}>{l.title}</a></>)}
+      </li>
+    ))
+  }
+</ul>

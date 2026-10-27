@@ -1,0 +1,95 @@
+---
+title: Task Index
+description: For each task on Peekbank, which repository to work in and what access you need.
+---
+
+This list is meant to give you an overview of the parts of Peekbank you can contribute to, and what prerequisites (accounts, permissions on resources, etc.) are needed.
+
+## Analyse Peekbank data
+
+<details>
+<summary>You need</summary>
+
+- a free <a href="https://redivis.com" target="_blank">Redivis account</a>
+
+</details>
+
+The released data is public, so just use our <a href="../../start/dataaccess/" target="_blank">provided interfaces</a> to pull it and refer to the <a href="../../peekbank/dataschema/" target="_blank">Data Schema</a> and <a href="../../peekbank/codebook/" target="_blank">Codebook</a> for the details on the data structure. If you opt for PeekbankR, we provide <a href="../../start/peekbankrapi/#methods" target="_blank">helper functions</a> to facilitate analyses involving CDI data or stimulus images.
+
+## Share your own study data
+
+If you have collected looking-while-listening data and want it in Peekbank, great! We will take care of most of the import work; refer to the page on <a href="../../misc/sharing/" target="_blank">Sharing Data</a> for details.
+
+## Add raw data to be imported
+
+<details>
+<summary>You need</summary>
+
+- a Redivis account
+- edit access to <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx" target="_blank">peekbank_files</a> on Redivis
+- edit access to the <a href="https://docs.google.com/spreadsheets/d/1nGXWRu6_q7ATGrdWrFDuDmb9VoGHCnTO9NLhqhpuN28/edit?usp=sharing" target="_blank">Peekbank datasets sheet</a> on Google Sheets
+
+</details>
+
+To add a dataset we have received to Peekbank's raw data:
+
+1. Pick an identifying internal name for it (see <a href="../../misc/howtocite/#current-datasets" target="_blank">the list of current datasets</a> for examples).
+2. Add the dataset to the <a href="https://docs.google.com/spreadsheets/d/1nGXWRu6_q7ATGrdWrFDuDmb9VoGHCnTO9NLhqhpuN28/edit?usp=sharing" target="_blank">Peekbank datasets sheet</a>.
+3. Upload the data to <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx" target="_blank">peekbank_files</a> on Redivis. [The workflow will be described here once the changes to the import pipeline are done.]
+
+## Transform data into the Peekbank schema
+
+<details>
+<summary>You need</summary>
+
+- a Redivis account
+- a GitHub account
+- either write access to <a href="https://github.com/peekbank/peekbank-data-import" target="_blank">peekbank-data-import</a> (ask the Peekbank team) or your own fork to open pull requests from
+- to upload the result, edit access to <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx" target="_blank">peekbank_files</a>
+
+</details>
+
+To turn a raw dataset into Peekbank-ready tables ("data import"):
+
+1. Clone <a href="https://github.com/peekbank/peekbank-data-import" target="_blank">peekbank-data-import</a>.
+2. Pick a dataset from the <a href="https://docs.google.com/spreadsheets/d/1nGXWRu6_q7ATGrdWrFDuDmb9VoGHCnTO9NLhqhpuN28/edit?usp=sharing" target="_blank">Peekbank datasets sheet</a> that hasn't been imported yet.
+3. Set up an import script for it as described in the repository's <a href="https://github.com/peekbank/peekbank-data-import#peekbank-data-import" target="_blank">README</a>.
+4. Fill in the code following the steps in the documentation, and note any relevant import decisions in the dataset's README.
+5. Run the script. It validates the data and prints a summary with plots to check against the original paper.
+6. Once the data looks right, set `upload=TRUE` in `write_and_validate_list()` and run it again to upload the processed data to Redivis.
+
+## Release a new Peekbank version
+
+<details>
+<summary>You need</summary>
+
+- a Redivis account
+- edit access to <a href="https://stanford.redivis.com/datasets/a3v0-3drqa89kg" target="_blank">Peekbank on Redivis</a>
+
+</details>
+
+[The workflow will be described here once the rework of the ingestion pipeline is done.]
+
+## Extend PeekbankR
+
+<details>
+<summary>You need</summary>
+
+- a GitHub account
+- either write access to <a href="https://github.com/peekbank/peekbankr" target="_blank">peekbankr</a> (ask the Peekbank team) or your own fork to open pull requests from
+
+</details>
+
+The code and the issue tracker can be found on GitHub: <a href="https://github.com/peekbank/peekbankr" target="_blank">peekbankr</a>.
+
+## Extend this website
+
+<details>
+<summary>You need</summary>
+
+- a GitHub account
+- either write access to <a href="https://github.com/peekbank/peekbank-website" target="_blank">peekbank-website</a> (ask the Peekbank team) or your own fork to open pull requests from
+
+</details>
+
+The code and the issue tracker can be found on GitHub: <a href="https://github.com/peekbank/peekbank-website" target="_blank">peekbank-website</a>.

@@ -1,0 +1,48 @@
+---
+title: Dataset Lifecycle
+description: How a dataset moves through the Peekbank stack, from a contributing lab to a release.
+---
+
+import LifecycleDiagram from "/src/components/docs/LifecycleDiagram.astro";
+
+This page gives you a tour through the Peekbank stack by describing the stages a newly added dataset goes through. You can click on an element in the diagram below to jump to the related section.
+
+<div class="not-content my-8" data-mdast="ignore">
+  <LifecycleDiagram />
+</div>
+
+## Raw data in peekbank_files
+
+The lab sends the data (or a link to a data repository) to someone on the Peekbank team, who uploads it to <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx/files" target="_blank">peekbank_files</a> on Redivis. Each dataset has its own folder there, named after its identifier (for example `weaver_zettersten_2024`), and the raw files go into `raw_data/` inside it.
+
+## Import
+
+The import process turns the raw data into preprocessed data in the Peekbank format. For each dataset, a collaborator writes a separate, scaffolded `import.R` script in <a href="https://github.com/peekbank/peekbank-data-import" target="_blank">peekbank-data-import</a>, which downloads the raw data from <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx/files" target="_blank">peekbank_files</a>, reshapes it (outputting one `.csv` per table of the schema) and validates the result.
+
+The import scripts use some internal helper functions from <a href="https://github.com/peekbank/peekbankr" target="_blank">PeekbankR</a>.
+
+Once the data passes validation, we perform an internal review step where another collaborator looks through the import script and the paper the data came from in tandem. If no further issues are found, a flag in the import script is set to upload the dataset into its folder on <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx/files" target="_blank">peekbank_files</a> as `processed_data/`, along with the dataset's `README.md`, which documents import decisions.
+
+## Ingestion
+
+The ingestion workflow collects every dataset's processed data into a draft of the next version of <a href="https://stanford.redivis.com/datasets/a3v0-3drqa89kg" target="_blank">Peekbank on Redivis</a>, by reading the contents of the separate `.csv` files into one Redivis database and offsetting the row IDs to their respective position in the joined dataset. [The ingestion pipeline is being reworked, and this section will describe it once that is done]. Peekbank uses release names in the format \<YEAR\>.\<Incrementing Number\>.
+
+The ingest also creates an `aoi_timepoints_rle` table, a <a href="https://en.wikipedia.org/wiki/Run-length_encoding" target="_blank">run-length-encoded</a> version of `aoi_timepoints`, which is used by PeekbankR to cut transmission size. Similarly, the ingestion creates a `release_info` table, which has a single row with the release name of the dataset.
+
+## Release
+
+Publishing the draft via the Redivis interface turns it into a new release of the Peekbank dataset. Redivis numbers its versions on its own (e.g., `v1.4`), so our `release_info` table is used to keep track of Peekbank release names (e.g., `2026.1`). Previous versions stay available to keep old analyses reproducible. The list of supported releases can be seen on the <a href="../../peekbank/releases/" target="_blank">Releases</a> page.
+
+## Access
+
+End users have three ways to access the data of a release:
+
+- <a href="../../start/dataaccess/" target="_blank">PeekbankR</a>, the R package most people use. It allows you to specify a release and read the tables from Redivis into your R environment.
+- <a href="../../start/dataaccess/redivis/" target="_blank">Redivis</a> itself, where you can browse and query the tables in the browser or read them with one of its clients.
+- This website, as it features <a href="../../analyses/accuracy/" target="_blank">interactive visualisations</a> that let you explore some analyses on the data directly in the browser.
+
+Furthermore, certain elements of this website (e.g., the dataset list on the <a href="../../misc/howtocite/#current-datasets" target="_blank">Citation page</a>) are populated with data from the releases. These, as well as the analyses, don't query Redivis live. When the website is deployed, a Python script pulls the releases and turns them into compressed per-dataset JSON files that the browser loads.
+
+## Corrections
+
+When someone finds a problem in the data, it goes into the issue tracker of <a href="https://github.com/peekbank/peekbank-data-import" target="_blank">peekbank-data-import</a>. That dataset's import script is then fixed, and the corrected data reaches everyone with the next release.

@@ -1,0 +1,65 @@
+---
+export type Link = { title: string; href: string; description?: string; external?: boolean };
+export type Choice = { label: string; question?: string; choices?: Choice[]; links?: Link[] };
+
+interface Props {
+  node: Choice;
+}
+
+const { node } = Astro.props;
+
+type Row = { label: string; description?: string; href?: string; external?: boolean; choice?: Choice };
+const linkRow = (l: Link, label = l.title): Row => ({ label, description: l.description, href: l.href, external: l.external });
+const rows: Row[] = node.links
+  ? node.links.map((l) => linkRow(l))
+  : node.choices!.map((c) => (c.links?.length === 1 ? linkRow(c.links[0], c.label) : { label: c.label, choice: c }));
+
+const row =
+  "flex w-full cursor-pointer items-center justify-between gap-4 rounded-lg border border-black/25 bg-white px-4 py-3 text-left text-charcoal no-underline hover:border-black/40";
+const icon = "size-4 shrink-0 text-brown";
+---
+
+{node.question && <p class="mb-3 font-medium text-ink">{node.question}</p>}
+<div class="flex flex-col gap-2">
+  {
+    rows.map((r) =>
+      r.choice ? (
+        <details>
+          <summary class={row}>
+            {r.label}
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class:list={[icon, "transition-transform"]}>
+              <path d="M4 6l4 4 4-4" />
+            </svg>
+          </summary>
+          <div class="mt-4 mb-2 ml-4 border-l-2 border-black/10 pl-5">
+            <Astro.self node={r.choice} />
+          </div>
+        </details>
+      ) : (
+        <a href={r.href} target={r.external ? "_blank" : undefined} class={row}>
+          <span>
+            {r.label}
+            {r.description && <span class="block text-sm text-brown/70 sm:ml-2 sm:inline">{r.description}</span>}
+          </span>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" class={icon}>
+            <path d={r.external ? "M5 11l6-6M6 5h5v5" : "M3 8h10M9 4l4 4-4 4"} />
+          </svg>
+        </a>
+      ),
+    )
+  }
+</div>
+
+<style>
+  /* ">" so that a closed step inside an open one keeps its closed look */
+  details[open] > summary {
+    border-color: rgb(0 0 0 / 0.6);
+  }
+  details[open] > summary > svg {
+    rotate: 180deg;
+  }
+  /* Safari draws its triangle even on a flex summary */
+  summary::-webkit-details-marker {
+    display: none;
+  }
+</style>

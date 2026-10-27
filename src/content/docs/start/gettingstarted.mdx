@@ -3,44 +3,20 @@ title: Getting Started
 description: How to get started with Peekbank
 ---
 
-import { LinkCard } from 'starlight-theme-nova/components'
+import StartChooser from "/src/components/docs/StartChooser.astro";
 
 
 #### Welcome to Peekbank!
 
-This quickstart guide will set you up so that you can work with the data offered by peekbank. Here are some ways to get started:
+{/* break only once the column fits the first sentence on one line */}
+<p class="@container">These docs will set you up so that you can work with the data offered by peekbank.<br class="hidden @[42rem]:block" /> Pick what you want to do:</p>
 
-<div data-mdast="ignore">
+<StartChooser />
 
-  
+<div class="mt-10" data-mdast="ignore">
 
-  <LinkCard
-    title="I want to access the data using R"
-    href="../../start/dataaccess"
-    description="Use our provided package to load the data into your R environment"
-  />
+  #### Using a coding agent?
 
-  <LinkCard
-    title="I am not working in R and want to access the data"
-    href="../../start/dataaccess/redivis"
-    description="Read the tables straight from Redivis"
-  />
-
-  <LinkCard
-    title="I want an overview of the Peekbank data structure"
-    href="../../peekbank/dataschema/"
-    description="Get familiar with the data schema of Peekbank"
-  />
-
-  <div class="mt-10">
-
-    #### Using a coding agent?
-
-    <a href="../../llms-full.txt" target="_blank">llms-full.txt</a> contains these docs in one agent-friendly markdown file.
-
-  </div>
+  <a href="../../llms-full.txt" target="_blank">llms-full.txt</a> contains these docs in one agent-friendly markdown file.
 
 </div>
-
-
-

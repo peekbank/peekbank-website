@@ -105,6 +105,13 @@ export default defineConfig({
             { label: "About", slug: "misc/about" },
           ],
         },
+        {
+          label: "Contribute",
+          items: [
+            { label: "Task Index", slug: "contribute/tasks" },
+            { label: "Dataset Lifecycle", slug: "contribute/lifecycle" },
+          ],
+        },
       ],
     }),
     react(),
