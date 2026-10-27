@@ -2,11 +2,6 @@
 import "@fontsource/kalam/400.css";
 import rough from "roughjs";
 
-// Where a dataset's data sits on its way through Peekbank: the two Redivis
-// datasets on top, the people who move the data between them below. Rough.js
-// draws it at build time, so the page ships a plain SVG, and fixed seeds keep
-// the wobble the same on every build. Each place links to its section.
-
 type Path = { d: string; stroke: string; strokeWidth: number; fill?: string };
 
 const gen = rough.generator();
