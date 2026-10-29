@@ -84,24 +84,7 @@ pb$subset$aoi_timepoints(dataset_name == "pomper_saffran_2016",
                          age < 24, vanilla_trial)
 ```
 
-For the timepoint tables specifically, the predicates are translated to remote SQL queries to limit transfer size, meaning only a subset of predicates is available. The functions emit error messages to inform you if you try to use an untranslatable predicate.
-
-<details>
-<summary>Filtering on t_norm</summary>
-
-**`t_norm`** on `pb$subset$aoi_timepoints()` cannot be directly filtered on due to the transfer encoding of the table. If you need to filter t_norm, either do it on the fetched result OR pass `rle = FALSE` to read the expanded table directly (which will make the fetch take a lot longer):
-
-```r
-pb$subset$aoi_timepoints(dataset_name == "pomper_saffran_2016") |>
-  subset(t_norm > 0)
-
-pb$subset$aoi_timepoints(dataset_name == "pomper_saffran_2016", t_norm > 0,
-                         rle = FALSE)
-```
-
-Every other column filters normally, and `pb$subset$xy_timepoints()` has no such restriction.
-
-</details>
+For the timepoint tables specifically, the predicates are translated to remote SQL queries to limit transfer size, meaning only a <a href="https://docs.redivis.com/api/client-libraries/redivis-r/reference/redivis/redivisusdconnect_dbi" target="_blank">subset of predicates</a> is available. The functions emit error messages to inform you if you try to use an untranslatable predicate.
 
 ## Server-side Queries
 

@@ -19,9 +19,9 @@ const raw = (table: string) =>
 // a table's own columns. The dataset_id and dataset_name peekbankr adds to some
 // tables are listed under datasets, which every such table is joined to below.
 const view = (table: string): Column[] => {
-  // aoi_timepoints is read run-length encoded, where t_norm cannot be filtered on
+  // peekbankr decodes aoi_timepoints from runs, which have no aoi_timepoint_id
   const names =
-    table === "aoi_timepoints" ? ["administration_id", "trial_id", "aoi"] : raw(table);
+    table === "aoi_timepoints" ? ["administration_id", "trial_id", "aoi", "t_norm"] : raw(table);
   return names.map((name) => ({ name, from: table, ref: `${table}-${name}` }));
 };
 
@@ -112,13 +112,6 @@ const groups = (table: string) => {
               <div>
                 {/* one line, since Astro renders the line breaks between elements as spaces */}
                 {columns.map((c, i) => <>{i > 0 && ", "}<a href={`../../peekbank/codebook/#${c.ref}`} target="_blank" class="no-underline"><code>{c.name}</code></a></>)}
-                {table === "aoi_timepoints" && columns[0].from === table && (
-                  <p class="mt-2">
-                    <code>t_norm</code> is missing because the table is transferred run-length
-                    encoded. To filter on it, pass <code class="whitespace-nowrap">rle = FALSE</code>;
-                    see <a href="../dataaccess/#subsetting" target="_blank">Filtering on t_norm</a>.
-                  </p>
-                )}
               </div>
             </>
           ))}
