@@ -84,7 +84,7 @@ pb$subset$aoi_timepoints(dataset_name == "pomper_saffran_2016",
                          age < 24, vanilla_trial)
 ```
 
-For the timepoint tables specifically, the predicates are translated to remote SQL queries to limit transfer size, meaning only a <a href="https://docs.redivis.com/api/client-libraries/redivis-r/reference/redivis/redivisusdconnect_dbi" target="_blank">subset of predicates</a> is available. The functions emit error messages to inform you if you try to use an untranslatable predicate.
+For the timepoint tables specifically, the predicates are translated to remote SQL queries to limit transfer size, meaning a subset of predicates is available (the <a href="https://dbplyr.tidyverse.org/articles/translation-function.html" target="_blank">dbplyr defaults</a> plus <a href="https://docs.redivis.com/api/client-libraries/redivis-r/reference/redivis/redivisusdconnect_dbi#supported-dplyr-functions" target="_blank">Redivis' additions</a>). The functions emit error messages to inform you if you try to use an untranslatable predicate.
 
 ## Server-side Queries
 
