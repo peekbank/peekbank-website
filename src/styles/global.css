@@ -64,6 +64,7 @@ html {
 }
 
 .sl-markdown-content summary {
+  color: inherit;
   font-weight: 400;
   user-select: none;
 }

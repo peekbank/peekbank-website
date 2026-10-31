@@ -1,0 +1,18 @@
+---
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import Content, { getHeadings } from "./_legacy.mdx";
+
+// Outside the docs collection so that it stays out of the sidebar and the llms txt files
+---
+
+<StarlightPage
+  frontmatter={{
+    title: "Migrating from get_ Functions",
+    description: "How the superseded get_ functions of peekbankr translate to the peekbank() client.",
+  }}
+  headings={getHeadings()}
+>
+  <div class="[&_:not(pre)>code]:whitespace-nowrap [&_a:has(>code)]:no-underline">
+    <Content />
+  </div>
+</StarlightPage>

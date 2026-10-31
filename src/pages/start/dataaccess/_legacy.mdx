@@ -1,0 +1,72 @@
+The `get_` functions are still functional, but we recommend that new scripts use the `peekbank()` [client](../). This page shows you how the code you knew is expressed via the new interface.
+
+## A Typical Script
+
+Data access now runs through fields on a client object that pins a database release. The old access pattern
+
+```r
+con <- connect_to_peekbank("2026.1")
+
+administrations <- get_administrations(connection = con)
+trials <- get_trials(connection = con)
+aoi_timepoints <- get_aoi_timepoints(connection = con)
+
+data <- aoi_timepoints |>
+  left_join(administrations) |>
+  left_join(trials)
+```
+
+becomes
+
+```r
+pb <- peekbank("2026.1")
+
+data <- pb$aoi_timepoints |>
+  left_join(pb$administrations) |>
+  left_join(pb$trials)
+```
+
+To read the most recent release, we used to leave out the `connection =` parameter. This is now achieved via `peekbank("current")`.
+
+## Filter Arguments
+
+Prefetch filtering has moved from the arguments of the `get_` functions to the functions on `pb$subset$`, which take [predicates](../#subsetting) instead:
+
+| `get_` argument | Predicate |
+| --- | --- |
+| `dataset_name = "a"` | `dataset_name == "a"` |
+| `dataset_name = c("a", "b")` | `dataset_name %in% c("a", "b")` |
+| `dataset_id = 3` | `dataset_id == 3` |
+| `age = 24` | `age == 24` |
+| `age = c(24, 30)` | `age >= 24, age <= 30` |
+
+```r
+get_aoi_timepoints(dataset_name = "fernald_marchman_2012", age = c(24, 30),
+                   connection = con)
+
+pb$subset$aoi_timepoints(dataset_name == "fernald_marchman_2012",
+                         age >= 24, age <= 30)
+```
+
+Furthermore, you can now filter on a [wider range of columns](../../peekbankrapi/#subsets).
+
+## Function Successors
+
+| Old | New |
+| --- | --- |
+| `connect_to_peekbank("2026.1")` to pass | [`peekbank("2026.1")`](../../peekbankrapi/#creating-a-client) as an R6 object |
+| `get_<table>(connection = con)` | [`pb$<table>`](../../peekbankrapi/#whole-tables), or [`pb$subset$<table>()`](../../peekbankrapi/#subsets) with filters |
+| `list_peekbank_tables(con)` | [`pb$tables`](../../peekbankrapi/#client-fields) |
+| `get_db_info()` | [`peekbank_releases()`](../../peekbankrapi/#peekbank_releases) |
+| `get_sql_query(sql, connection = con)` | [`pb$query(sql)`](../../peekbankrapi/#pbquery) |
+| `download_stimuli(con, local_base_dir, datasets)` | [`pb$images(datasets, dir)`](../../peekbankrapi/#pbimages) |
+| `get_readmes(datasets, local_base_dir)` | [`pb$readmes(datasets, dir)`](../../peekbankrapi/#pbreadmes) |
+| `unpack_aux_data(df)` | [`unnest_aux(df, key)`](../../peekbankrapi/#unnest_aux) |
+| `populate_cdi_percentiles()` | [`add_cdi_percentiles()`](../../peekbankrapi/#add_cdi_percentiles) |
+| `append_relative_cdi_scores()` | [`add_cdi_proportions()`](../../peekbankrapi/#add_cdi_proportions) |
+
+## Differences in Behavior
+
+- `excluded` and `vanilla_trial` are returned as logical `TRUE` or `FALSE` instead of numeric 1 or 0.
+- `pb$images()` names the path column in its returned tibble `local_image_path` instead of `local_stimulus_path`.
+- Unlike `get_aoi_timepoints()`, the corresponding `pb$subset$aoi_timepoints()` has no `rle` argument, as it always transfers the run-length encoded table and decodes it automatically.

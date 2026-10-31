@@ -14,6 +14,9 @@ export default defineConfig({
   base,
   vite: {
     plugins: [tailwindcss()],
+    // Before Astro 7.4.2, `astro build` pre-bundles React for production into the
+    // same cache a running dev server reads from (withastro/astro#18449).
+    cacheDir: `node_modules/.vite/${process.env.NODE_ENV}`,
   },
   markdown: {
     shikiConfig: {
