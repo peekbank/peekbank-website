@@ -48,6 +48,12 @@
   --color-brown: #474645;
 }
 
+/* iOS Safari enlarges text in some blocks (mostly wide code) unless told not to */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 /* For inserting Libre Baskerville into template generated stuf, but
    LB ships 400 and 700 only, so putting 700 avoids a synthesised weight
    where Starlight asks for 600. */

@@ -81,7 +81,7 @@ pb$xy_timepoints
 
 The result has only the table's own columns and is cached for the session.
 
-**The timepoint tables** are filtered on the server before data transfer, limiting predicates to what can be translated to SQL (the <a href="https://dbplyr.tidyverse.org/articles/translation-function.html" target="_blank">dbplyr defaults</a> plus <a href="https://docs.redivis.com/api/client-libraries/redivis-r/reference/redivis/redivisusdconnect_dbi#supported-dplyr-functions" target="_blank">Redivis' additions</a>). Local variables are filled in automatically, but if you want to evaluate a function before sending it to the server (e.g. to compare some external values), you need to prefix with `!!`, e.g. <code class="whitespace-nowrap">{"age < !!max(local_ages)"}</code>, as the function would otherwise be sent to the server for translation.
+**The timepoint tables** are filtered on the server before data transfer, limiting predicates to what can be translated to SQL (the <a href="https://dplyr.tidyverse.org/reference/filter.html#useful-filter-functions" target="_blank">basic filter functions</a> plus <a href="https://docs.redivis.com/api/client-libraries/redivis-r/reference/redivis/redivisusdconnect_dbi#supported-dplyr-functions" target="_blank">Redivis' additions</a>). Local variables are filled in automatically, but if you want to evaluate a function before sending it to the server (e.g. to compare some external values), you need to prefix with `!!`, e.g. <code class="whitespace-nowrap">{"age < !!max(local_ages)"}</code>, as the function would otherwise be sent to the server for translation.
 
 All other tables are filtered locally and take any `dplyr` expression.
 
