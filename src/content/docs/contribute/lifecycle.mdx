@@ -13,7 +13,7 @@ This page gives you a tour through the Peekbank stack by describing the stages a
 
 ## Raw data in peekbank_files
 
-The lab sends the data (or a link to a data repository) to someone on the Peekbank team, who uploads it to <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx/files" target="_blank">peekbank_files</a> on Redivis. Each dataset has its own folder there, named after its identifier (for example `weaver_zettersten_2024`), and the raw files go into `raw_data/` inside it.
+The lab sends the data (or a link to a data repository) to someone on the Peekbank team, who uploads it to <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx/files" target="_blank">peekbank_files</a> on Redivis. Each dataset has its own folder there, named after its identifier (for example `weaver_zettersten_2024`), holding the raw files.
 
 ## Import
 
@@ -21,7 +21,7 @@ The import process turns the raw data into preprocessed data in the Peekbank for
 
 The import scripts use some internal helper functions from <a href="https://github.com/peekbank/peekbankr" target="_blank">PeekbankR</a>.
 
-Once the data passes validation, we perform an internal review step where another collaborator looks through the import script and the paper the data came from in tandem. If no further issues are found, a flag in the import script is set to upload the dataset into its folder on <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx/files" target="_blank">peekbank_files</a> as `processed_data/`, along with the dataset's `README.md`, which documents import decisions.
+Once the data passes validation, we perform an internal review step where another collaborator looks through the import script and the paper the data came from in tandem. If no further issues are found, a flag in the import script is set to upload the processed data to <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx/files" target="_blank">peekbank_files</a>, along with the dataset's `README.md`, which documents import decisions. Both go into the special `_processed_data` folder under the dataset's identifier, e.g. `processed_data/reflook_v4/trials.csv`.
 
 ## Ingestion
 

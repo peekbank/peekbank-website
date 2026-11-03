@@ -35,7 +35,20 @@ To add a dataset we have received to Peekbank's raw data:
 
 1. Pick an identifying internal name for it (see <a href="../../misc/howtocite/#current-datasets" target="_blank">the list of current datasets</a> for examples).
 2. Add the dataset to the <a href="https://docs.google.com/spreadsheets/d/1nGXWRu6_q7ATGrdWrFDuDmb9VoGHCnTO9NLhqhpuN28/edit?usp=sharing" target="_blank">Peekbank datasets sheet</a>.
-3. Upload the data to <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx" target="_blank">peekbank_files</a> on Redivis. [The workflow will be described here once the changes to the import pipeline are done.]
+3. Open the draft version of <a href="https://stanford.redivis.com/datapages/editor/datasets/frvk-5c922jwkx/files" target="_blank">peekbank_files</a> on Redivis.
+4. Click `+ Upload files`, choose `Upload directory` and select the local folder containing the raw data.
+5. In the `Destination folder` dropdown, scroll down and click `+ Create new folder`.
+6. Enter the internal name from step 1 under `New folder name` and click `Upload`. Files in nested folders keep their parent folders as a prefix.
+
+<details>
+<summary>Making raw data available to contributors without edit access</summary>
+
+The added files now live in the draft `"next"` version. By default, only people with `edit` privileges on `datapages.peekbank_files` can read this version; everyone else gets the latest published version. If you want people without this privilege to write import scripts (e.g. in a Peekbank hackathon), use the `Review and release` button to create a versioned release.
+
+</details>
+
+If you want to add or replace files, use the `+ Upload files` button and choose the folder of the dataset you want to edit.
+If you want to delete files, click on the dataset's folder name in the right panel and delete the file.
 
 ## Transform data into the Peekbank schema
 

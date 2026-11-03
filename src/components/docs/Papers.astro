@@ -1,0 +1,81 @@
+---
+interface Paper {
+  authors: string[];
+  year: number;
+  title: string;
+  venue: string;
+  // the venue as written in the long citation, where it differs
+  fullVenue?: string;
+  pages?: string;
+  doi?: string;
+  preprint?: string;
+  code: string;
+}
+
+interface Props {
+  variant: "short" | "long";
+}
+
+const { variant } = Astro.props;
+
+const papers: Paper[] = [
+  {
+    authors: ["Boyce, V.", "Marchman, V. A.", "Baumgartner, H. A.", "Bergey, C. A.", "Braginsky, M.", "Giovannetti, F.", "Kachergis, G.", "Mankewitz, J.", "Meylan, S.", "Prystawski, B.", "Sparks, R. Z.", "Steffan, A.", "Tan, A. W. M.", "Frank, M. C.", "Zettersten, M."],
+    year: 2026,
+    title: "Data-driven recommendations for increasing reliability and validity in measures of infant word recognition",
+    venue: "PsyArXiv",
+    preprint: "https://osf.io/preprints/psyarxiv/28gq4",
+    code: "https://github.com/peekbank/peekbank-method",
+  },
+  {
+    authors: ["Frank, M. C.", "Marchman, V. A.", "Bergey, C. A.", "Boyce, V.", "Braginsky, M.", "Kachergis, G.", "Mankewitz, J.", "Meylan, S.", "Prystawski, B.", "Ram, N.", "Sparks, R. Z.", "Steffan, A.", "Tan, A. W. M.", "Zettersten, M."],
+    year: 2025,
+    title: "Continuous developmental changes in word recognition support language learning across early childhood",
+    venue: "eLife",
+    doi: "https://doi.org/10.7554/eLife.109636",
+    code: "https://github.com/peekbank/peekbank-development",
+  },
+  {
+    authors: ["Zettersten, M.", "Yurovsky, D.", "Xu, T. L.", "Uner, S.", "Tsui, A.S.T.", "Schneider, R. M.", "Saleh, A. N.", "Meylan, S. C.", "Marchman, V.", "Mankewitz, J.", "MacDonald, K.", "Long, B.", "Lewis, M.", "Kachergis, G.", "Handa, K.", "deMayo, B.", "Carstensen, A.", "Braginsky, M.", "Boyce, V.", "Bhatt, N.", "Bergey, C. A.", "Frank, M.C."],
+    year: 2023,
+    title: "Peekbank: An open, large-scale repository for developmental eye-tracking data of children's word recognition",
+    venue: "Behavior Research Methods",
+    fullVenue: "Behavior Research Methods, 55",
+    pages: "2485-2500",
+    doi: "https://doi.org/10.3758/s13428-022-01906-4",
+    preprint: "https://psyarxiv.com/tgnzv",
+    code: "https://github.com/peekbank/peekbank-paper/tree/main/brm",
+  },
+  {
+    authors: ["Zettersten, M.", "Bergey, C. A.", "Bhatt, N.", "Boyce, V.", "Braginsky, M.", "Carstensen, A.", "deMayo, B.", "Kachergis, G.", "Lewis, M.", "Long, B.", "MacDonald, K.", "Mankewitz, J.", "Meylan, S. C.", "Saleh, A. N.", "Schneider, R. M.", "Tsui, A.", "Uner, S.", "Xu, T. L.", "Yurovsky, D.", "Frank, M.C."],
+    year: 2021,
+    title: "Peekbank: Exploring children's word recognition through an open, large-scale repository for developmental eye-tracking data",
+    venue: "CogSci",
+    fullVenue: "Proceedings of the 43rd Annual Conference of the Cognitive Science Society",
+    preprint: "https://psyarxiv.com/ep693",
+    code: "https://github.com/peekbank/peekbank-paper/tree/main/cogsci2021",
+  },
+];
+---
+
+<ul>
+  {
+    papers.map((paper) =>
+      variant === "short" ? (
+        <li>
+          {paper.authors[0].split(",")[0]} et al. ({paper.year}). {paper.title}. <em>{paper.venue}</em>.
+          <a href={paper.doi ?? paper.preprint} target="_blank">{paper.doi ? "Paper" : "Preprint"}</a> ·
+          <a href={paper.code} target="_blank">Analysis code</a>
+        </li>
+      ) : (
+        <li>
+          {paper.authors.slice(0, -1).join(", ")}, & {paper.authors.at(-1)} ({paper.year}).
+          <strong>{paper.title}.</strong>
+          <em>{paper.fullVenue ?? paper.venue}</em>{paper.pages && `, ${paper.pages}`}.
+          {paper.doi && <a href={paper.doi} target="_blank">{paper.doi}</a>}
+          {paper.preprint && <a href={paper.preprint} target="_blank">[preprint]</a>}
+        </li>
+      ),
+    )
+  }
+</ul>

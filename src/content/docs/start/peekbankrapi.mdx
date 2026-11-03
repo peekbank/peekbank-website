@@ -129,7 +129,7 @@ pb$query("SELECT dataset_name, shortcite FROM datasets")
 
 ### pb$images()
 
-Downloads the stimulus images to `<dir>/<dataset_name>/raw_data/<stimulus_image_path>` and returns a tibble with:
+Downloads the stimulus images to `<dir>/<dataset_name>/<stimulus_image_path>` and returns a tibble with:
 
 - one row per stimulus that has an image, in the requested datasets
 - the columns of `pb$stimuli`, plus `local_image_path`: the path the image was saved to, or `NA` where the download failed
