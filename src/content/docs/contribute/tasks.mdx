@@ -28,6 +28,7 @@ If you have collected looking-while-listening data and want it in Peekbank, grea
 - a Redivis account
 - edit access to <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx" target="_blank">peekbank_files</a> on Redivis
 - edit access to the <a href="https://docs.google.com/spreadsheets/d/1nGXWRu6_q7ATGrdWrFDuDmb9VoGHCnTO9NLhqhpuN28/edit?usp=sharing" target="_blank">Peekbank datasets sheet</a> on Google Sheets
+- (optional) for datasets with private raw data, edit access to <a href="https://stanford.redivis.com/datasets/2vqs-2cfz9magg" target="_blank">peekbank_private_raw</a> on Redivis
 
 </details>
 
@@ -36,19 +37,40 @@ To add a dataset we have received to Peekbank's raw data:
 1. Pick an identifying internal name for it (see <a href="../../misc/howtocite/#current-datasets" target="_blank">the list of current datasets</a> for examples).
 2. Add the dataset to the <a href="https://docs.google.com/spreadsheets/d/1nGXWRu6_q7ATGrdWrFDuDmb9VoGHCnTO9NLhqhpuN28/edit?usp=sharing" target="_blank">Peekbank datasets sheet</a>.
 3. Open the draft version of <a href="https://stanford.redivis.com/datapages/editor/datasets/frvk-5c922jwkx/files" target="_blank">peekbank_files</a> on Redivis.
-4. Click `+ Upload files`, choose `Upload directory` and select the local folder containing the raw data.
-5. In the `Destination folder` dropdown, scroll down and click `+ Create new folder`.
-6. Enter the internal name from step 1 under `New folder name` and click `Upload`. Files in nested folders keep their parent folders as a prefix.
+4. Click <code class="whitespace-nowrap">+ Upload files</code> (clicking `Create` if asked to create a new version), choose <code class="whitespace-nowrap">Upload directory</code> and select the local folder containing the raw data.
+5. In the <code class="whitespace-nowrap">Destination folder</code> dropdown, scroll down and click <code class="whitespace-nowrap">+ Create new folder</code>.
+6. Enter the internal name from step 1 under <code class="whitespace-nowrap">New folder name</code> and click `Upload`. Files in nested folders keep their parent folders as a prefix.
 
 <details>
-<summary>Making raw data available to contributors without edit access</summary>
+<summary>Making newly added raw data available to importers outside the Peekbank team</summary>
 
-The added files now live in the draft `"next"` version. By default, only people with `edit` privileges on `datapages.peekbank_files` can read this version; everyone else gets the latest published version. If you want people without this privilege to write import scripts (e.g. in a Peekbank hackathon), use the `Review and release` button to create a versioned release.
+The added files now live in the draft `"next"` version. By default, only people with `edit` privileges on `datapages.peekbank_files` can read this version; everyone else gets the latest published version. If you want people without this privilege to write import scripts (e.g. in a Peekbank hackathon), use the <code class="whitespace-nowrap">Review and release</code> button to create a versioned release.
 
 </details>
 
-If you want to add or replace files, use the `+ Upload files` button and choose the folder of the dataset you want to edit.
+If you want to add or replace files, use the <code class="whitespace-nowrap">+ Upload files</code> button and choose the folder of the dataset you want to edit.
 If you want to delete files, click on the dataset's folder name in the right panel and delete the file.
+
+<details>
+<summary>What about datasets that do not allow us to share the raw data?</summary>
+
+Raw data that may not be shared publicly (e.g. the NIH Baby Toolbox dataset) goes into <a href="https://stanford.redivis.com/datapages/editor/datasets/2vqs-2cfz9magg" target="_blank">peekbank_private_raw</a>, which only the Peekbank team can see. To upload such a dataset in a way that the pipeline can pick up:
+
+1. Pick an identifying internal name for it (see <a href="../../misc/howtocite/#current-datasets" target="_blank">the list of current datasets</a> for examples).
+2. Add the dataset to the <a href="https://docs.google.com/spreadsheets/d/1nGXWRu6_q7ATGrdWrFDuDmb9VoGHCnTO9NLhqhpuN28/edit?usp=sharing" target="_blank">Peekbank datasets sheet</a>.
+3. Open the draft version of <a href="https://stanford.redivis.com/datapages/editor/datasets/2vqs-2cfz9magg" target="_blank">peekbank_private_raw</a> (this is the private one) on Redivis.
+4. Click <code class="whitespace-nowrap">+ Upload files</code> (clicking `Create` if asked to create a new version), choose <code class="whitespace-nowrap">Upload directory</code> and select the local folder containing the raw data.
+5. In the <code class="whitespace-nowrap">Destination folder</code> dropdown, scroll down and click <code class="whitespace-nowrap">+ Create new folder</code>.
+6. Enter the internal name from step 1 under <code class="whitespace-nowrap">New folder name</code> and click `Upload`. Files in nested folders keep their parent folders as a prefix.
+7. On your computer, create an empty file named `raw_data_in_private_repo.txt`.
+8. Open the draft version of <a href="https://stanford.redivis.com/datapages/editor/datasets/frvk-5c922jwkx/files" target="_blank">peekbank_files</a> (this is the public one) on Redivis.
+9. Click <code class="whitespace-nowrap">+ Upload files</code>, choose <code class="whitespace-nowrap">Upload files</code> and select the file from step 7.
+10. In the <code class="whitespace-nowrap">Destination folder</code> dropdown, scroll down and click <code class="whitespace-nowrap">+ Create new folder</code>.
+11. Enter the same internal name from step 1 under <code class="whitespace-nowrap">New folder name</code> and click `Upload`. This placeholder tells the import scripts to look for the raw data in peekbank_private_raw.
+
+The import scripts then automatically download the raw data from `peekbank_private_raw` for everyone who has access to it. The processed data still goes to the public `peekbank_files`, as that data has the same shape as what will be distributed via the Peekbank releases.
+
+</details>
 
 ## Transform data into the Peekbank schema
 
@@ -58,7 +80,8 @@ If you want to delete files, click on the dataset's folder name in the right pan
 - a Redivis account
 - a GitHub account
 - either write access to <a href="https://github.com/peekbank/peekbank-data-import" target="_blank">peekbank-data-import</a> (ask the Peekbank team) or your own fork to open pull requests from
-- to upload the result, edit access to <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx" target="_blank">peekbank_files</a>
+- (optional) to upload the result, edit access to <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx" target="_blank">peekbank_files</a>
+- (optional) for datasets with private raw data, read access to <a href="https://stanford.redivis.com/datasets/2vqs-2cfz9magg" target="_blank">peekbank_private_raw</a>
 
 </details>
 
