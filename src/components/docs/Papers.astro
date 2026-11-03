@@ -58,7 +58,7 @@ const papers: Paper[] = [
 ];
 ---
 
-<ul>
+<ul class:list={[variant === "long" && "space-y-4"]}>
   {
     papers.map((paper) =>
       variant === "short" ? (
