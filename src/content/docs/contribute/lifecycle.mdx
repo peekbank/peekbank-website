@@ -3,13 +3,28 @@ title: Dataset Lifecycle
 description: How a dataset moves through the Peekbank stack, from a contributing lab to a release.
 ---
 
-import LifecycleDiagram from "/src/components/docs/LifecycleDiagram.astro";
+import ReleaseWorkflowDiagram from "/src/components/docs/lifecycle/ReleaseWorkflowDiagram.astro";
+import CachedWorkflowDiagram from "/src/components/docs/lifecycle/CachedWorkflowDiagram.astro";
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 This page gives you a tour through the Peekbank stack by describing the stages a newly added dataset goes through. You can click on an element in the diagram below to jump to the related section.
 
+<Tabs>
+<TabItem label="Release workflow">
+
 <div class="not-content my-8" data-mdast="ignore">
-  <LifecycleDiagram />
+  <ReleaseWorkflowDiagram />
 </div>
+
+</TabItem>
+<TabItem label="Cached workflow for quick testing">
+
+<div class="not-content my-8" data-mdast="ignore">
+  <CachedWorkflowDiagram />
+</div>
+
+</TabItem>
+</Tabs>
 
 ## Raw data in peekbank_files
 
@@ -17,21 +32,32 @@ The lab sends the data (or a link to a data repository) to someone on the Peekba
 
 ## Import
 
-The import process turns the raw data into preprocessed data in the Peekbank format. For each dataset, a collaborator writes a separate, scaffolded `import.R` script in <a href="https://github.com/peekbank/peekbank-data-import" target="_blank">peekbank-data-import</a>, which downloads the raw data from <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx/files" target="_blank">peekbank_files</a>, reshapes it (outputting one `.csv` per table of the schema) and validates the result.
+The import process turns the raw data into preprocessed data in the Peekbank format. For each dataset, a collaborator writes a separate, scaffolded `import.R` script in <a href="https://github.com/peekbank/peekbank-data-import" target="_blank">peekbank-data-import</a>, which downloads the raw data from <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx/files" target="_blank">peekbank_files</a>, reshapes it (outputting one `.csv` per table of the schema) and validates the result. Next to the script, the dataset's `README.md` documents the import decisions.
 
 The import scripts use some internal helper functions from <a href="https://github.com/peekbank/peekbankr" target="_blank">PeekbankR</a>.
 
-Once the data passes validation, we perform an internal review step where another collaborator looks through the import script and the paper the data came from in tandem. If no further issues are found, a flag in the import script is set to upload the processed data to <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx/files" target="_blank">peekbank_files</a>, along with the dataset's `README.md`, which documents import decisions. Both go into the special `_processed_data` folder under the dataset's identifier, e.g. `_processed_data/reflook_v4/trials.csv`.
+Once the data passes validation, we perform an internal review step where another collaborator looks through the import script and the paper the data came from in tandem. Until then, a file named `ignored_by_pipeline_remove_after_review.txt` in the dataset's folder keeps it out of the pipeline and the releases. If no further issues are found, the reviewer deletes that file and commits the deletion, which makes the dataset part of the next release.
+
+With a flag in the import script, the processed data and `README.md` can also be uploaded to <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx/files" target="_blank">peekbank_files</a>, into the special `_processed_data` folder under the dataset's identifier (creating e.g. `_processed_data/reflook_v4/trials.csv`). Releases do not use these uploads, but the [cached workflow](#testing-with-the-cached-workflow) for testing does, to allow for faster end-to-end testing of import changes.
 
 ## Ingestion
 
-The ingestion workflow collects every dataset's processed data into a draft of the next version of <a href="https://stanford.redivis.com/datasets/a3v0-3drqa89kg" target="_blank">Peekbank on Redivis</a>, by reading the contents of the separate `.csv` files into one Redivis database and offsetting the row IDs to their respective position in the joined dataset. [The ingestion pipeline is being reworked, and this section will describe it once that is done]. Peekbank uses release names in the format \<YEAR\>.\<Incrementing Number\>.
+The ingestion builds a draft of the next release of <a href="https://stanford.redivis.com/datasets/a3v0-3drqa89kg" target="_blank">Peekbank on Redivis</a> from the raw data and the import code. It is triggered via a command in <a href="https://github.com/peekbank/peekbank-data-import" target="_blank">peekbank-data-import</a> (`./pbi ingest <release-name>`), which runs in Docker and pins both the raw data and the state of the import repository to the release. It downloads the raw data, reruns every import script and then combines the processed `.csv` files of all datasets into one set of tables, offsetting the row IDs to their position in the joined dataset. The process stops if any dataset fails to import or validate. Peekbank uses release names in the format \<YEAR\>.\<Incrementing Number\>.
 
-The ingest also creates an `aoi_timepoints_rle` table, a <a href="https://en.wikipedia.org/wiki/Run-length_encoding" target="_blank">run-length-encoded</a> version of `aoi_timepoints`, which is used by PeekbankR to cut transmission size. Similarly, the ingestion creates a `release_info` table, which has a single row with the release name of the dataset.
+Every dataset's `README.md` and raw data go into the release as files, in a folder named after the dataset. These files enable us to reproduce the ingestion if needed and allow PeekbankR to fetch versioned stimulus images and READMEs.
+
+The ingest also creates an `aoi_timepoints_rle` table, a <a href="https://en.wikipedia.org/wiki/Run-length_encoding" target="_blank">run-length-encoded</a> version of `aoi_timepoints`, which is used by PeekbankR to cut transmission size. Similarly, the ingestion creates a `release_info` table with metadata, which has a single row with the release name of the dataset and the commit of <a href="https://github.com/peekbank/peekbank-data-import" target="_blank">peekbank-data-import</a> it was built from.
+
+<details id="testing-with-the-cached-workflow">
+<summary>Testing with the cached workflow</summary>
+
+Rerunning every import takes a while, so for quickly testing import changes there is a quicker way, depicted in the "Cached workflow for quick testing" tab above. `./pbi ingest <release-name> --cache` builds a draft from the cached `.csv` files uploaded to `_processed_data`. Such a draft records no import repository commit and is labelled as a test build on Redivis. Individuals with edit access on the Peekbank dataset on Redivis can read it with `peekbank("next")` in PeekbankR for testing purposes.
+
+</details>
 
 ## Release
 
-Publishing the draft via the Redivis interface turns it into a new release of the Peekbank dataset. Redivis numbers its versions on its own (e.g., `v1.4`), so our `release_info` table is used to keep track of Peekbank release names (e.g., `2026.1`). Previous versions stay available to keep old analyses reproducible. The list of supported releases can be seen on the <a href="../../peekbank/releases/" target="_blank">Releases</a> page.
+Releasing the draft with `./pbi release <release-name>` (or the Redivis interface) publishes it as a new release of the Peekbank dataset. Redivis numbers its versions on its own (e.g., `v1.4`), so our `release_info` table is used to keep track of Peekbank release names (e.g., `2026.1`). Previous versions stay available to keep old analyses reproducible. The list of supported releases can be seen on the <a href="../../peekbank/releases/" target="_blank">Releases</a> page.
 
 ## Access
 

@@ -93,6 +93,7 @@ To turn a raw dataset into Peekbank-ready tables ("data import"):
 4. Fill in the code following the steps in the documentation, and note any relevant import decisions in the dataset's README.
 5. Run the script. It validates the data and prints a summary with plots to check against the original paper.
 6. Once the data looks right, set `upload=TRUE` in `write_and_validate_list()` and run it again to upload the processed data to Redivis.
+7. Ask someone on the team to review the import. Once they are happy with it, they delete `ignored_by_pipeline_remove_after_review.txt` from the dataset folder and commit the deletion along with any fixes, which adds the dataset to the next release.
 
 ## Release a new Peekbank version
 
@@ -101,10 +102,20 @@ To turn a raw dataset into Peekbank-ready tables ("data import"):
 
 - a Redivis account
 - edit access to <a href="https://stanford.redivis.com/datasets/a3v0-3drqa89kg" target="_blank">Peekbank on Redivis</a>
+- edit access to <a href="https://stanford.redivis.com/datasets/frvk-5c922jwkx" target="_blank">peekbank_files</a> on Redivis, as the release uploads the processed data that changed
+- read access to <a href="https://stanford.redivis.com/datasets/2vqs-2cfz9magg" target="_blank">peekbank_private_raw</a> on Redivis, as a release reruns every import (including those with private raw data)
 
 </details>
 
-[The workflow will be described here once the rework of the ingestion pipeline is done.]
+To build and publish a release:
+
+1. Clone <a href="https://github.com/peekbank/peekbank-data-import" target="_blank">peekbank-data-import</a> and set it up as described in its <a href="https://github.com/peekbank/peekbank-data-import/tree/master/ingest#you-need" target="_blank">ingestion README</a>.
+2. Commit hashes of that repository get baked into releases. If you have any local changes, commit them, get them onto master on GitHub and/or pull the latest master. Only the folders of datasets that still hold an `ignored_by_pipeline_remove_after_review.txt` may differ from the commit.
+3. Pick a release name in the format \<YEAR\>.\<Incrementing Number\>, e.g. `2026.2`.
+4. Run `./pbi ingest <release-name>`. This reruns every import from scratch, builds the release tables and stages them in the draft of <a href="https://stanford.redivis.com/datapages/editor/datasets/a3v0-3drqa89kg" target="_blank">Peekbank on Redivis</a>. Nothing is staged if any dataset fails to import or validate.
+5. Look through the draft on Redivis, or read it in PeekbankR with `peekbank("next")`. If you need to apply fixes, running the ingestion command again replaces the current draft on Redivis.
+6. Release the draft with `./pbi release <release-name>`. The <code class="whitespace-nowrap">Review and release</code> button on Redivis works too, but is discouraged as it does not perform the metadata validation of the command.
+7. If desired, add the release to the curated <a href="../../peekbank/releases/" target="_blank">Releases</a> page of this website.
 
 ## Extend PeekbankR
 
