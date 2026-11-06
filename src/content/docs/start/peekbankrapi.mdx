@@ -12,7 +12,7 @@ An overview of the peekbankr client and helpers. For full argument lists, see th
 `peekbank()` returns a client pinned to one <a href="../../peekbank/releases/" target="_blank">Peekbank release</a>, through which most of peekbankr is used.
 
 ```r
-pb <- peekbank("2026.2")
+pb <- peekbank("%RELEASE%")
 ```
 
 `peekbank_releases()` lists the releases you can pass. `"current"` takes the most recently published one.
@@ -101,16 +101,16 @@ pb$db$aoi_timepoints |>
 
 | Field | What it holds |
 | --- | --- |
-| `pb$release` | the Peekbank release this client is pinned to, e.g. `"2026.2"` |
-| `pb$redivis_tag` | the Redivis version holding it, e.g. `"v2.1"` |
+| `pb$release` | the Peekbank release this client is pinned to, e.g. `"%RELEASE%"` |
+| `pb$redivis_tag` | the Redivis version holding it, e.g. `"%REDIVIS_VERSION%"` |
 | `pb$tables` | the names of the tables in this release |
 
 Printing the client shows the release it is pinned to and what is on it:
 
 ```r
 pb
-#> <peekbank> release 2026.2 (Redivis version v2.1)
-#>   code:    https://github.com/peekbank/peekbank-data-import/tree/87e05116bcdc46736589d392659a336ac73db4e9
+#> <peekbank> release %RELEASE% (Redivis version %REDIVIS_VERSION%)
+#>   code:    https://github.com/peekbank/peekbank-data-import/tree/<commit>
 #>   tables:  datasets subjects administrations trials trial_types stimuli
 #>            aoi_region_sets aoi_timepoints xy_timepoints
 #>   methods: clear_cache() images() query() readmes()

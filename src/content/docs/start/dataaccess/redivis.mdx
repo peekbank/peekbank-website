@@ -27,7 +27,7 @@ import redivis  # uv add redivis
 
 table = (
     redivis.organization("datapages")
-    .dataset("peekbank:a3v0", version="v2.1")
+    .dataset("peekbank:a3v0", version="%REDIVIS_VERSION%")
     .table("administrations")
 )
 

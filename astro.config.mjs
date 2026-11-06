@@ -6,8 +6,25 @@ import starlightThemeNova from "starlight-theme-nova";
 import starlightLlmsTxt from "starlight-llms-txt";
 
 import react from "@astrojs/react";
+import fs from "node:fs";
 
 const base = process.env.ASTRO_BASE || "/";
+
+// Examples in the docs write %RELEASE% and %REDIVIS_VERSION% for the release
+// pinned in viz_src/release.json, the one the site's data is pulled from
+const pinned = JSON.parse(fs.readFileSync(new URL("./viz_src/release.json", import.meta.url), "utf8"));
+function remarkPinnedRelease() {
+  /** @param {any} node */
+  const fill = (node) => {
+    if (typeof node.value === "string") {
+      node.value = node.value
+        .replaceAll("%RELEASE%", pinned.release)
+        .replaceAll("%REDIVIS_VERSION%", pinned.redivisVersion);
+    }
+    node.children?.forEach(fill);
+  };
+  return fill;
+}
 
 export default defineConfig({
   site: "https://peekbank.github.io",
@@ -19,6 +36,7 @@ export default defineConfig({
     cacheDir: `node_modules/.vite/${process.env.NODE_ENV}`,
   },
   markdown: {
+    remarkPlugins: [remarkPinnedRelease],
     shikiConfig: {
       transformers: [
         {
