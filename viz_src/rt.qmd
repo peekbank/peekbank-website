@@ -2,10 +2,11 @@
 title: "Reaction Time Explorer"
 ---
 
-Latency of gaze shifts after target-word onset. Reaction time is the
-landing time of the first shift from the distractor to the target
-(distractor-initial trials); onset-contingent curves show shifting away
-from the initially fixated image for both trial types.
+Reaction time measures how fast children shift their gaze once the target
+word starts. It is the moment a look that began on the distractor first lands
+on the target, so only trials that started on the distractor count. The onset-contingent
+curves show how many trials have moved off the starting image over time, for
+trials starting on either image.
 
 {{< include components/_interval.qmd >}}
 {{< include components/_vizlib.qmd >}}
@@ -18,27 +19,28 @@ from the initially fixated image for both trial types.
 ::: {.viz-sidebar}
 
 ```{ojs rt-inputs}
-viewof all_datasets = Inputs.toggle({ label: "All datasets", value: false })
-viewof sel_datasets = Inputs.select(datasetNames, {
-  label: "Datasets", multiple: 6, value: ["pomper_saffran_2016"],
+viewof all_datasets = allToggle()
+viewof sel_datasets = Inputs.checkbox(datasetNames, {
+  label: "Datasets", value: ["pomper_saffran_2016"],
   format: (d) => datasetLabel(d), disabled: all_datasets,
 })
+html`<p class="viz-note">${active_datasets.length} of ${datasetNames.length} selected</p>`
 viewof age_range = interval([0, 84], {
   step: 1, value: [0, 84], label: "Ages (months)",
 })
 viewof age_nbins = Inputs.range([1, 6], {
   step: 1, value: 2, label: "Age groups",
 })
-viewof sel_words = Inputs.select(["All"].concat(allWords), {
-  label: "Words", multiple: 5, value: ["All"],
-})
+viewof sel_words = Inputs.checkbox(allWords, { label: "Words", value: [] })
+html`<p class="viz-note">${sel_words.length
+  ? `${sel_words.length} selected` : "None checked: all words combined"}</p>`
 viewof rt_range = interval([0, 4000], {
-  step: 25, value: [0, 4000], label: "RT range (msec)",
+  step: 25, value: [0, 4000], label: "RT range (ms)",
 })
 viewof onset_window = interval([0, 4000], {
-  step: 25, value: [0, 4000], label: "Onset plot window (msec)",
+  step: 25, value: [0, 4000], label: "Onset plot window (ms)",
 })
-viewof include_excluded = Inputs.toggle({ label: "Excluded trials", value: true })
+viewof include_excluded = Inputs.toggle({ label: "Include excluded trials", value: true })
 ```
 
 :::
@@ -52,7 +54,7 @@ slices = Promise.all(active_datasets.map(loadSlice))
 allWords = wordsOf(slices)
 
 rows = {
-  const useAll = sel_words.includes("All");
+  const useAll = sel_words.length === 0;
   return buildRows(slices, {
     ageLo: age_range[0], ageHi: age_range[1],
     words: useAll ? null : sel_words,
@@ -128,17 +130,21 @@ onsetData = {
 
 ```{ojs rt-means-plot}
 {
-  document.querySelectorAll(".pb-spinner").forEach((el) => el.remove());
+  markReady();
   const facets = new Set(rtMeans.map((d) => d.word));
-  return Plot.plot({
-    width, height: Math.max(380, 220 * Math.ceil(facets.size / 3)),
-    x: { label: "Age (binned)", domain: orderedBins(binner.labels, rtMeans) },
-    y: { label: "Reaction time (msec)" },
+  const ageGroups = orderedBins(binner.labels, rtMeans);
+  return plot({
+    height: Math.max(380, 220 * Math.ceil(facets.size / 3)),
+    x: { label: "Age group (months)", domain: ageGroups,
+      ...barPadding(ageGroups.length, facets.size) },
+    y: { label: "Reaction time (ms)" },
     color: { domain: orderedBins(binner.labels, rtMeans) },
     fx: facets.size > 1 ? { label: null } : undefined,
     marks: [
       Plot.barY(rtMeans, {
         x: "age_bin", y: "mean_rt", fill: "age_bin",
+        tip: true, title: (d) => `${d.age_bin} months\n${Math.round(d.mean_rt)} ms ` +
+          `[${Math.round(d.ci_lower)}, ${Math.round(d.ci_upper)}]\n${d.n_trials} trials`,
         ...(facets.size > 1 ? { fx: "word" } : {}),
       }),
       Plot.ruleX(rtMeans, {
@@ -150,20 +156,23 @@ onsetData = {
 }
 ```
 
+Mean reaction time on distractor-initial trials; whiskers are 95%
+confidence intervals.
+
 ### Distribution
 
 ```{ojs rt-hist-plot}
-Plot.plot({
-  width, height: 400,
-  x: { label: "RT (msec)" },
+plot({
+  height: 400,
+  x: { label: "RT (ms)" },
   y: { label: "Trials" },
-  color: { legend: true, label: "Age group",
+  color: { legend: true, label: "Age group (months)",
     domain: orderedBins(binner.labels, rtTrials) },
   marks: [
     Plot.rectY(rtTrials.filter((d) => d.shift_type === "D-T"),
       Plot.binX({ y: "count" }, {
         x: "rt", fill: "age_bin", opacity: 0.6, interval: 100,
-        mixBlendMode: "multiply",
+        mixBlendMode: "multiply", tip: true,
       })),
   ],
 })
@@ -174,10 +183,10 @@ Plot.plot({
 ```{ojs rt-onset-plot}
 {
   const facets = new Set(onsetData.map((d) => d.age_bin));
-  return Plot.plot({
-    width, height: Math.max(400, 220 * Math.ceil(facets.size / 2)),
-    grid: true,
-    x: { label: "Time (msec)" },
+  return plot({
+    height: Math.max(400, 220 * Math.ceil(facets.size / 2)),
+    grid: true, marginRight: 60,
+    x: { label: "Time (ms)" },
     y: { label: "Prop. shifted from onset image", domain: [0, 1] },
     fy: facets.size > 1
       ? { label: null, domain: orderedBins(binner.labels, onsetData) }
@@ -185,10 +194,12 @@ Plot.plot({
     marks: [
       Plot.lineY(onsetData.filter((d) => d.shift_type === "D-T"), {
         x: "t", y: "prop_shifted", stroke: "#2563eb",
+        tip: true, title: (d) => `Distractor-initial\n${d.prop_shifted.toFixed(2)} at ${d.t} ms (n=${d.n})`,
         ...(facets.size > 1 ? { fy: "age_bin" } : {}),
       }),
       Plot.lineY(onsetData.filter((d) => d.shift_type === "T-D"), {
         x: "t", y: "prop_shifted", stroke: "#2563eb", strokeDasharray: "5 4",
+        tip: true, title: (d) => `Target-initial\n${d.prop_shifted.toFixed(2)} at ${d.t} ms (n=${d.n})`,
         ...(facets.size > 1 ? { fy: "age_bin" } : {}),
       }),
       Plot.ruleY([0.5], { strokeDasharray: "4 4" }),
@@ -205,6 +216,8 @@ Solid: distractor-initial (D-T). Dashed: target-initial (T-D).
 Inputs.table(rtMeans, {
   format: { mean_rt: (d) => d.toFixed(0), ci_lower: (d) => d.toFixed(0),
             ci_upper: (d) => d.toFixed(0) },
+  header: { age_bin: "Age group (months)", word: "Word", n_trials: "Trials",
+            mean_rt: "Mean RT (ms)", ci_lower: "95% CI lower", ci_upper: "95% CI upper" },
 })
 ```
 

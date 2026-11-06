@@ -2,9 +2,9 @@
 title: "Accuracy Explorer"
 ---
 
-Proportion of looks to the target image (among target + distractor looks),
-over time and within an analysis window. Chance is 0.5; time is centered on
-target-word onset.
+The share of looks to the named image (the target) out of all looks to
+either image, over time and averaged within an analysis window. Time 0 is
+when the target word starts, and proportional looking of 0.5 is chance.
 
 {{< include components/_interval.qmd >}}
 {{< include components/_vizlib.qmd >}}
@@ -17,28 +17,29 @@ target-word onset.
 ::: {.viz-sidebar}
 
 ```{ojs acc-inputs}
-viewof all_datasets = Inputs.toggle({ label: "All datasets", value: false })
-viewof sel_datasets = Inputs.select(datasetNames, {
-  label: "Datasets", multiple: 6, value: ["pomper_saffran_2016"],
+viewof all_datasets = allToggle()
+viewof sel_datasets = Inputs.checkbox(datasetNames, {
+  label: "Datasets", value: ["pomper_saffran_2016"],
   format: (d) => datasetLabel(d), disabled: all_datasets,
 })
+html`<p class="viz-note">${active_datasets.length} of ${datasetNames.length} selected</p>`
 viewof age_range = interval([0, 84], {
   step: 1, value: [0, 84], label: "Ages (months)",
 })
 viewof age_nbins = Inputs.range([1, 6], {
   step: 1, value: 2, label: "Age groups",
 })
-viewof sel_words = Inputs.select(["All"].concat(allWords), {
-  label: "Words", multiple: 5, value: ["All"],
-})
+viewof sel_words = Inputs.checkbox(allWords, { label: "Words", value: [] })
+html`<p class="viz-note">${sel_words.length
+  ? `${sel_words.length} selected` : "None checked: all words combined"}</p>`
 viewof analysis_window = interval([-1000, 4000], {
-  step: 25, value: [250, 2250], label: "Analysis window (msec)",
+  step: 25, value: [250, 2250], label: "Analysis window (ms)",
 })
 viewof plot_window = interval([-1000, 4000], {
-  step: 25, value: [-500, 4000], label: "Profile window (msec)",
+  step: 25, value: [-500, 4000], label: "Profile window (ms)",
 })
 viewof age_as_color = Inputs.toggle({ label: "Age as color", value: true })
-viewof include_excluded = Inputs.toggle({ label: "Excluded trials", value: true })
+viewof include_excluded = Inputs.toggle({ label: "Include excluded trials", value: true })
 ```
 
 :::
@@ -52,7 +53,7 @@ slices = Promise.all(active_datasets.map(loadSlice))
 allWords = wordsOf(slices)
 
 rows = {
-  const useAll = sel_words.includes("All");
+  const useAll = sel_words.length === 0;
   return buildRows(slices, {
     ageLo: age_range[0], ageHi: age_range[1],
     words: useAll ? null : sel_words,
@@ -114,16 +115,16 @@ accuracyData = {
 
 ```{ojs acc-profile-plot}
 {
-  document.querySelectorAll(".pb-spinner").forEach((el) => el.remove());
+  markReady();
   const colorField = age_as_color ? "age_bin" : "word";
   const facetField = age_as_color ? "word" : "age_bin";
   const facets = new Set(profileData.map((d) => d[facetField]));
-  return Plot.plot({
-    width, height: Math.max(420, 230 * Math.ceil(facets.size / 2)),
+  return plot({
+    height: Math.max(420, 230 * Math.ceil(facets.size / 2)),
     grid: true, marginRight: 40,
-    x: { label: "Time (msec)" },
+    x: { label: "Time (ms)" },
     y: { label: "Proportion target looking", domain: [0, 1] },
-    color: { legend: true, label: colorField === "age_bin" ? "Age group" : "Word",
+    color: { legend: true, label: colorField === "age_bin" ? "Age group (months)" : "Word",
       ...(colorField === "age_bin"
         ? { domain: orderedBins(binner.labels, profileData) } : {}) },
     fy: facets.size > 1 ? { label: null,
@@ -138,6 +139,8 @@ accuracyData = {
       }),
       Plot.lineY(profileData, {
         x: "t", y: "prop_looking", stroke: colorField,
+        tip: true, title: (d) => `${colorField === "age_bin" ? d.age_bin + " months" : d.word}\n` +
+          `${d.prop_looking.toFixed(2)} at ${d.t} ms (n=${d.n})`,
         ...(facets.size > 1 ? { fy: facetField } : {}),
       }),
       Plot.ruleY([0.5], { strokeDasharray: "4 4" }),
@@ -147,6 +150,9 @@ accuracyData = {
 }
 ```
 
+The shaded band is the analysis window and the ribbons are 95% credible
+intervals. Dashed lines mark chance (0.5) and target-word onset.
+
 ### Window accuracy
 
 ```{ojs acc-window-plot}
@@ -154,9 +160,11 @@ accuracyData = {
   const xField = age_as_color ? "age_bin" : "word";
   const facetField = age_as_color ? "word" : "age_bin";
   const facets = new Set(accuracyData.map((d) => d[facetField]));
-  return Plot.plot({
-    width, height: Math.max(380, 220 * Math.ceil(facets.size / 3)),
-    x: { label: xField === "age_bin" ? "Age (binned)" : "Word",
+  const bars = new Set(accuracyData.map((d) => d[xField])).size;
+  return plot({
+    height: Math.max(380, 220 * Math.ceil(facets.size / 3)),
+    x: { label: xField === "age_bin" ? "Age group (months)" : "Word",
+      ...barPadding(bars, facets.size),
       ...(xField === "age_bin"
         ? { domain: orderedBins(binner.labels, accuracyData) } : {}) },
     y: { label: "Proportion target looking", domain: [0, 1] },
@@ -168,6 +176,8 @@ accuracyData = {
     marks: [
       Plot.barY(accuracyData, {
         x: xField, y: "mean", fill: xField,
+        tip: true, title: (d) => `${xField === "age_bin" ? d.age_bin + " months" : d.word}\n` +
+          `${d.mean.toFixed(2)} [${d.ci_lower.toFixed(2)}, ${d.ci_upper.toFixed(2)}]\n${d.n_trials} trials`,
         ...(facets.size > 1 ? { fx: facetField } : {}),
       }),
       Plot.ruleX(accuracyData, {
@@ -180,12 +190,17 @@ accuracyData = {
 }
 ```
 
+Mean accuracy within the analysis window; whiskers are 95% confidence
+intervals.
+
 ### Data
 
 ```{ojs acc-table}
 Inputs.table(accuracyData, {
   format: { mean: (d) => d.toFixed(3), ci_lower: (d) => d.toFixed(3),
             ci_upper: (d) => d.toFixed(3) },
+  header: { age_bin: "Age group (months)", word: "Word", n_trials: "Trials",
+            mean: "Mean accuracy", ci_lower: "95% CI lower", ci_upper: "95% CI upper" },
 })
 ```
 

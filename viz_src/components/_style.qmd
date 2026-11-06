@@ -1,18 +1,17 @@
 ```{ojs input-style}
 //| output: false
-// input styling adapted from levante-datapage: pill labels, borderless
-// rounded selects (scoped to the ojs namespace class)
+// input styling adapted from levante-datapage: rounded selects (scoped to
+// the ojs namespace class)
 ojs_ns = Inputs.text().classList[0]
 ```
 
 ```{ojs input-style-css}
 html`<style>
-  .${ojs_ns} div label {
-    background-color: #eef2f6;
-    padding: 0.2rem 0.5rem;
-    border-radius: 0.4rem;
-    margin-bottom: 0.25rem;
-    width: auto;
+  /* our own chevron, as the native one sits flush against the right edge */
+  .${ojs_ns} select {
+    appearance: none;
+    padding-right: 2rem !important;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E") no-repeat right 0.6rem center / 0.8rem;
   }
 
   .${ojs_ns} select,
@@ -20,12 +19,12 @@ html`<style>
   .${ojs_ns} input[type="file"] {
     background-color: #fff;
     border: 1px solid #d8dee4;
-    border-radius: 0.4rem;
+    border-radius: 0.6rem;
     padding: 0.2rem 0.4rem;
   }
 
   .${ojs_ns} input[type="checkbox"] {
-    accent-color: #2780e3;
+    accent-color: #3b99fc;
     margin-bottom: 0;
   }
 </style>`

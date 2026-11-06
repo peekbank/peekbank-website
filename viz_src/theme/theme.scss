@@ -66,20 +66,26 @@ h1, h2, h3, .pb-serif {
   &:hover { background: #1f2937; }
 }
 
-// loading spinner shown until OJS cells produce output
+// loading spinner shown until OJS cells produce output. Laid over the
+// explorer rather than above it, so removing it shifts nothing.
 .pb-spinner {
+  position: absolute;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
-  color: #6b7280;
-  padding: 2.5rem 0;
+  gap: 0.6rem;
+  color: #9ca3af;
+  font-size: 0.875rem;
+  // about the middle of the empty space the explorer will fill
+  padding: 18vh 0;
 
   .ring {
-    width: 22px;
-    height: 22px;
-    border: 3px solid #e5e7eb;
-    border-top-color: #374151;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f4f6;
+    border-top-color: #9ca3af;
     border-radius: 50%;
     animation: pb-spin 0.9s linear infinite;
   }
@@ -99,26 +105,247 @@ h1, h2, h3, .pb-serif {
 .viz-layout {
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr);
-  gap: 1.25rem;
+  gap: 2.5rem;
   align-items: start;
 }
 
+// stacked, the chart comes first so it isn't a screen-length scroll away
 @media (max-width: 991px) {
-  .viz-layout { grid-template-columns: 1fr; }
+  .viz-layout { grid-template-columns: minmax(0, 1fr); }
+  .viz-main { order: -1; }
+  .viz-sidebar { position: static; }
+}
+
+// Download CSV, drawn like the site's secondary buttons
+.btn-outline-primary {
+  --bs-btn-color: #1f2937;
+  --bs-btn-border-color: #d1d5db;
+  --bs-btn-hover-color: #111827;
+  --bs-btn-hover-bg: #f9fafb;
+  --bs-btn-hover-border-color: #9ca3af;
+  --bs-btn-active-color: #111827;
+  --bs-btn-active-bg: #f3f4f6;
+  --bs-btn-active-border-color: #9ca3af;
+  border-radius: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+// everything clickable shows it
+input[type="checkbox"],
+input[type="range"],
+select,
+form[class*="-toggle"] label,
+form[class*="-checkbox"] > div label {
+  cursor: pointer;
+}
+
+// Plot draws its text at 10px, small next to the 15px page text
+.viz-main svg[class^="plot-"],
+.viz-main [class*="-swatches"] {
+  font-size: 14px;
+}
+
+// intro, captions and summaries at about 65 characters a line; letters
+// average narrower than the "0" that ch measures, hence 50ch
+p {
+  max-width: 50ch;
+  text-wrap: pretty;
+}
+
+// The explorer stays hidden until its first chart is drawn (markReady in
+// _pbdata.qmd), then fades in whole. The delayed animation shows it anyway
+// should a chart fail, so an error never hides behind the spinner.
+.viz-layout {
+  opacity: 0;
+  animation: viz-reveal 0.25s ease-out 8s forwards;
+
+  &.viz-ready {
+    opacity: 1;
+    animation: none;
+    transition: opacity 0.25s ease-out;
+  }
+}
+@keyframes viz-reveal { to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .viz-layout.viz-ready { transition: none; }
+}
+
+// in place of the charts while no dataset is selected (noDatasets in
+// _pbdata.qmd)
+.viz-main.viz-empty {
+  > * { display: none; }
+
+  &::before {
+    content: "Select at least one dataset, or check All, to see the charts.";
+    display: block;
+    padding: 4rem 1rem;
+    text-align: center;
+    color: #6b7280;
+    border: 1px dashed #d1d5db;
+    border-radius: 0.6rem;
+  }
+}
+
+// a chart that failed to draw (plot() in _vizlib.qmd)
+.viz-error {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: #6b7280;
+  border: 1px dashed #d1d5db;
+  border-radius: 0.6rem;
+
+  small {
+    display: block;
+    margin-top: 0.4rem;
+    color: #9ca3af;
+  }
+}
+
+// captions read as figure text
+.panel-tabset .tab-pane > p {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+// the one-line result above an explorer's tabs
+.viz-summary {
+  color: #6b7280;
+  margin: 0 0 1rem;
+}
+
+// Quarto gives the main column and the tab panel in it a top margin each,
+// which the sidebar doesn't have, so the two columns started out of line
+.viz-main,
+.viz-main > * {
+  margin-top: 0;
+}
+
+// one row of tabs that scrolls sideways instead of wrapping on phones
+.panel-tabset .nav-tabs {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+
+  .nav-link { white-space: nowrap; }
+}
+
+// Rounded tab panel. The panel draws its own full border instead of the tab
+// row's bottom line, and the active tab sits a pixel over its top edge to
+// hide it. The tab row's bottom padding keeps that pixel inside the area its
+// sideways scroll clips to.
+.panel-tabset {
+  .nav-tabs {
+    border-bottom: 0;
+    padding-bottom: 1px;
+  }
+  .nav-link { border-radius: 0.6rem 0.6rem 0 0; }
+  .nav-link.active {
+    position: relative;
+    z-index: 1;
+  }
+  .tab-content {
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.6rem;
+    margin-top: -1px;
+  }
+  // square only where the first tab, when active, runs straight into it
+  &:has(.nav-item:first-child > .nav-link.active) > .tab-content {
+    border-top-left-radius: 0;
+  }
 }
 
 .viz-sidebar {
   position: sticky;
   top: 70px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 0.85rem;
 
+  // Observable Inputs give labels a fixed 120px column, which wraps them here
+  form { --label-width: auto; }
   form, select { max-width: 100%; width: 100%; }
-  label { font-weight: 600; }
+  // the range slider labels its inputs with a div.label, not a <label>
+  label, .label { font-weight: 600; }
 
-  input[type="range"] { margin-left: 0; }
+  // native sliders drawn like the range slider: grey track, white thumb
+  input[type="range"] {
+    appearance: none;
+    margin-left: 0;
+    height: 7px;
+    border-radius: 4px;
+    background: hsl(0, 0%, 80%);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #fcfcfc;
+    border: 1px solid hsl(0, 0%, 55%);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #fcfcfc;
+    border: 1px solid hsl(0, 0%, 55%);
+  }
+
+  // single sliders: a bordered number box beside the slider
+  form > div:has(> input[type="range"]) {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  input[type="number"] {
+    flex: 0 0 4rem;
+    width: 4rem;
+    border: 1px solid #d8dee4;
+    border-radius: 0.6rem;
+    padding: 0.1rem 0.4rem;
+  }
+
+  // checkbox lists scroll in a box instead of stretching the sidebar
+  form[class*="-checkbox"] > div {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    max-height: 12rem;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #d8dee4;
+    border-radius: 0.6rem;
+    padding: 0.6rem 0.8rem;
+
+    // baseline keeps the box on the first line of a name that wraps
+    label { font-weight: 400; margin: 0.15rem 0; align-items: baseline; gap: 0.35rem; }
+  }
+
+  .viz-note {
+    color: #6b7280;
+    font-size: 0.8rem;
+    margin: 0;
+  }
+  .cell-output-display:has(.viz-note) { margin-top: 0.25rem; }
+
+  // every control's hidden value slot has a top margin of its own, which
+  // doubled the gaps between controls
+  .quarto-ojs-hide { margin-top: 0; }
+
+  // the "All" switch sits at the end of the dataset list's label line.
+  // Absolute rather than floated: a float would narrow the whole list.
+  .cell { position: relative; }
+  .cell-output-display:has(.viz-all) {
+    position: absolute;
+    top: 0;
+    right: 8px;
+    margin-top: 0;
+    padding-right: 0;
+    z-index: 1;
+  }
+  .cell-output-display:has(.viz-all) + .cell-output-display { margin-top: 0; }
+  form.viz-all {
+    width: auto;
+    label { font-weight: 400; }
+  }
 
   .cell-output-display { padding-right: 8px; }
 
@@ -164,7 +391,7 @@ h1, h2, h3, .pb-serif {
 }
 
 // toggle rows: keep label and checkbox on one line in the sidebar
-.viz-sidebar form:has(input[type="checkbox"]) {
+.viz-sidebar form[class*="-toggle"] {
   flex-direction: row !important;
   align-items: center;
   justify-content: space-between;

@@ -9,8 +9,8 @@ manifest = d3.json(`${DATA_BASE}manifest.json`)
 datasetNames = manifest.datasets.map((d) => d.name)
 
 // display datasets by citation (team preference), disambiguating
-// duplicate shortcites with the internal name; data tables and legends
-// keep the internal dataset_name, which is the key peekbankr users need
+// duplicate shortcites with the internal name; data tables keep the
+// internal dataset_name, which is the key peekbankr users need
 datasetLabel = {
   const counts = d3.rollup(manifest.datasets, (v) => v.length,
     (d) => d.shortcite ?? d.name);
@@ -19,6 +19,52 @@ datasetLabel = {
     return [d.name, counts.get(cite) > 1 ? `${cite} · ${d.name}` : cite];
   }));
   return (name) => m.get(name) ?? name;
+}
+
+// Plot color options for charts coloured by dataset. A dataset starts from
+// the colour at its position in the explorer's pool of datasets, so it keeps
+// it while others are toggled, and only moves on when that colour is taken
+// (which cannot happen in a pool of nine or fewer). Tableau10 without
+// its grey has nine colours, so past that every line is grey and the
+// tooltip names it.
+datasetPalette = d3.schemeTableau10.slice(0, 9)
+
+function datasetColor(names, pool = datasetNames) {
+  const shown = new Set(names);
+  const domain = pool.filter((d) => shown.has(d));
+  if (domain.length > datasetPalette.length) {
+    return { domain, range: domain.map(() => "#9ca3af"), legend: false };
+  }
+  const taken = new Set();
+  const range = domain.map((name) => {
+    let i = pool.indexOf(name) % datasetPalette.length;
+    while (taken.has(i)) i = (i + 1) % datasetPalette.length;
+    taken.add(i);
+    return datasetPalette[i];
+  });
+  return { domain, range, legend: true, label: "Dataset", tickFormat: datasetLabel };
+}
+
+// the compact "All" switch beside a dataset list
+function allToggle() {
+  const toggle = Inputs.toggle({ label: "All", value: false });
+  toggle.classList.add("viz-all");
+  return toggle;
+}
+
+// called by each explorer's first chart: the explorer stays hidden behind
+// the spinner until then and fades in whole, rather than control by control
+function markReady() {
+  document.querySelectorAll(".pb-spinner").forEach((el) => el.remove());
+  document.querySelector(".viz-layout")?.classList.add("viz-ready");
+}
+
+// with no dataset selected there is nothing to draw, so the explorer says
+// that instead of showing empty or broken charts (styled in theme.scss)
+noDatasets = {
+  const empty = active_datasets.length === 0;
+  document.querySelector(".viz-main")?.classList.toggle("viz-empty", empty);
+  return empty;
 }
 
 sliceCache = new Map()

@@ -2,11 +2,11 @@
 title: "Reliability Explorer"
 ---
 
-How reliable is windowed accuracy as an individual-difference measure — and
-how does that depend on the analysis window? This explorer computes
-split-half reliability (children's trial sets split randomly in half,
-half-means correlated across children, Spearman-Brown corrected) for a grid
-of analysis windows, in your browser.
+Comparing children by their accuracy within a window only works if that
+measure is reliable, and reliability depends on the window chosen. For a grid
+of analysis windows, your browser computes split-half reliability. Each child's trials are split at
+random into two halves, the half means are correlated across children, and
+the result is Spearman-Brown corrected.
 
 {{< include components/_interval.qmd >}}
 {{< include components/_vizlib.qmd >}}
@@ -19,16 +19,17 @@ of analysis windows, in your browser.
 ::: {.viz-sidebar}
 
 ```{ojs rel-inputs}
-viewof all_datasets = Inputs.toggle({ label: "All datasets", value: false })
-viewof sel_datasets = Inputs.select(datasetNames, {
-  label: "Datasets", multiple: 6, value: ["pomper_saffran_2016"],
+viewof all_datasets = allToggle()
+viewof sel_datasets = Inputs.checkbox(datasetNames, {
+  label: "Datasets", value: ["pomper_saffran_2016"],
   format: (d) => datasetLabel(d), disabled: all_datasets,
 })
+html`<p class="viz-note">${active_datasets.length} of ${datasetNames.length} selected</p>`
 viewof age_range = interval([0, 84], {
   step: 1, value: [0, 84], label: "Ages (months)",
 })
 viewof my_window = interval([-1000, 4000], {
-  step: 25, value: [300, 1800], label: "Your window (msec)",
+  step: 25, value: [300, 1800], label: "Your window (ms)",
 })
 viewof n_splits = Inputs.range([5, 50], {
   step: 5, value: 20, label: "Random splits",
@@ -36,11 +37,8 @@ viewof n_splits = Inputs.range([5, 50], {
 viewof min_trials = Inputs.range([4, 20], {
   step: 1, value: 6, label: "Min trials per child",
 })
-viewof include_excluded = Inputs.toggle({ label: "Excluded trials", value: true })
+viewof include_excluded = Inputs.toggle({ label: "Include excluded trials", value: true })
 ```
-
-The heatmap sweeps window **start** (−500 to 1500 ms) and **end** (1000 to
-4000 ms); your window is marked ×.
 
 :::
 
@@ -168,8 +166,8 @@ myR = splitHalf(childTrials, my_window[0], my_window[1], n_splits)
 ```
 
 ```{ojs rel-readout}
-html`<p style="color:#374151; margin:0 0 0.5rem 0">
-<b>Your window [${my_window[0]}, ${my_window[1]}] ms:</b>
+html`<p class="viz-summary">
+Your window [${my_window[0]}, ${my_window[1]}] ms:
 split-half r = ${isNaN(myR.r) ? "— (too few children)" : myR.r.toFixed(2)}
 across ${myR.n} children ·
 best grid cell: ${(() => {
@@ -185,11 +183,11 @@ best grid cell: ${(() => {
 
 ```{ojs rel-heatmap}
 {
-  document.querySelectorAll(".pb-spinner").forEach((el) => el.remove());
-  return Plot.plot({
-    width, height: 480,
-    x: { label: "Window start (msec)", tickFormat: (d) => d },
-    y: { label: "Window end (msec)", tickFormat: (d) => d },
+  markReady();
+  return plot({
+    height: 480,
+    x: { label: "Window start (ms)", tickFormat: (d) => d },
+    y: { label: "Window end (ms)", labelAnchor: "top", tickFormat: (d) => d },
     color: {
       legend: true, label: "Split-half r (corrected)", scheme: "viridis",
       domain: [Math.max(0, d3.min(windowGrid, (d) => d.r) ?? 0),
@@ -208,8 +206,9 @@ best grid cell: ${(() => {
 }
 ```
 
-Cells with too few children (< 8 usable) are blank. The × marks the grid
-cell nearest your window.
+The grid covers windows starting from −500 to 1500 ms and ending from 1000
+to 4000 ms. Cells with too few children (< 8 usable) are blank. The × marks
+the grid cell nearest your window.
 
 ### Reliability vs. window end
 
@@ -217,14 +216,17 @@ cell nearest your window.
 {
   const byStart = d3.group(windowGrid.filter((d) => !isNaN(d.r)), (d) => d.start);
   const data = Array.from(byStart, ([start, g]) => g.map((d) => ({ ...d }))).flat();
-  return Plot.plot({
-    width, height: 420, grid: true,
-    x: { label: "Window end (msec)" },
+  return plot({
+    height: 420, grid: true,
+    x: { label: "Window end (ms)" },
     y: { label: "Split-half r (corrected)" },
-    color: { legend: true, label: "Window start (msec)", scheme: "plasma" },
+    color: { legend: true, label: "Window start (ms)", scheme: "plasma" },
     marks: [
       Plot.lineY(data, { x: "end", y: "r", stroke: "start" }),
-      Plot.dot(data, { x: "end", y: "r", fill: "start", r: 2.5 }),
+      Plot.dot(data, {
+        x: "end", y: "r", fill: "start", r: 2.5,
+        tip: true, title: (d) => `[${d.start}, ${d.end}] ms\nr = ${d.r.toFixed(2)}`,
+      }),
     ],
   });
 }
@@ -235,6 +237,8 @@ cell nearest your window.
 ```{ojs rel-table}
 Inputs.table(windowGrid, {
   format: { r: (d) => (isNaN(d) ? "—" : d.toFixed(3)) },
+  header: { start: "Window start (ms)", end: "Window end (ms)", r: "Split-half r",
+            n: "Children" },
 })
 ```
 

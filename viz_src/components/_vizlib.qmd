@@ -112,18 +112,19 @@ function trialRT(t0, runs) {
 // equal-width age bins with whole-month edges (team preference over the
 // R cut()-style fractional edges): the requested range is widened to
 // integer months and the bin width rounded up to a whole month, so labels
-// read (6,9] rather than (6.2,9.4]. Right-closed intervals; the realized
-// number of bins can be smaller than requested when the range is narrow.
+// read 6-9 rather than 6.2-9.4. Right-closed intervals, with the last one
+// cut off at the oldest age; the realized number of bins can be smaller
+// than requested when the range is narrow.
 function makeAgeBinner(ages, nbins) {
   if (nbins <= 1 || ages.length === 0) {
-    return ({ bin: () => 0, labels: ["all ages"] });
+    return ({ bin: () => 0, labels: ["All ages"] });
   }
   const lo = Math.floor(Math.min(...ages));
   const hi = Math.ceil(Math.max(...ages));
   const w = Math.max(1, Math.ceil((hi - lo) / nbins));
   const n = Math.max(1, Math.ceil((hi - lo) / w));
   const labels = Array.from({ length: n }, (_, i) =>
-    `(${lo + i * w},${lo + (i + 1) * w}]`);
+    `${lo + i * w}-${Math.min(hi, lo + (i + 1) * w)}`);
   return ({
     bin: (a) => Math.min(n - 1, Math.max(0, Math.ceil((a - lo) / w) - 1)),
     labels,
@@ -131,11 +132,52 @@ function makeAgeBinner(ages, nbins) {
 }
 
 // age-bin labels restricted to those present in the data, in bin order
-// (string sorts put (12,15] before (6,9]; use this for scale domains)
+// (string sorts put 12-15 before 6-9; use this for scale domains)
 function orderedBins(labels, data, field = "age_bin") {
   const present = new Set(data.map((d) => d[field]));
   return labels.filter((l) => present.has(l));
 }
 
 aoiNames = ["target", "distractor", "other", "missing"]
+
+// band padding that keeps bars at most 80px wide and grouped in the middle,
+// however few share the chart; the 60px stand in for the axis margins
+function barPadding(nBars, nFacets = 1) {
+  const room = (chartWidth - 60) / nFacets;
+  const paddingInner = 0.3;
+  const step = 80 / (1 - paddingInner);
+  return {
+    paddingInner,
+    paddingOuter: Math.max(0.1, (room / step - Math.max(1, nBars) + paddingInner) / 2),
+  };
+}
+
+// Observable's `width` is the page width here, but the charts sit in the
+// narrower tab column, where the browser would shrink them, text included
+chartWidth = Generators.observe((notify) => {
+  const observer = new ResizeObserver(([entry]) =>
+    notify(Math.floor(entry.contentRect.width)));
+  observer.observe(document.querySelector(".viz-main .tab-content"));
+  return () => observer.disconnect();
+})
+
+// Plot.plot for every explorer chart: column wide, with room for tick labels
+// at the larger font, and room between the ticks and the axis titles, which
+// Plot pins to the chart's corners. A y axis ends on a round tick above the
+// data rather than right at its top.
+function plot(options) {
+  try {
+    return Plot.plot({
+      marginTop: 36, marginLeft: 52, marginBottom: 50,
+      ...options,
+      y: { nice: true, ...options.y },
+      width: chartWidth,
+    });
+  } catch (error) {
+    return html`<div class="viz-error">
+      This chart couldn't be drawn for the current selection.
+      <small>${error.message}</small>
+    </div>`;
+  }
+}
 ```

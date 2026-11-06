@@ -325,7 +325,7 @@ theme_Flat = `
   top: -4px;
   border-radius: 100%;
   border: 1px solid hsl(0,0%,55%);
-  cursor: default;
+  cursor: pointer;
   margin: 0;
 }
 :scope .thumb:active {

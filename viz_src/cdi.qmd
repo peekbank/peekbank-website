@@ -2,10 +2,10 @@
 title: "CDI Relationships"
 ---
 
-Many Peekbank datasets include parent-reported vocabulary from the
-MacArthur-Bates Communicative Development Inventories (CDI). This explorer
-relates in-lab word recognition (accuracy or reaction time) to CDI scores,
-pairing each test session with the child's closest-in-age CDI administration.
+Many Peekbank datasets also have parent reports of children's vocabulary from
+the MacArthur-Bates Communicative Development Inventories (CDI). These charts
+compare word recognition in the lab (accuracy or reaction time) with CDI
+scores, pairing each test session with the child's CDI closest in age.
 
 {{< include components/_interval.qmd >}}
 {{< include components/_vizlib.qmd >}}
@@ -18,14 +18,13 @@ pairing each test session with the child's closest-in-age CDI administration.
 ::: {.viz-sidebar}
 
 ```{ojs cdi-inputs}
-cdiNames = manifest.datasets.filter((d) => d.n_subjects_with_cdi > 0).map((d) => d.name)
-
-viewof all_datasets = Inputs.toggle({ label: "All CDI datasets", value: false })
-viewof sel_datasets = Inputs.select(cdiNames, {
-  label: "Datasets (with CDI)", multiple: 6,
+viewof all_datasets = allToggle()
+viewof sel_datasets = Inputs.checkbox(cdiNames, {
+  label: "Datasets (with CDI)",
   value: ["adams_marchman_2018", "fernald_marchman_2012", "fmw_2013"],
   format: (d) => datasetLabel(d), disabled: all_datasets,
 })
+html`<p class="viz-note">${active_datasets.length} of ${cdiNames.length} selected</p>`
 viewof cdi_measure = Inputs.select(
   new Map([["Production", "prod"], ["Comprehension", "comp"]]),
   { label: "CDI measure", value: "prod" })
@@ -36,7 +35,7 @@ viewof lwl_measure = Inputs.select(["Accuracy", "Reaction time"], {
   label: "Recognition measure", value: "Accuracy",
 })
 viewof analysis_window = interval([-1000, 4000], {
-  step: 25, value: [250, 2250], label: "Accuracy window (msec)",
+  step: 25, value: [250, 2250], label: "Accuracy window (ms)",
 })
 viewof age_tol = Inputs.range([0.5, 6], {
   step: 0.5, value: 2, label: "Max age gap (months)",
@@ -52,6 +51,8 @@ viewof min_trials = Inputs.range([1, 10], {
 
 ```{ojs cdi-data}
 //| output: false
+cdiNames = manifest.datasets.filter((d) => d.n_subjects_with_cdi > 0).map((d) => d.name)
+
 cdiRaw = d3.json(`${DATA_BASE}cdi.json`)
 
 cdiRows = cdiRaw.rows.map((r) =>
@@ -118,7 +119,7 @@ pearsonR = {
 ```
 
 ```{ojs cdi-count}
-html`<p style="color:#6b7280; margin:0 0 0.5rem 0">
+html`<p class="viz-summary">
 ${pairedData.length.toLocaleString()} paired sessions ·
 r = ${isNaN(pearsonR) ? "—" : pearsonR.toFixed(2)}
 (${lwl_measure.toLowerCase()} × CDI ${cdi_measure === "prod" ? "production" : "comprehension"})</p>`
@@ -130,19 +131,19 @@ r = ${isNaN(pearsonR) ? "—" : pearsonR.toFixed(2)}
 
 ```{ojs cdi-scatter}
 {
-  document.querySelectorAll(".pb-spinner").forEach((el) => el.remove());
+  markReady();
   const isAcc = lwl_measure === "Accuracy";
-  return Plot.plot({
-    width, height: 520, grid: true,
+  return plot({
+    height: 520, grid: true,
     x: isAcc
       ? { label: "Proportion target looking", domain: [0, 1] }
-      : { label: "Reaction time (msec)" },
+      : { label: "Reaction time (ms)" },
     y: { label: cdi_scale === "rawscore" ? "CDI raw score" : "CDI percentile" },
     color: { legend: true, label: "Age (months)", scheme: "viridis" },
     marks: [
       Plot.dot(pairedData, {
         x: "lwl", y: "cdi", fill: "age", r: 3, fillOpacity: 0.7, tip: true,
-        title: (d) => `${d.dataset}\nage ${d.age} mo (CDI at ${d.cdi_age})\n` +
+        title: (d) => `${datasetLabel(d.dataset)}\nage ${d.age} mo (CDI at ${d.cdi_age})\n` +
           `${isAcc ? "acc " + d.lwl.toFixed(2) : "RT " + Math.round(d.lwl) + " ms"}` +
           ` · CDI ${d.cdi}`,
       }),
@@ -157,18 +158,22 @@ r = ${isNaN(pearsonR) ? "—" : pearsonR.toFixed(2)}
 ### By age
 
 ```{ojs cdi-by-age}
-Plot.plot({
-  width, height: 480, grid: true,
-  x: { label: "Age at CDI (months)" },
-  y: { label: cdi_scale === "rawscore" ? "CDI raw score" : "CDI percentile" },
-  color: { legend: true, label: "Dataset" },
-  marks: [
-    Plot.dot(
-      cdiRows.filter((c) => c.measure === cdi_measure &&
-        active_datasets.includes(c.dataset) && c[cdi_scale] != null && c.age != null),
-      { x: "age", y: cdi_scale, fill: "dataset", r: 2.5, fillOpacity: 0.6 }),
-  ],
-})
+{
+  const administrations = cdiRows.filter((c) => c.measure === cdi_measure &&
+    active_datasets.includes(c.dataset) && c[cdi_scale] != null && c.age != null);
+  return plot({
+    height: 480, grid: true,
+    x: { label: "Age at CDI (months)" },
+    y: { label: cdi_scale === "rawscore" ? "CDI raw score" : "CDI percentile" },
+    color: datasetColor(administrations.map((d) => d.dataset), cdiNames),
+    marks: [
+      Plot.dot(administrations, {
+        x: "age", y: cdi_scale, fill: "dataset", r: 2.5, fillOpacity: 0.6,
+        tip: true, title: (d) => `${datasetLabel(d.dataset)}\nage ${d.age} mo · CDI ${d[cdi_scale]}`,
+      }),
+    ],
+  });
+}
 ```
 
 All CDI administrations of the selected measure in the selected datasets
@@ -177,7 +182,13 @@ All CDI administrations of the selected measure in the selected datasets
 ### Data
 
 ```{ojs cdi-table}
-Inputs.table(pairedData, { maxHeight: 500 })
+Inputs.table(pairedData, {
+  maxHeight: 500,
+  header: { dataset: "Dataset", aid: "Administration", subject: "Child", age: "Age (months)",
+            lwl: lwl_measure === "Accuracy" ? "Accuracy" : "RT (ms)", cdi: "CDI score",
+            cdi_age: "CDI age (months)", age_gap: "Age gap (months)",
+            instrument: "CDI form", n_trials: "Trials" },
+})
 ```
 
 ```{ojs cdi-download}

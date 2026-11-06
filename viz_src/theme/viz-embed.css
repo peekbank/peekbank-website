@@ -3,9 +3,22 @@
 /* build-viz.mjs wraps the harvested markup in .pb-viz; the <main> element it
    replaces carried Quarto's container width and padding. */
 .pb-viz {
+  /* the loading spinner is laid out against this */
+  position: relative;
   padding: 1rem 1.5rem 2.5rem;
   max-width: 1400px;
   margin: 0 auto;
+}
+
+/* the intro fades in as the page opens */
+.pb-viz > p {
+  animation: pb-intro-in 0.2s ease-out both;
+}
+@keyframes pb-intro-in {
+  from { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pb-viz > p { animation: none; }
 }
 
 /* theme.scss offsets the sticky sidebar below Quarto's navbar; on the site it
