@@ -280,3 +280,56 @@ cdi <- pb$subjects |>
   add_cdi_percentiles() |>
   add_cdi_proportions()
 ```
+
+### nearest_cdi()
+
+Matches each row of a table with a `subject_id` and an `age`, e.g. `pb$administrations`, to the child's CDI scores closest to it in age from a provided cdi table, and returns:
+
+- one row per matched score, in the input table's order
+- the columns of the input table and the columns the table supplied as the `cdi` input argument, with the score's age as `cdi_age`
+
+Each row gets assigned the closest score of every language, form and measure within `max_age_diff` months. Rows without any are dropped.
+
+| Argument | Default | |
+| --- | --- | --- |
+| `df` | required | a table with `subject_id` and `age`, e.g. `pb$administrations` |
+| `cdi` | required | CDI scores from <code class="whitespace-nowrap">{'unnest_aux(pb$subjects, "cdi_responses")'}</code> |
+| <code class="whitespace-nowrap">max_age_diff</code> | required | the furthest a cdi administration's age may be from the lwl administration's age, in months |
+| <code class="whitespace-nowrap">prefer_later</code> | FALSE | use the later of two equally close scores instead of the earlier one |
+
+```r
+cdi <- pb$subjects |>
+  unnest_aux("cdi_responses") |>
+  add_cdi_percentiles()
+
+pb$administrations |>
+  nearest_cdi(cdi, max_age_diff = 3)
+```
+
+<details class="[&_table]:text-sm [&_td]:whitespace-nowrap [&_td]:px-2 [&_th]:px-2 [&_pre]:text-[13px]!">
+<summary>Example: Matching CDI scores to administrations</summary>
+
+These two administrations in `pb$administrations`
+
+| administration_id | subject_id | age | … | dataset_name |
+| --- | --- | --- | --- | --- |
+| 1488 | 936 | 18 | … | fernald_marchman_2012 |
+| 1490 | 936 | 31 | … | fernald_marchman_2012 |
+
+belong to a child with these scores in `cdi`:
+
+| subject_id | … | language | instrument_type | measure | age | rawscore |
+| --- | --- | --- | --- | --- | --- | --- |
+| 936 | … | English (American) | wg | comp | 18 | 83 |
+| 936 | … | English (American) | wg | prod | 18 | 17 |
+| 936 | … | English (American) | ws | prod | 22 | 36 |
+| 936 | … | English (American) | ws | prod | 24 | 85 |
+
+Running the code example above turns them into two rows. The administration at 18 months gets the WG comprehension and production scores from 18 months, but no WS score, as the closest one is 4 months away. The administration at 31 months has no score within 3 months, so it is dropped:
+
+| administration_id | subject_id | age | … | language | instrument_type | measure | cdi_age | rawscore | … |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1488 | 936 | 18 | … | English (American) | wg | comp | 18 | 83 | … |
+| 1488 | 936 | 18 | … | English (American) | wg | prod | 18 | 17 | … |
+
+</details>
