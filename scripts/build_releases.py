@@ -8,7 +8,7 @@ List every released Redivis version of the peekbank dataset with the Peekbank
 release it holds, read from that version's release_info table, newest release
 first.
 
-Writes viz_src/releases.json: [{"release": "2026.1", "redivisVersion": "v1.4"}, ...]
+Writes viz_src/releases.json: [{"release": "2026.2", "redivisVersion": "v2.1"}, ...]
 
 Needs a read-only Redivis token in REDIVIS_API_TOKEN, or in .env.local.
 

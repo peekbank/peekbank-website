@@ -5,7 +5,7 @@ The `get_` functions are still functional, but we recommend that new scripts use
 Data access now runs through fields on a client object that pins a database release. The old access pattern
 
 ```r
-con <- connect_to_peekbank("2026.1")
+con <- connect_to_peekbank("2026.2")
 
 administrations <- get_administrations(connection = con)
 trials <- get_trials(connection = con)
@@ -19,7 +19,7 @@ data <- aoi_timepoints |>
 becomes
 
 ```r
-pb <- peekbank("2026.1")
+pb <- peekbank("2026.2")
 
 data <- pb$aoi_timepoints |>
   left_join(pb$administrations) |>
@@ -54,7 +54,7 @@ Furthermore, you can now filter on a [wider range of columns](../../peekbankrapi
 
 | Old | New |
 | --- | --- |
-| `connect_to_peekbank("2026.1")` to pass | [`peekbank("2026.1")`](../../peekbankrapi/#creating-a-client) as an R6 object |
+| `connect_to_peekbank("2026.2")` to pass | [`peekbank("2026.2")`](../../peekbankrapi/#creating-a-client) as an R6 object |
 | `get_<table>(connection = con)` | [`pb$<table>`](../../peekbankrapi/#whole-tables), or [`pb$subset$<table>()`](../../peekbankrapi/#subsets) with filters |
 | `list_peekbank_tables(con)` | [`pb$tables`](../../peekbankrapi/#client-fields) |
 | `get_db_info()` | [`peekbank_releases()`](../../peekbankrapi/#peekbank_releases) |

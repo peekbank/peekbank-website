@@ -42,7 +42,7 @@ Create a client for a release and read the tables from it:
 library(peekbankr)
 library(dplyr)
 
-pb <- peekbank("2026.1")
+pb <- peekbank("2026.2")
 
 data <- pb$aoi_timepoints |>
   left_join(pb$administrations)
@@ -57,8 +57,8 @@ Every table in the [data schema](../../peekbank/dataschema/) is a field on the c
 ```r
 peekbank_releases() # available releases
 
-pb <- peekbank("2026.1")
-pb$release   # "2026.1"
+pb <- peekbank("2026.2")
+pb$release   # "2026.2"
 ```
 
 Alternatively, `"current"` gets you the most recently published version. Avoid this in contexts where reproducibility is important, as "current" might point to a different release by the time the code is rerun.
