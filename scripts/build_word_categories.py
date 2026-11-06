@@ -55,7 +55,7 @@ def main():
             "WHERE language = 'English (American)' AND form = 'WS' "
             "AND item_kind = 'word'"
         )
-        .to_pandas_dataframe()
+        .to_pandas_dataframe(progress=False)
     )
 
     # index CDI definitions by every normalized variant ("inside/in" -> both)
