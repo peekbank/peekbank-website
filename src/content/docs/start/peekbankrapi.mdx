@@ -17,6 +17,12 @@ pb <- peekbank("%RELEASE%")
 
 `peekbank_releases()` lists the releases you can pass. `"current"` takes the most recently published one.
 
+A client caches the data it downloads for the duration of the R session. `cache_on_disk = TRUE` additionally saves the data in a `.pbcache` folder in the working directory, which persists across sessions to prevent redownloading.
+
+```r
+pb <- peekbank("%RELEASE%", cache_on_disk = TRUE)
+```
+
 ## Tables
 
 The client has one field per table in the [data schema](../../peekbank/dataschema/), each reachable three ways (here `trials`):
@@ -163,7 +169,7 @@ readmes <- pb$readmes(datasets = "pomper_saffran_2016")
 
 ### pb$clear_cache()
 
-Drops this release's cached tables and query results.
+Drops this release's cached tables and query results. A `cache_on_disk` client also deletes the saved files.
 
 ```r
 pb$clear_cache()
