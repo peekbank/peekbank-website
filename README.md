@@ -66,7 +66,7 @@ Some of the files (mostly data and build artefacts for the `/analyses` subpage) 
 | `src/components/analyses/viz_autogen/`, `public/viz/` | `npm run build:viz` | `/analyses/*` |
 
 The quarto explorers run in two places, which is why we locally copy the data slices to both:
-- `quarto preview`serves them from `viz_src/_site/`
+- `quarto preview` serves them from `viz_src/_site/`
 - the Astro site from `public/viz/`.
 
 ```
