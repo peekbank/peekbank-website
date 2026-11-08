@@ -88,7 +88,12 @@ for (const f of ["quarto-ojs-runtime.js", "quarto-ojs.css"]) {
 // Quarto compiles bootstrap + the theme .scss into one hashed file. Prefixing
 // every selector with .pb-viz confines it to the explorer so it does not collide with Starlight styling
 const bootstrapDir = path.join(site, "site_libs", "bootstrap");
-const cssName = fs.readdirSync(bootstrapDir).find((f) => /^bootstrap-.*\.min\.css$/.test(f));
+// Files from renders with an earlier theme stay behind, and the newest is the
+// current one, as every render rewrites it
+const mtime = (f) => fs.statSync(path.join(bootstrapDir, f)).mtimeMs;
+const cssName = fs.readdirSync(bootstrapDir)
+  .filter((f) => /^bootstrap-.*\.min\.css$/.test(f))
+  .sort((a, b) => mtime(b) - mtime(a))[0];
 if (!cssName) throw new Error("no compiled bootstrap css in " + bootstrapDir);
 
 const scoped = postcss([
